@@ -1,5 +1,25 @@
-trigger: master
-- master
+resources:
+- repo: self
+
+pool:
+  vmImage: Hosted VS2017
 steps:
-  - script: build -target BuildServer
-  
+- task: ArchiveFiles@2
+  displayName: 'Archive output'
+  inputs:
+    rootFolderOrFile: output
+    includeRootFolder: false
+
+- task: AzureRmWebAppDeployment@4
+  displayName: 'Azure App Service Deploy: acrblog'
+  inputs:
+    azureSubscription: 'Visual Studio Enterprise (1574dd30-dfbf-4b36-b94d-2416fc2f07c3)'
+    WebAppName: acrblog
+    packageForLinux: '$(build.artifactstagingdirectory)/**/*.zip'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+
+
