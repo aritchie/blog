@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+	<channel>
+		<title>Allan Ritchie</title>
+		<link>http://allancritchie.net//</link>
+		<description>throw new NullReferenceException</description>
+		<copyright>2019</copyright>
+		<pubDate>Sat, 09 Feb 2019 18:22:34 GMT</pubDate>
+		<lastBuildDate>Sat, 09 Feb 2019 18:22:34 GMT</lastBuildDate>
+		<item>
+			<title>First Post</title>
+			<link>http://allancritchie.net//posts/first-post</link>
+			<description>&lt;p&gt;This is my first post!&lt;/p&gt;</description>
+			<guid>http://allancritchie.net//posts/first-post</guid>
+			<pubDate>Fri, 01 Jan 2016 00:00:00 GMT</pubDate>
+			<content:encoded>&lt;p&gt;This is my first post!&lt;/p&gt;
+</content:encoded>
+		</item>
+	</channel>
+</rss>

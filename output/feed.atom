@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<id>http://allancritchie.net//</id>
+	<title>Allan Ritchie</title>
+	<link rel="self" href="http://allancritchie.net//" />
+	<rights>2019</rights>
+	<updated>2019-02-09T18:22:34Z</updated>
+	<subtitle>throw new NullReferenceException</subtitle>
+	<entry>
+		<id>http://allancritchie.net//posts/first-post</id>
+		<title>First Post</title>
+		<link href="http://allancritchie.net//posts/first-post" />
+		<updated>2016-01-01T00:00:00Z</updated>
+		<content>&lt;p&gt;This is my first post!&lt;/p&gt;
+</content>
+		<summary>&lt;p&gt;This is my first post!&lt;/p&gt;</summary>
+	</entry>
+</feed>

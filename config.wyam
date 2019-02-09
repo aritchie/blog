@@ -1,0 +1,7 @@
+#recipe Blog
+
+Settings[Keys.Host] = "allancritchie.net/";
+Settings[BlogKeys.Title] = "Allan Ritchie";
+Settings[BlogKeys.Description] = "throw new NullReferenceException";
+
+// Add any pipeline customizations here
