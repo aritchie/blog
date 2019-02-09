@@ -1,0 +1,5 @@
+trigger: master
+- master
+steps:
+  - script: build -target BuildServer
+  

@@ -5,15 +5,16 @@
 		<link>http://allancritchie.net//</link>
 		<description>throw new NullReferenceException</description>
 		<copyright>2019</copyright>
-		<pubDate>Sat, 09 Feb 2019 18:22:34 GMT</pubDate>
-		<lastBuildDate>Sat, 09 Feb 2019 18:22:34 GMT</lastBuildDate>
+		<pubDate>Sat, 09 Feb 2019 19:17:43 GMT</pubDate>
+		<lastBuildDate>Sat, 09 Feb 2019 19:17:43 GMT</lastBuildDate>
 		<item>
-			<title>First Post</title>
-			<link>http://allancritchie.net//posts/first-post</link>
-			<description>&lt;p&gt;This is my first post!&lt;/p&gt;</description>
-			<guid>http://allancritchie.net//posts/first-post</guid>
-			<pubDate>Fri, 01 Jan 2016 00:00:00 GMT</pubDate>
-			<content:encoded>&lt;p&gt;This is my first post!&lt;/p&gt;
+			<title>My First Blog Post</title>
+			<link>http://allancritchie.net//posts/my-first-post</link>
+			<description>&lt;p&gt;So I've had people telling me for a while to start up a blog and seeing as though I'm almost finished a fairly large OSS project, I figured now was as good as time as any.&lt;/p&gt;</description>
+			<guid>http://allancritchie.net//posts/my-first-post</guid>
+			<pubDate>Sat, 09 Feb 2019 00:00:00 GMT</pubDate>
+			<content:encoded>&lt;p&gt;So I've had people telling me for a while to start up a blog and seeing as though I'm almost finished a fairly large OSS project, I figured now was as good as time as any.&lt;/p&gt;
+&lt;p&gt;More to come!&lt;/p&gt;
 </content:encoded>
 		</item>
 	</channel>

@@ -1,4 +1,5 @@
 #recipe Blog
+#t CleanBlog
 
 Settings[Keys.Host] = "allancritchie.net/";
 Settings[BlogKeys.Title] = "Allan Ritchie";
