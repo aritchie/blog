@@ -1,4 +1,5 @@
 Title: My First Blog Post
+Lead: I don't have anything to say yet!
 Published: 2/9/2019
 Tags:
     - Blog
