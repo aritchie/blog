@@ -16,7 +16,7 @@ Settings[Keys.LinksUseHttps] = true;
 Settings[Keys.Host] = "allancritchie.net/";
 Settings[BlogKeys.Title] = "Allan Ritchie";
 Settings[BlogKeys.Description] = "The personal blog of Allan Ritchie";
-Settings[BlogKeys.Intro] = "Software development evangelist - Lover of all things .NET!  Microsoft MVP - I also write a bunch of OSS stuffs";
+Settings[BlogKeys.Intro] = ".NET & OSS Enthusiast - Microsoft MVP - now 'await SomethingUseful();'";
 Settings[BlogKeys.Image] = "images/toronto_pan.jpg";
 
 // Add any pipeline customizations here
