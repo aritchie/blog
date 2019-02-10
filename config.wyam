@@ -1,9 +1,28 @@
 #recipe Blog
 #t CleanBlog
+//#n Wyam.Highlight
+//#n Wyam.GitHub
+//#n Wyam.Images
+//#n Wyam.Markdown
+
+// https://wyam.io/docs/usage/configuration
+// https://wyam.io/modules/highlight
+// https://wyam.io/modules/github
+// https://wyam.io/modules/image
+// https://wyam.io/modules/markdown
 
 Settings[Keys.LinksUseHttps] = true;
 Settings[Keys.Host] = "allancritchie.net/";
 Settings[BlogKeys.Title] = "Allan Ritchie";
 Settings[BlogKeys.Description] = "The personal blog of Allan Ritchie";
 Settings[BlogKeys.Intro] = "Software development evangelist - Lover of all things .NET!  Microsoft MVP - I also write a bunch of OSS stuffs";
+
+
 // Add any pipeline customizations here
+//Pipelines.Add("Highlight",
+//    ReadFiles("*.html"),
+//    Highlight(),
+//    WriteFiles(".html")
+//);
+
+//GitHub(string username, string password);
