@@ -1,10 +1,15 @@
 #recipe Blog
 //#t Stellar
 #t CleanBlog
+#n Wyam.Feeds
 //#n Wyam.Highlight
 //#n Wyam.GitHub
 //#n Wyam.Images
 //#n Wyam.Markdown
+#n Microsoft.SyndicationFeed.ReaderWriter -v 1.0.2
+
+using Microsoft.SyndicationFeed;
+using Microsoft.SyndicationFeed.Rss;
 
 // https://wyam.io/docs/usage/configuration
 // https://wyam.io/modules/highlight
@@ -27,3 +32,22 @@ Settings[BlogKeys.Image] = "images/toronto_pan.jpg";
 //);
 
 //GitHub(string username, string password);
+
+//https://github.com/daveaglick/discoverdotnet/blob/master/config.wyam
+//Pipelines.Add("Xamarin Rss",
+    //Documents("posts"),
+//    ReadFiles("posts/*.md"),
+//    Where((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Recent),
+    //OrderBy((doc, ctx) => doc.Get<FeedItem>("FeedItems").Published).Descending(),
+//    GenerateFeeds()
+ ///       .WithRssPath(_ => "xamarin.rss")
+   //     .WithFeedTitle(_ => "Allan Ritchie's Blog")
+     //   .WithFeedDescription(_ => "Xamarin Feed")
+        //.WithItemTitle((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Title)
+        //.WithItemDescription((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Description)
+        //.WithItemPublished((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Published.DateTime)
+        //.WithItemLink((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Link)
+        //.WithItemId((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Link)
+       // .WithItemImageLink((doc, ctx) => null),
+    //WriteFiles()
+//);
