@@ -1,8 +1,9 @@
-Title: Background Jobs Plugin for Xamarin
+Title: ACR Core Background Jobs
 Published: 2/10/2019
 Tags:
     - Xamarin
     - OSS
+    - ACR Core
 ---
 
 ## First Post

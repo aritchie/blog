@@ -1,10 +1,10 @@
-Title: Plugin.BluetoothLE Part 1 
-Lead: Getting Started with Plugin.BluetoothLE
+Title: ACR Core BluetoothLE Central 
 Published: 2/9/2019
 Tags:
     - Xamarin
     - BluetoothLE
     - OSS
+    - ACR Core
 ---
 Bluetooth (specifically LE) has been a big project of mine for some time.  The reason I like BLE so much is that it is the one protocol that just works on all platforms.  You don't need internet, you don't need any weird permission or to beg the user to do much beyond asking "can we use your bluetooth radio"?  
 
