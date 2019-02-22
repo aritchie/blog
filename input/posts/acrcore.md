@@ -5,7 +5,7 @@ Tags:
     - OSS
     - ACR Core
 ---
-<?# Include "acrcore-links.md" /?>
+<?# Include "/posts/acrcore-links.md" /?>
 
 ACR Core is a new OSS library that was built with the idea of making background operations easy in a cross platform way.  Initially, I am targeting Xamarin Android, Xamarin iOS & UWP platforms, but I've got my sights set on making it work on macOS, tizen, and possibly - Blazor & Meadow IoT in the near future.
 

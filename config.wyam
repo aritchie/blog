@@ -33,8 +33,8 @@ Pipelines.Add("XamarinRss",
         .WithItemAuthor((doc, ctx) => "Allan Ritchie")
         .WithItemDescription(@doc.String("Lead") ?? @doc.String("Title"))
         .WithItemPublished((doc, ctx) => doc.DateTime("Published"))
-        .WithItemLink((doc, ctx) => ctx.GetLink(doc, true) + ".html")
-        .WithItemId((doc, ctx) => ctx.GetLink(doc, true) + ".html")
+        .WithItemLink((doc, ctx) => ctx.GetLink(doc, true))
+        .WithItemId((doc, ctx) => ctx.GetLink(doc, true))
         .WithItemImageLink((doc, ctx) => null),
     WriteFiles()
 );

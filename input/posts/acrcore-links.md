@@ -1,3 +1,7 @@
+[![NuGet](https://img.shields.io/nuget/v/Acr.DeviceInfo.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.DeviceInfo/)
+[![Build status](https://dev.azure.com/allanritchie/Core/_apis/build/status/DeviceInfo)](https://dev.azure.com/allanritchie/Core/_build/latest?definitionId=0)
+
+
 [All ACR Core Topics](/tags/ACR-Core.html)
 [Introducing ACR Core](acrcore.html)
 [ACR Core Background Jobs](acrcore-jobs.html)
