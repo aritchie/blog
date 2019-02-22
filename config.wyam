@@ -6,48 +6,35 @@
 //#n Wyam.GitHub
 //#n Wyam.Images
 //#n Wyam.Markdown
-#n Microsoft.SyndicationFeed.ReaderWriter -v 1.0.2
 
-using Microsoft.SyndicationFeed;
-using Microsoft.SyndicationFeed.Rss;
-
-// https://wyam.io/docs/usage/configuration
-// https://wyam.io/modules/highlight
-// https://wyam.io/modules/github
-// https://wyam.io/modules/image
-// https://wyam.io/modules/markdown
+using System.Linq;
 
 Settings[Keys.LinksUseHttps] = true;
-Settings[Keys.Host] = "allancritchie.net/";
+Settings[Keys.Host] = "allancritchie.net";
 Settings[BlogKeys.Title] = "Allan Ritchie";
 Settings[BlogKeys.Description] = "The personal blog of Allan Ritchie";
 Settings[BlogKeys.Intro] = ".NET & OSS Enthusiast - Microsoft MVP - now 'await SomethingUseful();'";
 Settings[BlogKeys.Image] = "images/toronto_pan.jpg";
 
-// Add any pipeline customizations here
-//Pipelines.Add("Highlight",
-//    ReadFiles("*.html"),
-//    Highlight(),
-//    WriteFiles(".html")
-//);
 
-//GitHub(string username, string password);
-
-//https://github.com/daveaglick/discoverdotnet/blob/master/config.wyam
-//Pipelines.Add("Xamarin Rss",
-    //Documents("posts"),
-//    ReadFiles("posts/*.md"),
-//    Where((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Recent),
-    //OrderBy((doc, ctx) => doc.Get<FeedItem>("FeedItems").Published).Descending(),
-//    GenerateFeeds()
- ///       .WithRssPath(_ => "xamarin.rss")
-   //     .WithFeedTitle(_ => "Allan Ritchie's Blog")
-     //   .WithFeedDescription(_ => "Xamarin Feed")
-        //.WithItemTitle((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Title)
-        //.WithItemDescription((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Description)
-        //.WithItemPublished((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Published.DateTime)
-        //.WithItemLink((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Link)
-        //.WithItemId((doc, ctx) => doc.Get<FeedItemData>("FeedItems").Link)
-       // .WithItemImageLink((doc, ctx) => null),
-    //WriteFiles()
-//);
+Pipelines.Add("XamarinRss",
+    Documents("BlogPosts"),
+    FrontMatter(Yaml()),
+    OrderBy(@doc.Get<DateTime>("Published")),
+    Where((doc, ctx) => doc.Get<string[]>("Tags").Any(x => x.Equals("Xamarin"))),
+    Where(@doc.DateTime("Published") > DateTime.Now.AddMonths(-6)),
+    Where(@doc.Get<DateTime>("Published") < DateTime.Now),
+    GenerateFeeds()
+        .WithRssPath(_ => "xamarin.rss")
+        .WithAtomPath(_ => "xamarin.atom")
+        .WithFeedTitle(_ => "Allan Ritchie's Blog")
+        .WithFeedDescription(_ => "Xamarin Feed")
+        .WithItemTitle(@doc.Get<string>("Title"))
+        .WithItemAuthor((doc, ctx) => "Allan Ritchie")
+        .WithItemDescription(@doc.String("Lead") ?? @doc.String("Title"))
+        .WithItemPublished((doc, ctx) => doc.DateTime("Published"))
+        .WithItemLink((doc, ctx) => ctx.GetLink(doc, true) + ".html")
+        .WithItemId((doc, ctx) => ctx.GetLink(doc, true) + ".html")
+        .WithItemImageLink((doc, ctx) => null),
+    WriteFiles()
+);

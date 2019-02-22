@@ -6,9 +6,6 @@ Tags:
     - ACR Core
 ---
 
-## First Post
-Since this is my first post on my new blog, I thought I would start with one of my newest plugins!
-
 [Plugin.Jobs](https://github.com/aritchie/jobs) is a cross platform plugin for Xamarin (and yes... that UWP thing too).  Background jobs are an essential part of any mobile application whether you need to send a notification at a set period of time or the most common of all, synchronize data with a backend database.  I know this was one of the key reasons I decided to build this.
 
 Android has such a beautiful scheduled jobs engine that keeps improving.  iOS has zip mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 

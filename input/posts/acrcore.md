@@ -5,17 +5,7 @@ Tags:
     - OSS
     - ACR Core
 ---
-[All ACR Core Topics](/tags/ACR-Core.html)
-[Introducing ACR Core](acrcore.html)
-[ACR Core Background Jobs](acrcore-jobs.html)
-[ACR Core Geofencing & GPS](acrcore-locations.html)
-[ACR Core BluetoothLE Central](acrcore-ble-central.html)
-[ACR Core BluetoothLE Peripheral](acrcore-ble-peripheral.html)
-[ACR Core Notifications](acrcore-notifications.html)
-[ACR Core HTTP Uploads & Downloads](acrcore-http.html)
-[ACR Core Beacons](acrcore-beacons.html)
-[Integrating ACR Core with Prism](acrcore-prism.html)
-[Integrating ACR Core with ReactiveUI](acrcore-rxui.html)d
+<?# Include "acrcore-links.md" /?>
 
 ACR Core is a new OSS library that was built with the idea of making background operations easy in a cross platform way.  Initially, I am targeting Xamarin Android, Xamarin iOS & UWP platforms, but I've got my sights set on making it work on macOS, tizen, and possibly - Blazor & Meadow IoT in the near future.
 
