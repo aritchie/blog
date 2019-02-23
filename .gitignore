@@ -1,2 +1,6 @@
-# Remove output
+# wyam
 output/
+wwwroot/
+config.wyam.dll
+config.wyam.hash
+config.wyam.packages.xml
