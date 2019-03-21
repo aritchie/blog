@@ -68,7 +68,7 @@ Adhoc jobs are on-the-spot types of execution.  You need something to finish bef
 
 ```csharp
 // IJobManager can and should be injected into your viewmodel code
-CoreHost.Container.Resolve<Acr.Jobs.IJobManager>().RunTask(async () => 
+CoreHost.Resolve<Acr.Jobs.IJobManager>().RunTask(async () => 
 {
     // your code goes here - async stuff is welcome (and necessary)
 });
@@ -112,7 +112,7 @@ job.SetValue("Id", 10);
 
 
 // lastly, schedule it to go - don't worry about scheduling something more than once, we just update if your job name matches an existing one
-CoreHost.Container.Resolve<Acr.Jobs.IJobManager>().Schedule(job);
+CoreHost.Resolve<Acr.Jobs.IJobManager>().Schedule(job);
 ```
 
 ---

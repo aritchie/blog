@@ -14,7 +14,7 @@ Initially, I am targeting Xamarin Android, Xamarin iOS & UWP platforms, but I've
 
 
 Out of the box, CORE will offer:
-* A Centralized Hosting Platform
+* A Centralized Structured Hosting Platform
 * Environment (App & Device Information)
 * Logging
 * Connectivity
@@ -39,8 +39,7 @@ Well - to be fair, I've had most of these libraries before some of the other plu
 Current plugins also tend to lack features because they need an underlying layer to help keep things in check.  For instance, Plugin.Jobs (one of my plugins) spins up periodic jobs.  These jobs are essentially useless if you can't get your service layer into them in a consistent manner.  
 
 ## Main Objectives
-The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Core Samples](https://github.com/aritchie/core) to see Prism and Core working together
-
+The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Core Samples](https://github.com/aritchie/core) to see Prism and Core working together.
 
 ### Let's see it in action
 I know some people aren't a fan of dependency injection, but for background jobs, it truly is a necessity.  Some people don't want to figure out if their services are singleton, scoped, transient, let alone what the words mean, as such, I set out to make DI for required services as easy and "non-DI-ish" as humanly possible much like ASP.NET Core's new dependency injection.  In fact, we use the same Microsoft.Extensions.DependencyInjection
@@ -277,10 +276,11 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
 ```
 
 ### I Don't Like DI
-I'm sorry to hear that - but the recent resurgence of ASP.NET Core is due to smart & proven architectural patterns being brought to the forefront instead of an afterthought.  ASP.NET Core did a wonderful thing though, they did a really good job of hiding alot of the complexity that can come with things.
+I'm sorry to hear that - but the recent resurgence of ASP.NET Core is due to smart & proven architectural patterns being brought to the forefront instead of an afterthought.  ASP.NET Core did a wonderful thing though, they did a really good job of hiding alot of the complexity that can come with things.  I followed this model closely while building out the DI portion of Core.  In fact, if you do every thing by the books, you really won't ever see the DI container anywhere in your application!
 
 
-I'm sorry to hear that, but if you are building an app of any significant size or with multiple team members, dependency injection is very necessary.  Testability is also a big part.  That all being said, you can use Core in a service locator fashion
+### I Don't Like RX
+Ya - I hear that a lot too.  I love RX.  RX appears complex at first, but actually is amazing at taking hard things and making them easy once you know how to work with the observable.  For libraries like BluetoothLE & GATT, I don't see any better mechanism for doing this.
 
 ```csharp
 CoreHost.Resolve<IJobManager>().Schedule(...);
