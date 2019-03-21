@@ -1,5 +1,5 @@
 Title: Introducing ACR Core
-Published: 3/21/2019
+Published: 3/20/2019
 Tags:
     - Xamarin
     - OSS
