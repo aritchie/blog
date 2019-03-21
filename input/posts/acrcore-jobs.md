@@ -1,19 +1,19 @@
-Title: ACR Core Background Jobs
-Published: 2/10/2019
+Title: Background Jobs Using ACR Core
+Published: 3/21/2019
 Tags:
     - Xamarin
     - OSS
-    - ACR Core
+    - Core
 ---
 
-[Plugin.Jobs](https://github.com/aritchie/jobs) is a cross platform plugin for Xamarin (and yes... that UWP thing too).  Background jobs are an essential part of any mobile application whether you need to send a notification at a set period of time or the most common of all, synchronize data with a backend database.  I know this was one of the key reasons I decided to build this.
+Performing background jobs on mobile is a necessity these days whether you are synchronizing data with your background, triggering notifications to say happy birthday, or just tracking your user for every step they make.  With ACR Core, I set out to make this process a breeze.  Android has such a beautiful scheduled jobs engine that keeps improving.  iOS is painful mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
 
-Android has such a beautiful scheduled jobs engine that keeps improving.  iOS has zip mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
+Jobs is something that is built into the main ACR Core library as alot of what it does is the center point of the library and a lot of things will be built on it in the near future :)
 
 ---
 ## Getting Setup
 
-Obviously, first things first - install the [NuGet](https://www.nuget.org/packages/Plugin.Jobs/) package 
+Obviously, first things first - install the [NuGet](https://www.nuget.org/packages/ACR.Core/) package 
 
 ### Android
 Add the following to your AndroidManifest.xml
@@ -24,9 +24,18 @@ Add the following to your AndroidManifest.xml
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 ```
 
-In your Main/Launch Activity.OnCreate - add the following
+You need to have an actual Application class in your android project.  You can do this two ways:
 ```csharp
-Plugin.Jobs.CrossJobs.Init(this, savedInstanceState);
+[Application]
+public class YourApplication : Application
+{
+    public override void OnCreate()
+    {
+        base.OnCreate();
+        CoreAndroidHost.Init(this, new Startup());
+    }
+}
+
 ```
 
 ### iOS
@@ -36,12 +45,12 @@ To get iOS going, you have to wire the following into your AppDelegate:
 
 ```csharp
 // in your FinishedLaunching method
-Plugin.Jobs.CrossJobs.Init();
+CoreIosHost.Init(new Startup());
 
 // and add this guy
 public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
 {
-    Plugin.Jobs.CrossJobs.OnBackgroundFetch(completionHandler);
+    CoreIosHost.OnBackgroundFetch(completionHandler);
 }
 ```
 
@@ -58,7 +67,8 @@ And for your Info.plist
 Adhoc jobs are on-the-spot types of execution.  You need something to finish before your app takes a dirt nap... this is the guy to call:
 
 ```csharp
-CrossJobs.Current.RunTask(async () => 
+// IJobManager can and should be injected into your viewmodel code
+CoreHost.Container.Resolve<Acr.Jobs.IJobManager>().RunTask(async () => 
 {
     // your code goes here - async stuff is welcome (and necessary)
 });
@@ -69,9 +79,9 @@ CrossJobs.Current.RunTask(async () =>
 Scheduled jobs are the real meat though.  These are really what you need to make things happen when your app is backgrounded or needs to do something with some degree of regularity.  Don't go crazy, you still only get a finite amount of time to work with.  On iOS, this is 30 seconds and not a drop more.
 
 
-So first things first, let's build a job.  Building a job is as simple as implementing Plugin.Jobs.IJob.
+So first things first, let's build a job.  Building a job is as simple as implementing Acr.Jobs.IJob.
 ```csharp
-public class YourFirstJob : Plugin.Jobs.IJob
+public class YourFirstJob : Acr.Jobs.IJob
 {
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
@@ -102,7 +112,7 @@ job.SetValue("Id", 10);
 
 
 // lastly, schedule it to go - don't worry about scheduling something more than once, we just update if your job name matches an existing one
-CrossJobs.Current.Schedule(job);
+CoreHost.Container.Resolve<Acr.Jobs.IJobManager>().Schedule(job);
 ```
 
 ---
@@ -111,10 +121,10 @@ When your user logs out, you likely don't need to keep sucking away at their bat
 
 ```csharp
 // Cancelling A Job
-CrossJobs.Current.Cancel("YourJobName");
+CoreHost.Resolve<Acr.Jobs.IJobManager>().Cancel("YourJobName");
 
 // Cancelling All Jobs
-CrossJobs.Current.CancelAll();
+CoreHost.Resolve<Acr.Jobs.IJobManager>().CancelAll();
 ```
 
 ---
@@ -123,17 +133,18 @@ Unlike adhoc jobs, this is designed to run your registered job(s) when you need 
 
 ```csharp
 // Run All Jobs On-Demand
-var results = await CrossJobs.Current.RunAll();
+var results = await CoreHost.Resolve<Acr.Jobs.IJobManager>().RunAll();
 
 // Run A Specific Job On-Demand
-var result = await CrossJobs.Current.Run("YourJobName");
+var result = await CoreHost.Resolve<Acr.Jobs.IJobManager>().Run("YourJobName");
 ```
 NOTE: you can see the result(s) of a job pass by taking a look at the result object!
 
 ---
 ## Dependency Injection
-You don't like all this static junk... GOOD ON YA because neither do I!!  This is a topic for another time though.  There is more indepth documentation on this on [GitHub](https://github.com/aritchie/jobs).
+You don't like all this static junk... GOOD ON YA because neither do I!!  This is a topic for another time though.  There is more indepth documentation on this on [GitHub](https://github.com/aritchie/core).
 
 ## Links
-* [GitHub](https://github.com/aritchie/jobs) - Includes samples & the code itself
-* [![NuGet](https://img.shields.io/nuget/v/Plugin.Jobs.svg?maxAge=2592000)](https://www.nuget.org/packages/Plugin.Jobs/)
+* [GitHub](https://github.com/aritchie/core) - Includes samples & the code itself
+* [Documentation](/docs)
+* [![NuGet](https://img.shields.io/nuget/v/Acr.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.Core/)
