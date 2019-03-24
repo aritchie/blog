@@ -3,12 +3,12 @@ Published: 3/21/2019
 Tags:
     - Xamarin
     - OSS
-    - Core
+    - Shiny
 ---
 
-Performing background jobs on mobile is a necessity these days whether you are synchronizing data with your background, triggering notifications to say happy birthday, or just tracking your user for every step they make.  With ACR Core, I set out to make this process a breeze.  Android has such a beautiful scheduled jobs engine that keeps improving.  iOS is painful mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
+Performing background jobs on mobile is a necessity these days whether you are synchronizing data with your background, triggering notifications to say happy birthday, or just tracking your user for every step they make.  With Shiny, I set out to make this process a breeze.  Android has such a beautiful scheduled jobs engine that keeps improving.  iOS is painful mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
 
-Jobs is something that is built into the main ACR Core library as alot of what it does is the center point of the library and a lot of things will be built on it in the near future :)
+Jobs is something that is built into the main Shiny library as alot of what it does is the center point of the library and a lot of things will be built on it in the near future :)
 
 ---
 ## Getting Setup
@@ -32,7 +32,7 @@ public class YourApplication : Application
     public override void OnCreate()
     {
         base.OnCreate();
-        CoreAndroidHost.Init(this, new Startup());
+        AndroidShinyHost.Init(this, new Startup());
     }
 }
 
@@ -45,12 +45,12 @@ To get iOS going, you have to wire the following into your AppDelegate:
 
 ```csharp
 // in your FinishedLaunching method
-CoreIosHost.Init(new Startup());
+IosShinyHost.Init(new Startup());
 
 // and add this guy
 public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
 {
-    CoreIosHost.OnBackgroundFetch(completionHandler);
+    IosShinyHost.OnBackgroundFetch(completionHandler);
 }
 ```
 
@@ -68,7 +68,7 @@ Adhoc jobs are on-the-spot types of execution.  You need something to finish bef
 
 ```csharp
 // IJobManager can and should be injected into your viewmodel code
-CoreHost.Resolve<Acr.Jobs.IJobManager>().RunTask(async () => 
+ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunTask(async () => 
 {
     // your code goes here - async stuff is welcome (and necessary)
 });
@@ -81,7 +81,7 @@ Scheduled jobs are the real meat though.  These are really what you need to make
 
 So first things first, let's build a job.  Building a job is as simple as implementing Acr.Jobs.IJob.
 ```csharp
-public class YourFirstJob : Acr.Jobs.IJob
+public class YourFirstJob : Shiny.Jobs.IJob
 {
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
@@ -112,7 +112,7 @@ job.SetValue("Id", 10);
 
 
 // lastly, schedule it to go - don't worry about scheduling something more than once, we just update if your job name matches an existing one
-CoreHost.Resolve<Acr.Jobs.IJobManager>().Schedule(job);
+ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Schedule(job);
 ```
 
 ---
@@ -121,10 +121,10 @@ When your user logs out, you likely don't need to keep sucking away at their bat
 
 ```csharp
 // Cancelling A Job
-CoreHost.Resolve<Acr.Jobs.IJobManager>().Cancel("YourJobName");
+ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Cancel("YourJobName");
 
 // Cancelling All Jobs
-CoreHost.Resolve<Acr.Jobs.IJobManager>().CancelAll();
+ShinyHost.Resolve<Shiny.Jobs.IJobManager>().CancelAll();
 ```
 
 ---
@@ -133,18 +133,18 @@ Unlike adhoc jobs, this is designed to run your registered job(s) when you need 
 
 ```csharp
 // Run All Jobs On-Demand
-var results = await CoreHost.Resolve<Acr.Jobs.IJobManager>().RunAll();
+var results = await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunAll();
 
 // Run A Specific Job On-Demand
-var result = await CoreHost.Resolve<Acr.Jobs.IJobManager>().Run("YourJobName");
+var result = await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Run("YourJobName");
 ```
 NOTE: you can see the result(s) of a job pass by taking a look at the result object!
 
 ---
 ## Dependency Injection
-You don't like all this static junk... GOOD ON YA because neither do I!!  This is a topic for another time though.  There is more indepth documentation on this on [GitHub](https://github.com/aritchie/core).
+You don't like all this static junk... GOOD ON YA because neither do I!!  This is a topic for another time though.  There is more indepth documentation on this on [GitHub](https://github.com/shinyorg/shiny).
 
 ## Links
-* [GitHub](https://github.com/aritchie/core) - Includes samples & the code itself
+* [GitHub](https://github.com/aritchie/introducingshiny) - Includes samples & the code itself
 * [Documentation](/docs)
-* [![NuGet](https://img.shields.io/nuget/v/Acr.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.Core/)
+* [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.Core/)

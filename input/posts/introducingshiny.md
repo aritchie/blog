@@ -1,14 +1,14 @@
-Title: Introducing ACR Core
+Title: Introducing Shiny
 Published: 3/20/2019
 Tags:
     - Xamarin
     - OSS
-    - Core
+    - Shiny
 ---
 
 ### What is it?
 
-ACR Core is a new OSS library that was built with the idea of making background operations easy in a cross platform way.  At its "core", it contains a lot of the same functionality as Xamarin Essentials, but was built with dependency injection and RX in mind.  Dependency injection is a very necessary set of principles for building testable services, but for background processes, it is absolutely essential as I'll show in future articles.
+Shiny is a new OSS library that was built with the idea of making background operations easy in a cross platform way.  At its "core", it contains a lot of the same functionality as Xamarin Essentials, but was built with dependency injection and RX in mind.  Dependency injection is a very necessary set of principles for building testable services, but for background processes, it is absolutely essential as I'll show in future articles.
 
 Initially, I am targeting Xamarin Android, Xamarin iOS & UWP platforms, but I've got my sights set on making it work on macOS, Tizen, and possibly - Blazor & Meadow IoT in the near future.
 
@@ -39,7 +39,7 @@ Well - to be fair, I've had most of these libraries before some of the other plu
 Current plugins also tend to lack features because they need an underlying layer to help keep things in check.  For instance, Plugin.Jobs (one of my plugins) spins up periodic jobs.  These jobs are essentially useless if you can't get your service layer into them in a consistent manner.  
 
 ## Main Objectives
-The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Core Samples](https://github.com/aritchie/core) to see Prism and Core working together.
+The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Shiny Samples](https://github.com/shinyorg/sjomu) to see Prism and Shiny working together.
 
 ### Let's see it in action
 I know some people aren't a fan of dependency injection, but for background jobs, it truly is a necessity.  Some people don't want to figure out if their services are singleton, scoped, transient, let alone what the words mean, as such, I set out to make DI for required services as easy and "non-DI-ish" as humanly possible much like ASP.NET Core's new dependency injection.  In fact, we use the same Microsoft.Extensions.DependencyInjection
@@ -49,15 +49,15 @@ Step 2 - In your xplat project, create
 Step 3 - Create your "Startup" class
 ```csharp
 // this sample uses everything imaginable in Core - YOU DO NOT NEED IT ALL
-using Acr;
-using Acr.BluetoothLE;
-using Acr.Beacons;
-using Acr.Logging;
-using Acr.Locations;
-using Acr.Notifications;
-using Acr.Sensors;
-using Acr.SpeechRecognition;
-using Acr.Net.Http;
+using Shiny;
+using Shiny.BluetoothLE;
+using Shiny.Beacons;
+using Shiny.Logging;
+using Shiny.Locations;
+using Shiny.Notifications;
+using Shiny.Sensors;
+using Shiny.SpeechRecognition;
+using Shiny.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -106,13 +106,13 @@ Notice those "SampleDelegate" generics above, that's where you register your bac
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Acr;
-using Acr.Beacons;
-using Acr.BluetoothLE.Central;
-using Acr.Locations;
-using Acr.Jobs;
-using Acr.Net.Http;
-using Acr.Notifications;
+using Shiny;
+using Shiny.Beacons;
+using Shiny.BluetoothLE.Central;
+using Shiny.Locations;
+using Shiny.Jobs;
+using Shiny.Net.Http;
+using Shiny.Notifications;
 using Samples.Models;
 
 
@@ -229,14 +229,14 @@ namespace Samples
 iOS is pretty easy - GO to AppDelegate and add the following stuff
 ```csharp
 // in your FinishedLaunching method
-CoreIosHost.Init(new Startup(), services => 
+IosShinyHost.Init(new Startup(), services => 
 {
     // register any platform specific stuff you need here
 });
 
 // and add this guy - if you don't use jobs, you won't need it
 public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-    => CoreIosHost.OnBackgroundFetch(completionHandler);
+    => IosShinyHost.OnBackgroundFetch(completionHandler);
 
 ```
 
@@ -246,7 +246,7 @@ Android requires a fair bit more setup to get going.  Android requires a top lev
 
 ```csharp
 using System;
-using Acr;
+using Shiny;
 using Android.App;
 using Android.Runtime;
 
@@ -262,7 +262,7 @@ public class YourApplication : Application
     public override void OnCreate()
     {
         base.OnCreate();
-        CoreAndroidHost.Init(new Startup(), services => {
+        AndroidShinyHost.Init(new Startup(), services => {
             // register any platform specific stuff you need here
         });
     }
@@ -272,7 +272,7 @@ public class YourApplication : Application
 // and lastly - in your main/current activity
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-    => CoreAndroidHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 ```
 
 ### I Don't Like DI
@@ -283,11 +283,11 @@ I'm sorry to hear that - but the recent resurgence of ASP.NET Core is due to sma
 Ya - I hear that a lot too.  I love RX.  RX appears complex at first, but actually is amazing at taking hard things and making them easy once you know how to work with the observable.  For libraries like BluetoothLE & GATT, I don't see any better mechanism for doing this.
 
 ```csharp
-CoreHost.Resolve<IJobManager>().Schedule(...);
-CoreHost.Resolve<IGeofenceManager>().Add(...);
+ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Schedule(...);
+ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>().Add(...);
 ```
 
 ### Like What You See?
-Head over to see the full [GitHub Samples](https://github.com/aritchie/core) or official documentation located [here](/docs).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
+Head over to see the full [GitHub Samples](https://github.com/shinyorg/shiny) or official documentation located [here](/docs).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
 
-Follow the [links here](/tags/core) for more upcoming articles
+Follow the [links here](/tags/shiny) for more upcoming articles
