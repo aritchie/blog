@@ -78,14 +78,23 @@ ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunTask(async () =>
 ## Scheduled Jobs
 Scheduled jobs are the real meat though.  These are really what you need to make things happen when your app is backgrounded or needs to do something with some degree of regularity.  Don't go crazy, you still only get a finite amount of time to work with.  On iOS, this is 30 seconds and not a drop more.
 
+Note that jobs support injecting your dependencies if they are registered within the Shiny Startup
 
 So first things first, let's build a job.  Building a job is as simple as implementing Acr.Jobs.IJob.
 ```csharp
 public class YourFirstJob : Shiny.Jobs.IJob
 {
+    readonly IYourDepdendency depdency;
+    public YourFirstJob(IYourDependency dependency)
+    {
+        this.dependency = dependency;
+    }
+
+
     public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
         var id = jobInfo.GetValue("Id", 25); // we'll cover this in a minute
+        await this.dependency.SomeAsyncMethod(id);
     }
 }
 
@@ -141,10 +150,8 @@ var result = await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Run("YourJobName"
 NOTE: you can see the result(s) of a job pass by taking a look at the result object!
 
 ---
-## Dependency Injection
-You don't like all this static junk... GOOD ON YA because neither do I!!  This is a topic for another time though.  There is more indepth documentation on this on [GitHub](https://github.com/shinyorg/shiny).
 
 ## Links
-* [GitHub](https://github.com/aritchie/introducingshiny) - Includes samples & the code itself
-* [Documentation](/docs)
-* [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.Core/)
+* [GitHub](https://github.com/shinyorg/shiny) - Includes samples & the code itself
+* [Documentation](https://shinydocs.azurewebsites.net)
+* [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)

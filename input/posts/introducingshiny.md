@@ -39,7 +39,7 @@ Well - to be fair, I've had most of these libraries before some of the other plu
 Current plugins also tend to lack features because they need an underlying layer to help keep things in check.  For instance, Plugin.Jobs (one of my plugins) spins up periodic jobs.  These jobs are essentially useless if you can't get your service layer into them in a consistent manner.  
 
 ## Main Objectives
-The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Shiny Samples](https://github.com/shinyorg/sjomu) to see Prism and Shiny working together.
+The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to be something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Shiny Samples](https://github.com/shinyorg/shiny) to see Prism and Shiny working together.
 
 ### Let's see it in action
 I know some people aren't a fan of dependency injection, but for background jobs, it truly is a necessity.  Some people don't want to figure out if their services are singleton, scoped, transient, let alone what the words mean, as such, I set out to make DI for required services as easy and "non-DI-ish" as humanly possible much like ASP.NET Core's new dependency injection.  In fact, we use the same Microsoft.Extensions.DependencyInjection
@@ -288,6 +288,6 @@ ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>().Add(...);
 ```
 
 ### Like What You See?
-Head over to see the full [GitHub Samples](https://github.com/shinyorg/shiny) or official documentation located [here](/docs).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
+Head over to see the full [GitHub Samples](https://github.com/shinyorg/shiny) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
 
 Follow the [links here](/tags/shiny) for more upcoming articles
