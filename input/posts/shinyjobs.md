@@ -1,4 +1,4 @@
-Title: Background Jobs Using ACR Core
+Title: Background Jobs Using Shiny
 Published: 3/21/2019
 Tags:
     - Xamarin
@@ -13,7 +13,7 @@ Jobs is something that is built into the main Shiny library as alot of what it d
 ---
 ## Getting Setup
 
-Obviously, first things first - install the [NuGet](https://www.nuget.org/packages/ACR.Core/) package 
+Obviously, first things first - install the [NuGet](https://www.nuget.org/packages/Shiny/) package 
 
 ### Android
 Add the following to your AndroidManifest.xml
