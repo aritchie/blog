@@ -8,12 +8,11 @@ Tags:
 
 ### What is it?
 
-Shiny is a new OSS library that was built with the idea of making background operations easy in a cross platform way.  At its "core", it contains a lot of the same functionality as Xamarin Essentials, but was built with dependency injection and RX in mind.  Dependency injection is a very necessary set of principles for building testable services, but for background processes, it is absolutely essential as I'll show in future articles.
-
-Initially, I am targeting Xamarin Android, Xamarin iOS & UWP platforms, but I've got my sights set on making it work on macOS, Tizen, and possibly - Blazor & Meadow IoT in the near future.
+Introducing Shiny - a new OSS library that was built with the idea of making background operations easy in a cross platform way for Xamarin and over time, the rest of .NET.  I wrote this because I saw developers making the same consistent mistakes or writing a whole ton of code on mobile platforms, just to get simple background operations working.  The code often had different bugs on different platforms.  I found myself often not writing things in a consistent fashion as well.  My plugin code often had background needs for bluetoothLE and GPS, but I always found myself reaching for some other tools to pull things together so the plugins kept getting too large.  I needed to get this standardized so I could use things like dependency injection properly and additional device services.
 
 
-Out of the box, CORE will offer:
+
+Out of the box, Shiny will offer:
 * A Centralized Structured Hosting Platform
 * Environment (App & Device Information)
 * Logging
@@ -39,7 +38,7 @@ Well - to be fair, I've had most of these libraries before some of the other plu
 Current plugins also tend to lack features because they need an underlying layer to help keep things in check.  For instance, Plugin.Jobs (one of my plugins) spins up periodic jobs.  These jobs are essentially useless if you can't get your service layer into them in a consistent manner.  
 
 ## Main Objectives
-The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to be something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Shiny Samples](https://github.com/shinyorg/shiny) to see Prism and Shiny working together.
+The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to be something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Shiny Samples](https://github.com/shinyorg/shiny) to see Prism and Shiny working together.  Backgrounding on iOS is reasonably easy, but on Android - it can be painful.  I wanted to close this gap in a single, one stop solution.
 
 ### Let's see it in action
 I know some people aren't a fan of dependency injection, but for background jobs, it truly is a necessity.  Some people don't want to figure out if their services are singleton, scoped, transient, let alone what the words mean, as such, I set out to make DI for required services as easy and "non-DI-ish" as humanly possible much like ASP.NET Core's new dependency injection.  In fact, we use the same Microsoft.Extensions.DependencyInjection
@@ -149,55 +148,16 @@ namespace Samples
 
         public async void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
         {
-            await this.conn.InsertAsync(new GeofenceEvent
-            {
-                Identifier = region.Identifier,
-                Entered = newStatus == GeofenceState.Entered,
-                Date = DateTime.UtcNow
-            });
-            await this.notifications.Send(new Notification
-            {
-                Title = "Geofences",
-                Message = $"{region.Identifier} was {newStatus}"
-            });
         }
 
 
         public async void OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
         {
-            await this.conn.InsertAsync(new BeaconEvent
-            {
-                Identifier = region.Identifier,
-                Uuid = region.Uuid,
-                Major = region.Major,
-                Minor = region.Minor,
-                Entered = newStatus == BeaconRegionState.Entered,
-                Date = DateTime.UtcNow
-            });
         }
 
 
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            await this.notifications.Send(new Notification
-            {
-                Title = "Job Started",
-                Message = $"{jobInfo.Identifier} started"
-            });
-
-            var loops = jobInfo.Parameters.Get("Loops", 10);
-            for (var i = 0; i < loops; i++)
-            {
-                if (cancelToken.IsCancellationRequested)
-                    break;
-
-                await Task.Delay(1000, cancelToken).ConfigureAwait(false);
-            }
-            await this.notifications.Send(new Notification
-            {
-                Title = "Job Finished",
-                Message = $"{jobInfo.Identifier} Finished"
-            });
         }
 
 
@@ -208,17 +168,6 @@ namespace Samples
 
         public async void OnReading(IGpsReading reading)
         {
-            await this.conn.InsertAsync(new GpsEvent
-            {
-                Latitude = reading.Position.Latitude,
-                Longitude = reading.Position.Longitude,
-                Altitude = reading.Altitude,
-                PositionAccuracy = reading.PositionAccuracy,
-                Heading = reading.Heading,
-                HeadingAccuracy = reading.HeadingAccuracy,
-                Speed = reading.Speed,
-                Date = reading.Timestamp
-            });
         }
     }
 }
@@ -276,7 +225,7 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
 ```
 
 ### I Don't Like DI
-I'm sorry to hear that - but the recent resurgence of ASP.NET Core is due to smart & proven architectural patterns being brought to the forefront instead of an afterthought.  ASP.NET Core did a wonderful thing though, they did a really good job of hiding alot of the complexity that can come with things.  I followed this model closely while building out the DI portion of Core.  In fact, if you do every thing by the books, you really won't ever see the DI container anywhere in your application!
+I'm sorry to hear that - but the recent resurgence of ASP.NET Core is due to smart & proven architectural patterns being brought to the forefront instead of an afterthought.  ASP.NET Core did a wonderful thing though, they did a really good job of hiding alot of the complexity that can come with things.  I followed this model closely while building out the DI portion of Core.  In fact, if you do every thing by the books, you really won't ever see the DI container anywhere in your application! 
 
 
 ### I Don't Like RX
