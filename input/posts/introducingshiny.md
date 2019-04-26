@@ -7,13 +7,16 @@ Tags:
 ---
 
 ### What is it?
+Ever wanted to write a backgrounding experience that is consistent across all of the .NET platforms you work with.  Between Xamarin Android, Xamarin iOS, and the Universal Windows Platform (UWP) - there are a variety of issues that I've seen commonly occuring that makes this difficult.  As .NET developers, we often want our dependency injection, are async/awaits, and are general way of doing things in our ecosystem.  The mobile platforms really flipped us on our head.  Android has services & broadcast receivers, iOS has too many different ways of coming at backgrounding, and UWP is somewhere in between.
 
-Introducing Shiny - a new OSS library that was built with the idea of making background operations easy in a cross platform way for Xamarin and over time, the rest of .NET.  I wrote this because I saw developers making the same consistent mistakes or writing a whole ton of code on mobile platforms, just to get simple background operations working.  The code often had different bugs on different platforms.  I found myself often not writing things in a consistent fashion as well.  My plugin code often had background needs for bluetoothLE and GPS, but I always found myself reaching for some other tools to pull things together so the plugins kept getting too large.  I needed to get this standardized so I could use things like dependency injection properly and additional device services.
+There have been several plugins over time to help combat this problem, but all fail at some point because they lack the necessary infrastructure to bring it all together.  I have seen developers frequently fight this issue with things like BluetoothLE, GPS, Geofencing, background synchronization, etc.  Making this code testable is even harder and often painful to work with.  
+
+<img src="images/shiny_logo.png" width="100" /> Enter [Shiny](https://github.com/shinyorg/shiny) - a new framework that tackles problems that no other framework currently tackles - backgrounding and device hardware with all the bells and whistles you are use to in the .NET ecosystem.  Shiny was built on the premise of making depenendency injection and cross platform backgrounding a consistent & testable experience. 
 
 
 
 Out of the box, Shiny will offer:
-* A Centralized Structured Hosting Platform
+* A Centralized Hosting Platform
 * Environment (App & Device Information)
 * Logging
 * Connectivity
@@ -37,12 +40,13 @@ Well - to be fair, I've had most of these libraries before some of the other plu
 
 Current plugins also tend to lack features because they need an underlying layer to help keep things in check.  For instance, Plugin.Jobs (one of my plugins) spins up periodic jobs.  These jobs are essentially useless if you can't get your service layer into them in a consistent manner.  
 
-## Main Objectives
-The Xamarin Ecosystem has plenty of plugins, frameworks, & libraries.  There are great frameworks like Prism that help drive structured UI applications.  This framework set out to be something no other Xamarin framework is doing, bring structure to your device service code from a backgrounding perspective.  However, we still need to be able to feed our services (GPS Manager, etc) into the general ecosystem like Prism.  Take a look at the [Shiny Samples](https://github.com/shinyorg/shiny) to see Prism and Shiny working together.  Backgrounding on iOS is reasonably easy, but on Android - it can be painful.  I wanted to close this gap in a single, one stop solution.
+## Interoperability
+Because Shiny sits a bit higher in the execution pipeline (before Xamarin Forms gets going for example), it has its own set of registration principles and bootstrapping.  However, I wanted to play nice with Xamarin Forms & great frameworks like MvvmCross and Prism (shoot to Dan & Brian - you guys are awesome)!  There are already mechanisms to help these frameworks play nice out of the box from Day 1, but there is a roadmap to make this experience nearly seemless in the near future.  
+
+### At It's Core
+Shiny was built with Reactive Extensions (RX) and Microsoft Extension (DI) out of the box.  The Microsoft.Extensions.DependencyInjection had the greatest balance of speed, flexibility, and forward thinking support.  Reactive Extensions brings a different paradigm of programming which is often seen as complex.  I choose to embrace it because all other ecosystems embrace it fully (RXJS, Flutter, Java, etc).  I argue that RX isn't complex, it is powerful.  Shiny wants to offer that power at its roots!  As for dependency injection, it often has the same set of arguments and that it is slow.  For backgrounding, DI is extremely POWERFUL and gives you your infrastructure & business logic where you need it.  It also makes your code testable!
 
 ### Let's see it in action
-I know some people aren't a fan of dependency injection, but for background jobs, it truly is a necessity.  Some people don't want to figure out if their services are singleton, scoped, transient, let alone what the words mean, as such, I set out to make DI for required services as easy and "non-DI-ish" as humanly possible much like ASP.NET Core's new dependency injection.  In fact, we use the same Microsoft.Extensions.DependencyInjection
-
 Step 1 - Install from nuget (given)
 Step 2 - In your xplat project, create 
 Step 3 - Create your "Startup" class
@@ -146,17 +150,17 @@ namespace Samples
         }
 
 
-        public async void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
+        public void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
         {
         }
 
 
-        public async void OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
+        public void OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
         {
         }
 
 
-        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
         }
 
@@ -166,7 +170,7 @@ namespace Samples
         }
 
 
-        public async void OnReading(IGpsReading reading)
+        public void OnReading(IGpsReading reading)
         {
         }
     }
@@ -178,14 +182,14 @@ namespace Samples
 iOS is pretty easy - GO to AppDelegate and add the following stuff
 ```csharp
 // in your FinishedLaunching method
-IosShinyHost.Init(new Startup(), services => 
+iOSShinyHost.Init(new Startup(), services => 
 {
     // register any platform specific stuff you need here
 });
 
 // and add this guy - if you don't use jobs, you won't need it
 public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-    => IosShinyHost.OnBackgroundFetch(completionHandler);
+    => JobManager.OnBackgroundFetch(completionHandler);
 
 ```
 
@@ -224,19 +228,7 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
     => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 ```
 
-### I Don't Like DI
-I'm sorry to hear that - but the recent resurgence of ASP.NET Core is due to smart & proven architectural patterns being brought to the forefront instead of an afterthought.  ASP.NET Core did a wonderful thing though, they did a really good job of hiding alot of the complexity that can come with things.  I followed this model closely while building out the DI portion of Core.  In fact, if you do every thing by the books, you really won't ever see the DI container anywhere in your application! 
-
-
-### I Don't Like RX
-Ya - I hear that a lot too.  I love RX.  RX appears complex at first, but actually is amazing at taking hard things and making them easy once you know how to work with the observable.  For libraries like BluetoothLE & GATT, I don't see any better mechanism for doing this.
-
-```csharp
-ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Schedule(...);
-ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>().Add(...);
-```
-
 ### Like What You See?
-Head over to see the full [GitHub Samples](https://github.com/shinyorg/shiny) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
+Head over to see the full [GitHub Samples](https://github.com/shinyorg/shinysamples) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
 
 Follow the [links here](/tags/shiny) for more upcoming articles

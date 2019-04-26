@@ -6,7 +6,7 @@ Tags:
     - Shiny
 ---
 
-Performing background jobs on mobile is a necessity these days whether you are synchronizing data with your background, triggering notifications to say happy birthday, or just tracking your user for every step they make.  With Shiny, I set out to make this process a breeze.  Android has such a beautiful scheduled jobs engine that keeps improving.  iOS is painful mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
+<img src="images/shiny_logo.png" width="100" /> Performing background jobs on mobile is a necessity these days whether you are synchronizing data with your background, triggering notifications to say happy birthday, or just tracking your user for every step they make.  With Shiny, I set out to make this process a breeze.  Android has such a beautiful scheduled jobs engine that keeps improving.  iOS is painful mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lacks some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
 
 Jobs is something that is built into the main Shiny library as alot of what it does is the center point of the library and a lot of things will be built on it in the near future :)
 
@@ -150,6 +150,9 @@ var result = await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Run("YourJobName"
 NOTE: you can see the result(s) of a job pass by taking a look at the result object!
 
 ---
+
+## IOS - Be Prepared
+iOS is not "periodic" in the sense that you can rely on it to run every X mins.  In fact, it is quite intelligent about when/how it runs.  Do remember, you are piggybacking on "background fetch", so you really need to do some sort of remote data call if you don't want to aggrevate the apple gods that be.
 
 ## Links
 * [GitHub](https://github.com/shinyorg/shiny) - Includes samples & the code itself

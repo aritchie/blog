@@ -5,7 +5,7 @@ Tags:
     - OSS
     - Shiny
 ---
-I know - Preferences & Settings are a dime a dozen these days, but I'm such a big advocated of decoupled software that I had to do things differently.
+<img src="images/shiny_logo.png" width="100" /> I know - Preferences & Settings are a dime a dozen these days, but I'm such a big advocated of decoupled software that I had to do things differently.
 
 You've probably seen code similar to this before:
 ```csharp
