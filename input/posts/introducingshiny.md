@@ -1,10 +1,13 @@
 Title: Introducing Shiny
-Published: 3/20/2019
+Image: images/shiny_logo.png
+Published: 5/1/2019
 Tags:
     - Xamarin
     - OSS
     - Shiny
 ---
+
+<img src="images/shiny_logo.png" width="100" /> 
 
 ### What is it?
 Ever wanted to write a backgrounding experience that is consistent across all of the .NET platforms you work with.  Between Xamarin Android, Xamarin iOS, and the Universal Windows Platform (UWP) - there are a variety of issues that I've seen commonly occuring that makes this difficult.  As .NET developers, we often want our dependency injection, are async/awaits, and are general way of doing things in our ecosystem.  The mobile platforms really flipped us on our head.  Android has services & broadcast receivers, iOS has too many different ways of coming at backgrounding, and UWP is somewhere in between.
