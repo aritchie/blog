@@ -1,9 +1,9 @@
-Title: ACR Core BluetoothLE Peripheral
+Title: BluetoothLE Peripheral Mode Shiny Style
 Published: 2/9/2019
 Tags:
     - Xamarin
     - BluetoothLE
     - OSS
-    - ACR Core
+    - Shiny
 ---
 TODO

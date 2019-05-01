@@ -1,4 +1,4 @@
-Title: Startup Tasks with Shiny
+Title: Startup Tasks - Shiny Style
 Published: 1/1/2020
 Tags:
     - Xamarin
@@ -11,3 +11,6 @@ Startup tasks in Shiny are similar to IStartable's in Autofac if you've ever use
 ## How do startup tasks differ from a job?
 
 ## How do I make one?
+
+## Careful!!
+These things should execute very quickly as you will pay a startup cost otherwise

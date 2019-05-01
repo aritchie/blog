@@ -1,10 +1,10 @@
-Title: ACR Core BluetoothLE Central 
+Title: BluetoothLE - Shiny Style
 Published: 2/9/2019
 Tags:
     - Xamarin
     - BluetoothLE
     - OSS
-    - ACR Core
+    - Shiny
 ---
 Bluetooth (specifically LE) has been a big project of mine for some time.  The reason I like BLE so much is that it is the one protocol that just works on all platforms.  You don't need internet, you don't need any weird permission or to beg the user to do much beyond asking "can we use your bluetooth radio"?  
 
