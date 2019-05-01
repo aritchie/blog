@@ -1,6 +1,6 @@
 Title: Settings in a new light with Shiny
 Image: images/shiny_logo.png
-Published: 5/3/2019
+Published: 5/5/2019
 Tags:
     - Xamarin
     - OSS

@@ -230,6 +230,6 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
 ```
 
 ### Like What You See?
-Head over to see the full [GitHub Samples](https://github.com/shinyorg/shinysamples) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can found [here](https://nuget.org/profiles/aritchie).
+Head over to see the full [GitHub Samples](https://github.com/shinyorg/shinysamples) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can found [here](https://www.nuget.org/packages?q=shiny).
 
 Follow the [links here](/tags/shiny) for more upcoming articles
