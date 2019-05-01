@@ -8,7 +8,7 @@ Tags:
 ---
 
 ### What is it?
-Ever wanted to write a backgrounding experience that is consistent across all of the .NET platforms you work with?  Between Xamarin Android, Xamarin iOS, and the Universal Windows Platform (UWP) - there are a variety of issues that I've seen commonly occuring that makes this difficult.  As .NET developers, we often want our dependency injection, aourre async/awaits, and our general way of doing things in our ecosystem.  The mobile platforms really flipped us on our head.  Android has services & broadcast receivers, iOS has too many different ways of coming at backgrounding, and UWP is somewhere in between.
+Ever wanted to write a backgrounding experience that is consistent across all of the .NET platforms you work with?  Between Xamarin Android, Xamarin iOS, and the Universal Windows Platform (UWP) - there are a variety of issues that I've seen commonly occuring that makes this difficult.  As .NET developers, we often want our dependency injection, our async/awaits, and our general way of doing things in our ecosystem.  The mobile platforms really flipped us on our head.  Android has services & broadcast receivers, iOS has too many different ways of coming at backgrounding, and UWP is somewhere in between.
 
 There have been several plugins over time to help combat this problem, but all fail at some point because they lack the necessary infrastructure to bring it all together.  I have seen developers frequently fight this issue with things like BluetoothLE, GPS, Geofencing, background synchronization, etc.  Making this code testable is even harder and often painful to work with.  
 
@@ -230,6 +230,6 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
 ```
 
 ### Like What You See?
-Head over to see the full [GitHub Samples](https://github.com/shinyorg/shinysamples) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can found [here](https://www.nuget.org/packages?q=shiny).
+Head over to see the full [GitHub Samples](https://github.com/shinyorg/shinysamples) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can be found [here](https://www.nuget.org/packages?q=shiny).
 
 Follow the [links here](/tags/shiny) for more upcoming articles
