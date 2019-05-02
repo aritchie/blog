@@ -1,6 +1,7 @@
 Title: Projects
 ---
-# ACR OPEN SOURCE LIBRARIES
+
+# OPEN SOURCE LIBRARIES
 
 ## SUPPORT MY WORK
 
@@ -14,6 +15,24 @@ Want to help out?  There are several ways to do that
 
 
 ## THE OSS
+
+### SHINY PROJECT
+
+* [Documentation](https://shinydocs.azurewebsites.net)
+* [GitHub - Library](https://github.com/shinyorg/shiny)
+* [GitHub - Samples](https://github.com/shinary/shinysamples)
+* [Twitter](https://twitter.com/shinydotnet)
+
+|Project|NuGet|MyGet|
+|-------|-----|-----|
+|Core | [![CoreNugetShield]][CoreNuget] | [![CoreMygetShield]][CoreMyget] |
+|Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsMygetShield]][BeaconsMyget] |
+|BluetoothLE| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
+|Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsMygetShield]][LocationsMyget] |
+|HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
+|Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
+|Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
+
 
 ### XAMARIN & WINDOWS PLUGINS
 
@@ -47,3 +66,40 @@ Notifications|The ULTIMATE cross platform local notification library|||
 Extensions|Core extensions for most libraries<br>[![NuGet](https://img.shields.io/nuget/v/Acr.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.Core/) ![NuGet](https://img.shields.io/nuget/dt/Acr.Core.svg)
 Xamarin Forms Extensions|Collection of Xamarin Forms controls & behaviours<br>[![NuGet](https://img.shields.io/nuget/v/Acr.XamForms.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.XamForms/) ![NuGet](https://img.shields.io/nuget/dt/Acr.XamForms.svg)
 EntityFramework Core Extensions|Entity Framework addins for RX, events, auditing, and others<br>[![NuGet](https://img.shields.io/nuget/v/Acr.EfCore.svg?maxAge=2592000)](https://www.nuget.org/packages/Acr.EfCore/) ![NuGet](https://img.shields.io/nuget/dt/Acr.EfCore.svg)
+
+
+
+[BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
+[BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
+[BeaconsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Beacons.svg
+[BeaconsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Beacons
+
+[CoreNugetShield]: https://img.shields.io/nuget/v/Shiny.Core.svg
+[CoreNuget]: https://www.nuget.org/packages/Shiny.Core/
+[CoreMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Core.svg
+[CoreMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Core
+
+[BleNugetShield]: https://img.shields.io/nuget/v/Shiny.BluetoothLE.svg
+[BleNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE/
+[BleMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.BluetoothLE.svg
+[BleMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE
+
+[LocationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.svg
+[LocationsNuget]: https://www.nuget.org/packages/Shiny.Locations/
+[LocationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.svg
+[LocationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Locations
+
+[SensorsNugetShield]: https://img.shields.io/nuget/v/Shiny.Sensors.svg
+[SensorsNuget]: https://www.nuget.org/packages/Shiny.Sensors/
+[SensorsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Sensors.svg
+[SensorsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Sensors
+
+[HttpNugetShield]: https://img.shields.io/nuget/v/Shiny.Net.Http.svg
+[HttpNuget]: https://www.nuget.org/packages/Shiny.Net.Http/
+[HttpMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Net.Http.svg
+[HttpMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Net.Http
+
+[NotificationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Notifications.svg
+[NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
+[NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
+[NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
