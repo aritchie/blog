@@ -30,11 +30,11 @@ Pipelines.Add("XamarinRss",
         .WithFeedTitle(_ => "Allan Ritchie's Blog")
         .WithFeedDescription(_ => "Xamarin Feed")
         .WithItemTitle(@doc.Get<string>("Title"))
-        .WithItemAuthor((doc, ctx) => "Allan Ritchie")
+        //.WithItemAuthor((doc, ctx) => "Allan Ritchie")
         .WithItemDescription(@doc.String("Lead") ?? @doc.String("Title"))
         .WithItemPublished((doc, ctx) => doc.DateTime("Published"))
         .WithItemLink((doc, ctx) => ctx.GetLink(doc, true))
         .WithItemId((doc, ctx) => ctx.GetLink(doc, true))
-        .WithItemImageLink((doc, ctx) => null),
+        .WithItemImageLink((doc, ctx) => ctx.GetLink(doc.Get<string>("Image"), true)),
     WriteFiles()
 );
