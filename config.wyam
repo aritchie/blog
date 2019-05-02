@@ -23,7 +23,7 @@ Pipelines.Add("XamarinRss",
     OrderBy(@doc.Get<DateTime>("Published")),
     Where((doc, ctx) => doc.Get<string[]>("Tags").Any(x => x.Equals("Xamarin"))),
     Where(@doc.DateTime("Published") > DateTime.Now.AddMonths(-6)),
-    Where(@doc.Get<DateTime>("Published") < DateTime.Now),
+    Where(@doc.Get<DateTime>("Published") <= DateTime.Now),
     GenerateFeeds()
         .WithRssPath(_ => "xamarin.rss")
         .WithAtomPath(_ => "xamarin.atom")

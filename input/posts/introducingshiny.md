@@ -31,7 +31,7 @@ Out of the box, Shiny will offer:
 * Bluetooth LE (GATT Peripheral & Central)
 * Beacons
 * Speech Recognition
-* HTTP Uploads & Backgrounds
+* HTTP File Transfers
 * Sensors
 * Notifications
 * Integrations with 3rd Party MVVM Frameworks like Prism, ReactiveUI, & MvvmCross
