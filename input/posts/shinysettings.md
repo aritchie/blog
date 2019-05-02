@@ -1,12 +1,13 @@
-Title: Settings in a new light with Shiny
+Title: Settings in a New Light - Shiny Style
 Image: images/shiny_logo.png
-Published: 5/5/2019
+Published: 5/3/2019
 Tags:
     - Xamarin
     - OSS
     - Shiny
 ---
 <img src="images/shiny_logo.png" width="100" /> 
+
 I know - Preferences & Settings are a dime a dozen these days, but I'm such a big advocated of decoupled software that I had to do things differently.
 
 You've probably seen code similar to this before:
@@ -27,7 +28,7 @@ Several reasons
 * It is not a testable piece of code - not that settings usually have to be testable, but they are often used in tests
 * It creates some coupling (yes we can get around this though)
 * It uses some boilerplate code
-* It isn't nicely accessible to your UI
+* It isn't necessarily fun to wire through your app
 * You can't react to changes in your settings
 
 
@@ -118,7 +119,7 @@ public class MyViewModel : Prism.Mvvm.BindableBase, Prism.AppModel.IPageLifecycl
 
     public void OnAppearing()
     {
-        settings.UnBind(this);
+        settings.Bind(this);
     }
 
 
