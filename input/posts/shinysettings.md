@@ -8,7 +8,7 @@ Tags:
 ---
 <img src="images/shiny_logo.png" width="100" /> 
 
-I know - Preferences & Settings are a dime a dozen these days, but I'm such a big advocated of decoupled software that I had to do things differently.
+I know - Preferences & Settings are a dime a dozen these days, but I'm such a big advocated of decoupled software that I had to do things differently.  With Shiny, I had a chance to move one of the features that I loved from my ACR Settings plugin over and give it a good home in a DI universe of awesome!
 
 You've probably seen code similar to this before:
 ```csharp
@@ -148,7 +148,7 @@ public class MyViewModel : Prism.Mvvm.BindableBase, Prism.AppModel.IPageLifecycl
 ```
 
 ## Closing Thoughts
-Pretty epicly shiny right!?  Give it a try - give us feedback - and may all your apps be Shiny!
+Pretty epic right!?  This can serve in a bunch of capacities - you can use it as a good global store that you can monitor for changes (ie. Message Bus).   Give it a try - give us feedback - and may all your apps be Shiny!
 
 ## Links
 * [GitHub](https://github.com/shinyorg/shiny) - Includes samples & the code itself
