@@ -159,6 +159,7 @@ NOTE: you can see the result(s) of a job pass by taking a look at the result obj
 iOS is not "periodic" in the sense that you can rely on it to run every X mins.  In fact, it is quite intelligent about when/how it runs.  Do remember, you are piggybacking on "background fetch", so you really need to do some sort of remote data call if you don't want to aggrevate the apple gods that be.
 
 ## Links
-* [GitHub](https://github.com/shinyorg/shiny) - Includes samples & the code itself
+* [Source Code](https://github.com/shinyorg/shiny)
+* [Samples](https://github.com/shinyorg/shiny)
 * [Documentation](https://shinydocs.azurewebsites.net)
 * [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)

@@ -151,6 +151,7 @@ public class MyViewModel : Prism.Mvvm.BindableBase, Prism.AppModel.IPageLifecycl
 Pretty epic right!?  This can serve in a bunch of capacities - you can use it as a good global store that you can monitor for changes (ie. Message Bus).   Give it a try - give us feedback - and may all your apps be Shiny!
 
 ## Links
-* [GitHub](https://github.com/shinyorg/shiny) - Includes samples & the code itself
+* [Source Code](https://github.com/shinyorg/shiny)
+* [Samples](https://github.com/shinyorg/shiny)
 * [Documentation](https://shinydocs.azurewebsites.net)
 * [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
