@@ -1,5 +1,5 @@
-Title: Geofencing with a pinch of Notifications - Shiny Style
-Published: 12/15/2019
+Title: Geofencing with a Pinch of Notifications - Shiny Style
+Published: 5/21/2019
 Tags:
     - Xamarin
     - OSS
@@ -10,13 +10,21 @@ GPS & Geofencing is a common need for mobile and IoT platforms alike.  However, 
 
 We'll talk about GPS in a future article.  In this article, we'll focus on the geofencing and add in some notifications to make things awesome!
 
+## What Are Geofences?
+Geofencing is a location-based virtual boundary that uses GPS.  When you enter or exit this boundary, an event is executed in your application code.  A good example of this is a user coming close to your store and triggering a local notification - "Hey Peoples - come buy some stuff.  I'll make a deal you can't refuse".  When the user leaves the area "We're so sorry to see you leave.  Come back again and I'll give you 99% off with this magic code".  It's beautiful.... can be annoying, but if you do it right - you can create a good conversion opportunity.
 
-## Getting Started
+## Geofencing - Why?
+Geofencing is very efficient on battery for the mobile operating systems.  One of the pitfalls is that it isn't exact in terms of fire times.  Sometimes it can take a couple of minutes before the event is actually triggered.  I often get asked why use a geofence over raw GPS.  The explanation I use is, are you in the mall or not - if you are in the mall, you likely won't have a good GPS signal either.  The calculation for determining the circular area of a geofence is also not 2 lines of code if you need to do the effort yourself using raw GPS.  Geofences are good for when you enter and exit a particular area, GPS is better for real time "where are you".
 
-Do all of your normal Shiny setup - you can create read my [Introducing Shiny](introducingshiny) to get going.
+## Pitfalls
+I've also seen a number of "gone bad" geofence routines.  This one implementation tried to register over 300 geofences at startup.... so ya... don't do that.  In fact, iOS limits you to 20 and Android caps it at 60.  You may think "wow that is limiting", but really - it isn't.  If you can't get the job done in 20 geofence registrations, honestly, in my opinion - you're doing something wrong.  I generally set a geofence on the center of a structure/area that I'm interested in and set a circular distance of 200 meters.  This is the perfect balance between battery and quick OS response time in my experience.
 
-Shiny.Locations comes as a separate nuget package, but provides functionality for GPS & Geofencing.  
-You'll also want to pickup Shiny.Notifications to complete the sample in this article.
+## Making It Happen With Shiny
+
+Do all of your normal Shiny setup - you can read my [Introducing Shiny](introducingshiny) to get going on the general setup stuff.
+
+[Shiny.Locations](https://www.nuget.org/packages/Shiny.Locations/) comes as a separate nuget package, but provides functionality for GPS & Geofencing.  
+You'll also want to pickup [Shiny.Notifications](https://www.nuget.org/packages/Shiny.Notifications/) to complete the sample in this article.
 
 ### In Your Shared code
 
@@ -81,19 +89,38 @@ public class SampleStartup : Startup
 ```
 
 ### Android
-
-Other than the normal Android setup for Shiny, you need to add the following to your manifest.xml
+Other than the normal Android setup for Shiny, you need to add the following to your manifest.xml - we'll need a few bluetooth permissions here
 ```xml
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-permission android:name="android.permission.BLUETOOTH" />
 ```
 
 ### iOS
+Again, same typical iOS initialization.  Just add the following to your info.plist.  The UIBackgroundModes is required for geofencing.
+
+```xml
+<key>NSLocationAlwaysUsageDescription</key>
+<string>Your message</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Your message</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Your message</string>
+
+<key>UIBackgroundModes</key>
+<array>
+    <string>location</string>
+</array>
+```
 
 
 ## Registering an actual Geofence
 
-In your viewmodel, you can now register a geofence.  
+Your viewmodel is the best place to register a geofence.  
 
-Please note that will registering a geofence will request the necessary user permissions through the OS.  If the permissions decline in any way, the method will toss an exception.  It is also a good time to request 
+Please note that while registering a geofence will request the necessary user permissions through the OS, if the user declines the necessary permission, the method will toss an exception.  It is a good practice to use IGeofenceManager.RequestAccess to know the state of things yourself.
 
 ```csharp
 using Shiny;
