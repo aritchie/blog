@@ -165,7 +165,7 @@ Geofencing + Notifications is a powerful combination for things like marketing. 
 
 ## Links
 * [Source Code](https://github.com/shinyorg/shiny)
-* [Samples](https://github.com/shinyorg/shiny)
+* [Samples](https://github.com/shinyorg/shinysamples)
 * [Documentation](https://shinydocs.azurewebsites.net)
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
 * Shiny.Locations - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
