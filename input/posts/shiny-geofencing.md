@@ -93,9 +93,6 @@ Other than the normal Android setup for Shiny, you need to add the following to 
 ```xml
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-<uses-permission android:name="android.permission.BLUETOOTH" />
 ```
 
 ### iOS
@@ -168,6 +165,6 @@ Geofencing + Notifications is a powerful combination for things like marketing. 
 * [Samples](https://github.com/shinyorg/shinysamples)
 * [Documentation](https://shinydocs.azurewebsites.net)
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
-* Shiny.Locations - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
-* Shiny.Notifications - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Notifications/)
+* Shiny.Locations - [![NuGet](https://img.shields.io/nuget/v/Shiny.Locations.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
+* Shiny.Notifications - [![NuGet](https://img.shields.io/nuget/v/Shiny.Notifications.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Notifications/)
 
