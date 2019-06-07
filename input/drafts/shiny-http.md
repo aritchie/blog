@@ -10,3 +10,20 @@ Tags:
 
 ## Progress
 I have to admit, I'm impatient.  If I know how long something is going to take, I can go do something else while I wait.
+
+```csharp
+
+Shiny.ShinyHost.Resolve<IHttpTransferManager>();
+```
+
+## Background Operations
+
+```csharp
+
+public class YourHttpDelegate : IHttpDelegate
+{
+
+}
+```
+
+## Conclusion
