@@ -153,5 +153,5 @@ Pretty epic right!?  This can serve in a bunch of capacities - you can use it as
 ## Links
 * [Source Code](https://github.com/shinyorg/shiny)
 * [Samples](https://github.com/shinyorg/shinysamples)
-* [Documentation](https://shinydocs.azurewebsites.net)
+* [Documentation](https://shinylib.net)
 * [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)

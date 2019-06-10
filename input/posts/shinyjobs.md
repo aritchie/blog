@@ -161,5 +161,5 @@ iOS is not "periodic" in the sense that you can rely on it to run every X mins. 
 ## Links
 * [Source Code](https://github.com/shinyorg/shiny)
 * [Samples](https://github.com/shinyorg/shinysamples)
-* [Documentation](https://shinydocs.azurewebsites.net)
+* [Documentation](https://shinylib.net)
 * [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)

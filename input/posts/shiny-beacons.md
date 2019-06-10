@@ -1,5 +1,6 @@
 Title: Beacons - Shiny Style
-Published: 06/07/2019
+Image: images/shiny_beacons.png
+Published: 06/10/2019
 Tags:
     - Xamarin
     - OSS
@@ -7,9 +8,9 @@ Tags:
 ---
 
 ## What are Beacons
-They are low powered IoT device that's emit a signal over BluetoothLE advertising that contains a specific (and very small piece of data) that is like an address.  You attach that address to a "location" of some type.  They are like an invisible light house.  If you have a device that can "see" those signals, you can find out how close you are to it.  
+Beacons are low powered IoT devices that emit a signal over Bluetooth advertising that contains a specific (and very small piece of data) that is like an address.  You attach that address to a "location" of some type.  They are like an invisible light house.  If you have a device that can "see" those signals, you can find out how close you are to it.  
 
-Some beacons include cool sensors like temperature, accelerometer, ambient light, pressure, and more.  Head over to [Estimote](https://estimote.com/products/) to take a look.  These guys are essentially the Rolls Royce of the beacon industry.
+Some beacons include sensors like temperature, accelerometers, ambient light, pressure, and more.  Head over to [Estimote](https://estimote.com/products/) to take a look.  These guys are essentially the Rolls Royce of the beacon industry.
 
 Beacons from a software perspective actually come in several flavours/protocols.  The main one in practice is iBeacon which is a protocol created by Apple.  There is a beacon protocol by Google called Eddystone. Eddystone doesn't seem to have caught on like iBeacons did.  Eddystone is currently not a supported with Shiny.
 
@@ -21,7 +22,7 @@ Beacons are riddled with terms and acronyms.  Let me hopefully clear up the ones
 * **Major** - This is a ushort (uint16).  This would equate to the street on which you live
 * **Minor** - This is also a ushort (uint16).  This would equate to your street number.  Thereby, giving you the greatest precision in identification.
 * **Ranging** - Refers to scanning for all beacons within a certain address range.  You can see any and all beacons within your filter parameters as well as how close you are to it.  Think [GhostBuster PKE Meter](https://ghostbusters.fandom.com/wiki/P.K.E._Meter)
-* **Monitoring** - The art of scanning for a "filtered" set of beacon address in the background.  You don't know how close you are to the target in this mode, only if you are entering the region or leaving it.  If you watch the show "Chernobyl" on HBO - think the equivalent being the geiger counters on the belts of these guys (the clicking - you are in the bad zone) - [Watch Here](https://www.youtube.com/watch?v=uXafEIdkx6c)
+* **Monitoring** - The art of scanning for a "filtered" set of beacon address in the background.  You don't know how close you are to the target in this mode, only if you are entering the region or leaving it.  If you watch the show "Chernobyl" on HBO - think the equivalent being the dosimeters on the belts of these guys (the clicking - you are in the bad zone) - [Watch Here](https://www.youtube.com/watch?v=uXafEIdkx6c)
     * _iOS_ - You can monitor 20 beacons (this includes any geofences your app uses as well, so careful here) max
     * _UWP/Android_ - Technically, there is no limit here, but I would stick to 20 as well.
     
@@ -92,22 +93,42 @@ namespace YourNamespace
 
 ### Ranging
 
-Ranging is particularily easy
+Ranging is particularily easy - you can do this right in your viewmodel.  With ranging, you are given the specific beacon with its proximity.  You still have to set a beacon region to monitor that filters by at least your global UUID.  
 
 ```csharp
-Shiny
-    .ShinyHost
-    .Resolve<IBeaconManager>()
-    .WhenRanged(new BeaconRegion(YourUuid))
-    .Subscribe(x => 
-    {
 
-    });
+public class YourViewModel
+{
+    IDisposable scanSub;
+
+
+    public YourViewModel()
+    {
+        this.Start = new Command(() =>
+        {
+            this.scanSub = Shiny
+                .ShinyHost
+                .Resolve<IBeaconManager>()
+                .WhenRanged(new BeaconRegion(YourUuid))
+                .Subscribe(x => Device.BeginInvokeOnMainThread(() =>                
+                    this.Beacons.Add(x)
+                ))
+        });
+
+        this.Stop = new Command(() => this.scanSub?.Dispose());
+    }
+
+
+    public ICommand Start { get; }
+    public ICommand Stop { get; }
+    public IList<Beacon> Beacons { get; private set; }
+}
+
 ```
 
 
 ### Monitoring
-This is a pretty easy task to perform on iOS, but brutally painful to do in Android.  Shiny makes this an absolutely delightful to do
+With monitoring, you aren't given the specific beacon or how close the phone is to the beacon in terms of proximity.  You are basically handed back the filter you used.  This is to protect the privacy of the user (which I actually agree with).  This is a pretty easy task to perform on iOS, but brutally painful to do in Android.  Shiny makes this an absolutely delightful to do.
 
 ```csharp
 using System;
@@ -138,9 +159,13 @@ namespace YourNamespace
 }
 ```
 
+## In Closing
+Give Beacons a try - they are great for a variety of business applications from marketing to employee management
+
 ## Links
 * [Samples](https://github.com/shinyorg/shinysamples/tree/master/Samples/Beacons)
-* [Documentation](https://shinydocs.azurewebsites.net)
+* [Documentation](https://shinylib.net)
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
 * Shiny.Beacons - [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
 * Shiny.Notifications - [![NuGet](https://img.shields.io/nuget/v/Shiny.Notifications.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Notifications/)
+* [Estimote Beacons](https://estimote.com/products/)
