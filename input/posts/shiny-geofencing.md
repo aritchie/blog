@@ -161,6 +161,7 @@ public class YourViewModel
 Geofencing + Notifications is a powerful combination for things like marketing.  Hopefully, Shiny helps make this combo easy for you!
 
 ## Links
+* [Initial Shiny Setup](introducingshiny)
 * [Source Code](https://github.com/shinyorg/shiny)
 * [Samples](https://github.com/shinyorg/shinysamples)
 * [Documentation](https://shinylib.net)

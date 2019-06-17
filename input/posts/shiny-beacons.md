@@ -163,6 +163,7 @@ namespace YourNamespace
 Give Beacons a try - they are great for a variety of business applications from marketing to employee management
 
 ## Links
+* [Initial Shiny Setup](introducingshiny)
 * [Samples](https://github.com/shinyorg/shinysamples/tree/master/Samples/Beacons)
 * [Documentation](https://shinylib.net)
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
