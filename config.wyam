@@ -13,7 +13,7 @@ Settings[Keys.LinksUseHttps] = true;
 Settings[Keys.Host] = "allancritchie.net";
 Settings[BlogKeys.Title] = "Allan Ritchie";
 Settings[BlogKeys.Description] = "The personal blog of Allan Ritchie";
-Settings[BlogKeys.Intro] = ".NET & OSS Enthusiast - Microsoft MVP - now 'await SomethingUseful();'";
+Settings[BlogKeys.Intro] = ".NET & OSS Enthusiast - Bringing Useful Architecture to Your Xamarin Apps'";
 Settings[BlogKeys.Image] = "images/toronto_pan.jpg";
 
 
@@ -31,7 +31,7 @@ Pipelines.Add("XamarinRss",
         .WithFeedDescription(_ => "Xamarin Feed")
         .WithItemTitle(@doc.Get<string>("Title"))
         //.WithItemAuthor((doc, ctx) => "Allan Ritchie")
-        .WithItemDescription(@doc.String("Lead") ?? @doc.String("Title"))
+        .WithItemDescription(@doc.String("Lead") ?? @doc.String("Title").Replace("Allan Ritchie - ", ""))
         .WithItemPublished((doc, ctx) => doc.DateTime("Published"))
         .WithItemLink((doc, ctx) => ctx.GetLink(doc, true))
         .WithItemId((doc, ctx) => ctx.GetLink(doc, true))

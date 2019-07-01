@@ -1,12 +1,12 @@
-Title: GPS in the BG - Shiny Style
-Published: 7/1/2019
-Image: images/shiny_logo.png
+Title: Making Your Device a BLE Server - Shiny Style
+Published: 2/9/2019
 Tags:
     - Xamarin
+    - BluetoothLE
     - OSS
     - Shiny
 ---
-
+TODO
 
 ## Links
 * [Initial Shiny Setup](introducingshiny)
@@ -14,4 +14,4 @@ Tags:
 * [Samples](https://github.com/shinyorg/shinysamples)
 * [Documentation](https://shinylib.net)
 * [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
-* [![NuGet](https://img.shields.io/nuget/v/Shiny.Locations.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
+* [![NuGet](https://img.shields.io/nuget/v/Shiny.BluetoothLE.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.BluetoothLE/)
