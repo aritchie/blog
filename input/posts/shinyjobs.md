@@ -71,7 +71,7 @@ Adhoc jobs are on-the-spot types of execution.  You need something to finish bef
 
 ```csharp
 // IJobManager can and should be injected into your viewmodel code
-await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunTask(async () => 
+await Shiny.ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunTask(async () => 
 {
     // your code goes here - async stuff is welcome (and necessary)
 });
@@ -106,7 +106,6 @@ public class YourFirstJob : Shiny.Jobs.IJob
 
 ```
 
-
 Lastly, you have to register your job.  With scheduled jobs, I wanted to make sure that I could pass in metadata like last date run, some sort of identifiers, etc.  You also have the ability to set to preconditions of when your job is allowed to run.  Maybe you don't want to run unless you are on WiFi because you want to sync like 500+ megs?  Maybe you are going to run an infinite loop that melts the battery, so you want the battery to be charging or at least be above 20% - well, this is the place to make that happen.  
 
 ```csharp
@@ -136,7 +135,6 @@ However, if you have a service that you always want to run with your app, you ca
 
 ```csharp
 
-
 namespace YourNamespace
 {
     public class Startup : Shiny.Startup
@@ -159,18 +157,16 @@ namespace YourNamespace
 
 ```
 
-
-
 ---
 ## Canceling Jobs
 When your user logs out, you likely don't need to keep sucking away at their battery, so cancelling jobs is a necessary action to perform.  You have to ways to cancel jobs, by the specific ID of what you registered as the job name OR cancelling ALL jobs.  
 
 ```csharp
 // Cancelling A Job
-ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Cancel("YourJobName");
+Shiny.ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Cancel("YourJobName");
 
 // Cancelling All Jobs
-ShinyHost.Resolve<Shiny.Jobs.IJobManager>().CancelAll();
+Shiny.ShinyHost.Resolve<Shiny.Jobs.IJobManager>().CancelAll();
 ```
 
 ---
@@ -179,10 +175,10 @@ Unlike adhoc jobs, this is designed to run your registered job(s) when you need 
 
 ```csharp
 // Run All Jobs On-Demand
-var results = await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunAll();
+var results = await Shiny.ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunAll();
 
 // Run A Specific Job On-Demand
-var result = await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Run("YourJobName");
+var result = await Shiny.ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Run("YourJobName");
 ```
 NOTE: you can see the result(s) of a job pass by taking a look at the result object!
 

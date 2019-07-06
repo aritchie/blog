@@ -45,7 +45,7 @@ namespace MyNamespace
         }
 
 
-        public async void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
+        public async Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
         {
             if (newState == GeofenceState.Entered)
             {

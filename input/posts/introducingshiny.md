@@ -183,7 +183,7 @@ namespace Samples
 iOS is pretty easy - GO to AppDelegate and add the following stuff
 ```csharp
 // in your FinishedLaunching method
-iOSShinyHost.Init(new Startup(), services => 
+Shiny.iOSShinyHost.Init(new Startup(), services => 
 {
     // register any platform specific stuff you need here
 });
@@ -200,7 +200,6 @@ Android requires a fair bit more setup to get going.  Android requires a top lev
 
 ```csharp
 using System;
-using Shiny;
 using Android.App;
 using Android.Runtime;
 
@@ -216,7 +215,7 @@ public class YourApplication : Application
     public override void OnCreate()
     {
         base.OnCreate();
-        AndroidShinyHost.Init(new Startup(), services => {
+        Shiny.AndroidShinyHost.Init(new Startup(), services => {
             // register any platform specific stuff you need here
         });
     }
@@ -226,7 +225,10 @@ public class YourApplication : Application
 // and lastly - in your main/current activity
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-    => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+{
+    Shiny.AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+}
 ```
 
 ### Like What You See?
