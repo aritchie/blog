@@ -15,7 +15,6 @@ There have been several plugins over time to help combat this problem, but all f
 <img src="images/shiny_logo.png" width="100" /> Enter [Shiny](https://github.com/shinyorg/shiny) - a new framework that tackles problems that no other framework currently tackles - backgrounding and device hardware with all the bells and whistles you are use to in the .NET ecosystem.  Shiny was built on the premise of making depenendency injection and cross platform backgrounding a consistent & testable experience. 
 
 
-
 Out of the box, Shiny will offer:
 * A Centralized Hosting Platform
 * Environment (App & Device Information)
@@ -74,10 +73,9 @@ namespace Samples
             // custom logging
             Log.UseConsole();
             Log.UseDebug();
-            Log.AddLogger(new AppCenterLogger(), true, false);
 
             // create your infrastructure
-            builder.AddSingleton<SampleSqliteConnection, SampleSqliteConnection>();
+            builder.AddSingleton<SampleSqliteConnection>();
 
             // register all of the acr stuff you want to use
             builder.UseHttpTransfers<SampleDelegate>();
@@ -141,37 +139,39 @@ namespace Samples
         }
 
 
-        public void OnAdvertised(IScanResult result)
-        {
-        }
-
 
         public void OnConnected(IPeripheral peripheral)
         {
         }
 
 
-        public void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
+        public async Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
         {
         }
 
 
-        public void OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
+        public async Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
         {
         }
 
 
-        public Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
+        {
+            return true;
+        }
+
+
+        public async Task OnError(HttpTransfer transfer, Exception ex)
         {
         }
 
 
-        public void OnStatusChanged(IHttpTransfer transfer)
+        public async Task OnCompleted(HttpTransfer transfer)
         {
         }
 
 
-        public void OnReading(IGpsReading reading)
+        public async Task OnReading(IGpsReading reading)
         {
         }
     }

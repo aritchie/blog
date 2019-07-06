@@ -35,7 +35,7 @@ public class YourApplication : Application
     public override void OnCreate()
     {
         base.OnCreate();
-        AndroidShinyHost.Init(this);
+        Shiny.AndroidShinyHost.Init(this, new YourNamespace.Startup());
     }
 }
 
@@ -71,7 +71,7 @@ Adhoc jobs are on-the-spot types of execution.  You need something to finish bef
 
 ```csharp
 // IJobManager can and should be injected into your viewmodel code
-ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunTask(async () => 
+await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().RunTask(async () => 
 {
     // your code goes here - async stuff is welcome (and necessary)
 });
@@ -95,17 +95,19 @@ public class YourFirstJob : Shiny.Jobs.IJob
     }
 
 
-    public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+    public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
     {
         var id = jobInfo.GetValue("Id", 25); // we'll cover this in a minute
         await this.dependency.SomeAsyncMethod(id);
+
+        return true; // this is for iOS - try not to lie about this - return true when you actually do receive new data from the remote method
     }
 }
 
 ```
 
 
-Lastly, you have to register your job.  With scheduled jobs, I wanted to make sure that I could pass in metadata like last date run, some sort of identifiers, etc.  You also have the ability to set to preconditions of when your job is allowed to run.  Maybe you don't want to run unless you are on WiFi because you want to sync like 500+ megs?  Maybe you are going to run an infinite loop that melts the battery, so you want the battery to be charging or at least be above 20% - well, this is the place to make that happen
+Lastly, you have to register your job.  With scheduled jobs, I wanted to make sure that I could pass in metadata like last date run, some sort of identifiers, etc.  You also have the ability to set to preconditions of when your job is allowed to run.  Maybe you don't want to run unless you are on WiFi because you want to sync like 500+ megs?  Maybe you are going to run an infinite loop that melts the battery, so you want the battery to be charging or at least be above 20% - well, this is the place to make that happen.  
 
 ```csharp
 var job = new JobInfo
@@ -116,7 +118,7 @@ var job = new JobInfo
     // these are criteria that must be met in order for your job to run
     BatteryNotLow = true,
     DeviceCharging = false
-    NetworkType = NetworkType.Any,
+    RequiredInternetAccess = InternetAccess.Any,
     Repeat = true //defaults to true, set to false to run once OR set it inside a job to cancel further execution
 };
 
@@ -125,8 +127,39 @@ job.SetValue("Id", 10);
 
 
 // lastly, schedule it to go - don't worry about scheduling something more than once, we just update if your job name matches an existing one
-ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Schedule(job);
+await ShinyHost.Resolve<Shiny.Jobs.IJobManager>().Schedule(job);
 ```
+
+This is good for registering jobs in a controlled fashion in your viewmodel.
+
+However, if you have a service that you always want to run with your app, you can use a quick trick as part of your shiny startup file.
+
+```csharp
+
+
+namespace YourNamespace
+{
+    public class Startup : Shiny.Startup
+    {
+        var job = new JobInfo
+        {
+            Name = "YourFirstJob",
+            Type = typeof(YourFirstJob),
+
+            // these are criteria that must be met in order for your job to run
+            BatteryNotLow = true,
+            DeviceCharging = false
+            RequiredInternetAccess = InternetAccess.Any,
+            Repeat = true //defaults to true, set to false to run once OR set it inside a job to cancel further execution
+        };
+
+        services.RegisterJob(job);
+    }
+}
+
+```
+
+
 
 ---
 ## Canceling Jobs
