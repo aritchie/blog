@@ -66,7 +66,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Samples
 {
-    public class SampleStart : Startup
+    public class SampleStart : ShinyStartup
     {
         public override void ConfigureServices(IServiceCollection builder)
         {

@@ -78,7 +78,7 @@ using Shiny.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 
 
-public class SampleStartup : Startup
+public class SampleStartup : ShinyStartup
 {
     public override void ConfigureServices(IServiceCollection builder)
     {

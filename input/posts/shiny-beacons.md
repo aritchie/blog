@@ -77,7 +77,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace YourNamespace
 {
-    public class SampleStartup : Startup
+    public class SampleStartup : ShinyStartup
     {
         public override void ConfigureServices(IServiceCollection builder)
         {

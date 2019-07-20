@@ -137,7 +137,7 @@ However, if you have a service that you always want to run with your app, you ca
 
 namespace YourNamespace
 {
-    public class Startup : Shiny.Startup
+    public class Startup : Shiny.ShinyStartup
     {
         var job = new JobInfo
         {

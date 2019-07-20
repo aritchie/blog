@@ -90,7 +90,7 @@ public AppSettings()
 
 // to register this as a service with Shiny - add the following to your Startup
 
-public class MyStartup : Shiny.Startup
+public class MyStartup : Shiny.ShinyStartup
 {
     public override void ConfigureServices(IServiceCollection services)
     {

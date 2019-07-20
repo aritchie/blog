@@ -27,7 +27,7 @@ using Shiny.Jobs;
 
 namespace Todo.Data
 {
-    public class DataModule : Module
+    public class DataModule : ShinyModule
     {
         public override void Register(IServiceCollection services)
         {
@@ -58,7 +58,7 @@ using Shiny;
 
 namespace Todo
 {
-    public class ShinyStartup : Startup
+    public class ShinyStartup : ShinyStartup
     {
         public override void ConfigureServices(IServiceCollection services)
         {
@@ -84,7 +84,7 @@ I often like to wire up my auth service that has a "SignOut" event.  When that s
 ### How do I make one?
 
 ```csharp
-public class YourStartupTask : Shiny.IStartupTask
+public class YourStartupTask : Shiny.IShinyStartupTask
 {
     public YourStartupTask()
     {
