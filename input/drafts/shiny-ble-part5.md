@@ -1,5 +1,5 @@
-Title: BluetoothLE Connecting to Another Device - BLE Story Part 3 - Shiny Style
-Published: 7/1/2019
+Title: BluetoothLE 5 - Be the BLE Peripheral (Server) - Shiny Style
+Published: 2/9/2019
 Tags:
     - Xamarin
     - BluetoothLE

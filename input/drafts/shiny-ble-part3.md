@@ -1,4 +1,4 @@
-Title: BluetoothLE Connecting to Another Device - BLE Story Part 2 - Shiny Style
+Title: BluetoothLE Part 3 - Connecting to Another Device - Shiny Style
 Published: 7/1/2019
 Tags:
     - Xamarin

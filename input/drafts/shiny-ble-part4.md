@@ -1,5 +1,5 @@
-Title: Making Your Device a BLE Server - Shiny Style
-Published: 2/9/2019
+Title: BluetoothLE Part 4 - The Advanced Stuff Like Backgrounding - Shiny Style
+Published: 7/1/2019
 Tags:
     - Xamarin
     - BluetoothLE
