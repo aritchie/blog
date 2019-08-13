@@ -80,7 +80,7 @@ namespace Samples
             // register all of the acr stuff you want to use
             builder.UseHttpTransfers<SampleDelegate>();
             builder.UseBeacons<SampleDelegate>();
-            builder.UseBleCentral<SampleDelegate>();
+            builder.UseBleCentral();
             builder.UseBlePeripherals();
             builder.UseGpsBackground<SampleDelegate>();
             builder.UseGeofencing<SampleDelegate>();
@@ -215,7 +215,7 @@ public class YourApplication : Application
     public override void OnCreate()
     {
         base.OnCreate();
-        Shiny.AndroidShinyHost.Init(new Startup(), services => {
+        Shiny.AndroidShinyHost.Init(this, new Startup(), services => {
             // register any platform specific stuff you need here
         });
     }
