@@ -140,7 +140,7 @@ namespace Samples
 
 
 
-        public void OnConnected(IPeripheral peripheral)
+        public async Task OnConnected(IPeripheral peripheral)
         {
         }
 
