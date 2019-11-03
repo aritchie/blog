@@ -132,6 +132,7 @@ With monitoring, you aren't given the specific beacon or how close the phone is 
 
 ```csharp
 using System;
+using System.Threading.Tasks;
 using Samples.Models;
 using Shiny.Beacons;
 using Shiny.Notifications;
@@ -148,7 +149,7 @@ namespace YourNamespace
         }
 
 
-        public async void OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
+        public async Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
         {
             await this.notifications.Send(
                 $"Beacon Region {newStatus}",

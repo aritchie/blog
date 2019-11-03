@@ -94,7 +94,7 @@ public class MyStartup : Shiny.ShinyStartup
 {
     public override void ConfigureServices(IServiceCollection services)
     {
-        services.RegisterSettings<AppSettings>();
+        services.AddSingleton<AppSettings>();
     }
 }
 ```

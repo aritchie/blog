@@ -83,7 +83,7 @@ public class SampleStartup : ShinyStartup
     public override void ConfigureServices(IServiceCollection builder)
     {
         builder.UseGeofencing<MyGeofenceDelegate>();
-        builder.UseNotifications();
+        builder.UseNotifications(true);
     }
 }
 ```

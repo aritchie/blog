@@ -32,6 +32,11 @@ You need to have an actual Application class in your android project.  You can d
 [Application]
 public class YourApplication : Application
 {
+    public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+    {
+    }
+
+
     public override void OnCreate()
     {
         base.OnCreate();
