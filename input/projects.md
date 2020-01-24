@@ -10,7 +10,7 @@ Want to help out?  There are several ways to do that
 * Help write documentation/samples
 * Fix bugs listed with "Help Wanted"
 * File defects with complete test cases
-* [Become a Patreon](https://patreon.com/Aritchie)
+* [Be A GitHub Sponsor](https://github.com/sponsors/aritchie)
 * [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/QDF8SWy)
 
 
@@ -18,6 +18,7 @@ Want to help out?  There are several ways to do that
 
 ### SHINY PROJECT
 
+[![GitHub stars](https://img.shields.io/github/stars/shinyorg/shiny.svg?style=social&label=Stars)](https://github.com/shinyorg/shiny) 
 * [Documentation](https://shinydocs.azurewebsites.net)
 * [GitHub - Library](https://github.com/shinyorg/shiny)
 * [GitHub - Samples](https://github.com/shinary/shinysamples)
@@ -31,8 +32,9 @@ Want to help out?  There are several ways to do that
 |Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsMygetShield]][LocationsMyget] |
 |HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
-|Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
-
+|Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget]
+|Push| [![PushNugetShield]][PushNuget] | [![PushMygetShield]][PushMyget]
+|NFC| [![NfcNugetShield]][NfcNuget] | [![NfcMygetShield]][NfcMyget]
 
 ### XAMARIN & WINDOWS PLUGINS
 
@@ -51,15 +53,7 @@ Speech Recognition|Continuous speech recognition, keyword listening, etc<br>![Gi
 Beacons|The only pure managed cross platform ibeacon detection library<br>[![GitHub stars](https://img.shields.io/github/stars/aritchie/beacons.svg?style=social&label=Stars)](https://github.com/aritchie/beacons) [![NuGet](https://img.shields.io/nuget/v/Plugin.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Plugin.Beacons/) ![NuGet](https://img.shields.io/nuget/dt/Plugin.Beacons.svg) [![Build status](https://dev.azure.com/allanritchie/Plugins/_apis/build/status/Beacons)](https://dev.azure.com/allanritchie/Plugins/_build/latest?definitionId=0)
 Geofencing|geofencing for all<br>[![GitHub stars](https://img.shields.io/github/stars/aritchie/geofences.svg?style=social&label=Stars)](https://github.com/aritchie/geofences) [![NuGet](https://img.shields.io/nuget/v/Plugin.Geofencing.svg?maxAge=2592000)](https://www.nuget.org/packages/Plugin.Geofencing/) ![NuGet](https://img.shields.io/nuget/dt/Plugin.Geofencing.svg) [![Build status](https://dev.azure.com/allanritchie/Plugins/_apis/build/status/Geofences)](https://dev.azure.com/allanritchie/Plugins/_build/latest?definitionId=0)
 
-#### COMING SOON
-|Library|Description|Source|NuGet|
-|-------|-----------|------|-----|
-Notifications|The ULTIMATE cross platform local notification library|||
-
-
 ### EXTENSIONS
-
-![GitHub stars](https://img.shields.io/github/stars/aritchie/geofences.svg?style=social&label=Stars)  [![Build status](https://dev.azure.com/allanritchie/Plugins/_apis/build/status/Geofences)](https://dev.azure.com/allanritchie/Plugins/_build/latest?definitionId=0)
 
 |Library|Description|Source|NuGet|
 |-------|-----------|------|-----|
@@ -103,3 +97,13 @@ EntityFramework Core Extensions|Entity Framework addins for RX, events, auditing
 [NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
 [NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
 [NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
+
+[PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
+[PushNuget]: https://www.nuget.org/packages/Shiny.Push/
+[PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
+[PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
+
+[NfcNugetShield]: https://img.shields.io/nuget/v/Shiny.NFC.svg
+[NfcNuget]: https://www.nuget.org/packages/Shiny.NFC/
+[NfcMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.NFC.svg
+[NfcMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.NFC

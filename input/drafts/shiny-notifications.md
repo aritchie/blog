@@ -6,11 +6,12 @@ Tags:
     - OSS
     - Shiny
 ---
-What good are background tasks without being able to tell your user something went down?  Well - they still have merit, but let's add some additional sexy!
+What good are background tasks without being able to tell your user something went down?  We all use push notifications, but local notifications still have many uses like geofences & beacons.  Shiny Notifications (in my opinion) is the best of breed plugin in local notifications for Xamarin.  
 
 Setup & Permissions
 Sending
 Scheduled Notifications
+Notification Categories & Text Replies
 Notification Delegate
 
 ## Links
