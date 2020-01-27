@@ -1,20 +1,28 @@
-Title: Shiny - Easy Mode
-Published: 11/2/2019
+Title: Shiny - Easy Mode Statics
+Published: 1/28/2020
 Tags:
     - Xamarin
     - OSS
     - Shiny
 ---
-To keep porting efforts down, Shiny now has static feature access along side the traditional DI approach.  You still need some of the Shiny startup boilerplate, but there are now ways to cut that down a great deal as well.
+
+## Easy Mode
+
+While I was working on Shiny, a LOT of people emailed me telling me "Component.This" doesn't exist (they could have read the samples, but whatevs).  They wanted a Xamarin Essentials approach.  I disagree with this approach to a degree since it doesn't provide some enterprise practices that I require in my day-to-day, but I'm not everyone and people have different requirements.  Thus I decide to bring the static "shims" into Shiny as well as bring a registration model similar to Xamarin Forms.  You still need some of the Shiny startup boilerplate, but there are now ways to cut that down a great deal as well.  
 
 ## Static Access
 
-Let's start with the static accessors.  Essentially, if we have a service called Shiny.Jobs.IJobManager, we now have an equivalent CrossJobManager with all of the functions of the interface.  No more DI necessary.
+Let's start with the static accessors.  Essentially, if we have a service called Shiny.Jobs.IJobManager, we now have an equivalent ShinyJobManager with all of the functions of the interface.  No more DI necessary.
 
 ```csharp
-await CrossJobManager.Schedule(new JobInfo {
+// examples
+await ShinyJobManager.Schedule(new JobInfo(...));
+ShinySettings.Set("1");
+ShinyEnvironment.AppVersion
 
-})
+ShinyGeofences.StartMonitoring(...)
+ShinyGps.StartListener(...)
+ShinyMotionActivity.Query(...)
 ```
 
 Don't like the boilerplate?  I can only get rid of so much, but I've made service registration match the Xamarin Forms assembly attribute.  
@@ -30,13 +38,8 @@ iOSShinyHost.Init(ShinyStartup.FromAssemblyRegistration(typeof(App).Assembly));
 [assembly: ShinySqliteIntegration(true, true, true, true, true)]
 [assembly: ShinyJob(typeof(SampleJob), "MyIdentifier", BatteryNotLow = true, DeviceCharging = false, RequiredInternetAccess = Shiny.Jobs.InternetAccess.Any)]
 [assembly: ShinyAppCenterIntegration(Constants.AppCenterTokens, true, true)]
-[assembly: ShinyService(typeof(SampleSqliteConnection))]
-[assembly: ShinyService(typeof(GlobalExceptionHandler))]
-[assembly: ShinyService(typeof(CoreDelegateServices))]
-[assembly: ShinyService(typeof(JobLoggerTask))]
-[assembly: ShinyService(typeof(IUserDialogs), typeof(UserDialogs))]
-[assembly: ShinyService(typeof(IFullService), typeof(FullService))]
-[assembly: ShinyService(typeof(IAppSettings), typeof(AppSettings))]
+[assembly: ShinyService(typeof(YourOwnService))]
+[assembly: ShinyService(typeof(IYourOwnService, typeof(YourOwnService))]
 ```
 
 ## Auto-Registering Everything!

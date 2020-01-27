@@ -11,9 +11,9 @@ Tags:
 The Road To 1.0
 ---
 TLDR;
-Its been a while since I blogged because I've really been digging in to finish up a lot of the core parts of Shiny.  This has been such a fun OSS project to build.  I remember when I was discussing this over a year ago with a couple of colleagues.  Shiny had a horrid name when I first started called 'ACR Core'.  The name Shiny came to me one night on twitter when I was making fun of people complaining about updating to the Android Support libraries right away and having issues.... shocking.... when people see new NuGets, they must update them regardless of if they need them or not.  "They must have their Shinies" (said in the voice of Golem from LOTR).  The name stuck, but became more of an oxymoron because nothing in Shiny is what you see in your UI... EPIC!  
+Its been a while since I blogged because I've really been digging in to finish up a lot of the core parts of Shiny.  This has been such a fun OSS project to build.  I remember when I was discussing this over a year ago with a couple of colleagues.  Shiny had a horrid name when I first started called 'ACR Core'.  The name Shiny came to me one night on twitter when I was making fun of people complaining about updating to the latest Android Support libraries right away and having issues.... shocking.... when people see new NuGets, they must update them regardless of if they need them or not.  "They must have their Shinies" (said in the voice of Golem from LOTR).  The name stuck, but became more of an oxymoron because nothing in Shiny is what you see in your UI... EPIC!  
 
-When I started doing the plugins, they were just one off pieces of code.  The issue was that I always need some sort of persistence, permissions, settings, logging, etc.  It would also be a struggle to get people to wire things up properly for things to work.  I needed a way that would force a bit structure, bring all of the components I needed to services, and bring the users services into a solid unit while also providing a testable end product.  Thus Shiny had to become more of a framework than a plugin. The project intent was to create a simple way to create background services and work with some of the complex hardware on mobile devices (ie. BLE). 
+When I started doing Xamarin plugins a few years ago, they were just one off pieces of code.  The issue was that I always need some sort of persistence, permissions, settings, logging, etc.  It would also be a struggle to get people to wire things up properly for things to work.  I needed a way that would force a bit structure, bring all of the components I needed to services, and bring the users services into a solid unit while also providing a testable end product.  Thus Shiny had to become more of a framework than a plugin. The project intent is to create a simple way to create background services and work with some of the complex hardware on mobile devices (ie. BLE) while having a clean testing pattern and tie-in to your infrastructure. 
 
 
 What's In The Release
@@ -23,8 +23,8 @@ What's In The Release
 * Local Notifications with all the bells and whistles (blog post to follow)
 * HTTP Transfers - Background File Uploads and Downloads with metrics to track things like speed, estimate time remaining, etc
 * Sensors (RX Style) - pedometer, heart rate, accelerometer, etc
-* Static Shims (don't like DI - these are for you - blog post to follow)
 * A lot of the Essentials stuff (file system access, environment, settings, permissions, etc)
+* PS - for those that don't like DI - there are now Static Shims (blog post to follow)
 
 
 What's Next?
@@ -44,7 +44,7 @@ What's Next?
 Thanks
 ---
 
-A heartfelt thanks to all of those who have contributed in any way, shape, or form to Shiny - thank you.  I want to send out a few of special thank yous to people
+A big thank you to all of those who have contributed in any way, shape, or form to Shiny.  I want to send out a few of special thank yous to people
 
 * [Dan Siegel](https://twitter.com/DanJSiegel) 
 
@@ -52,11 +52,11 @@ A heartfelt thanks to all of those who have contributed in any way, shape, or fo
 
 * [James Montemagno](https://twitter.com/JamesMontemagno)
 
-> James jas made many references to it in the community standups, podcasts, and various shows he runs. He even tried Shiny on out one of his livestreams while building the Hanselmann app which included some bugfixing on my part - BUT IT WAS A BETA :)  Thanks so much James
+> James has made a ton of mentions in the community standups, podcasts, and various shows he runs. He even tried Shiny on out one of his livestreams while building the Hanselmann app which included some bugfixing on my part - BUT IT WAS A BETA :)  Thanks so much James
 
 * [Keith Dahlby](https://twitter.com/dahlbyk)
 
-> Keith has been contributing issue reports, pull requests with fixes & features for a few months.  He's just been a general good open source citizen and a fantastic person to have working in the project.  You've been awesome to work
+> Keith has been contributing issue reports, pull requests with fixes & features for a few months.  He's just been a general good open source citizen and a fantastic person to have working in the project.  You've been awesome to work with!
 
 * [Claudio Sanchez](https://twitter.com/ClaudioASanchez) and [Danny Ackerman](https://twitter.com/dannyackerman)
 
