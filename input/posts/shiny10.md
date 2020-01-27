@@ -56,7 +56,7 @@ A big thank you to all of those who have contributed in any way, shape, or form 
 
 * [Keith Dahlby](https://twitter.com/dahlbyk)
 
-> Keith has been contributing issue reports, pull requests with fixes & features for a few months.  He's just been a general good open source citizen and a fantastic person to have working in the project.  You've been awesome to work with!
+> Keith has been contributing issue reports, pull requests with fixes & features for a few months.  He's just been a general good open source citizen and a fantastic person to have working in the project.  Thanks Keith!
 
 * [Claudio Sanchez](https://twitter.com/ClaudioASanchez) and [Danny Ackerman](https://twitter.com/dannyackerman)
 
