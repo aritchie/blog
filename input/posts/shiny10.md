@@ -18,7 +18,7 @@ When I started doing Xamarin plugins a few years ago, they were just one off pie
 
 What's In The Release
 ---
-* Backround Jobs
+* Background Jobs
 * GPS, Geofencing, & Motion Activity
 * Local Notifications with all the bells and whistles (blog post to follow)
 * HTTP Transfers - Background File Uploads and Downloads with metrics to track things like speed, estimate time remaining, etc

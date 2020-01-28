@@ -27,14 +27,19 @@ ShinyMotionActivity.Query(...)
 
 Don't like the boilerplate?  I can only get rid of so much, but I've made service registration match the Xamarin Forms assembly attribute.  
 
+
 ## Registering with Assemblies
 
-This also includes jobs!
+I wanted a fast way to skip the startup file and give a familiar style, so I borrowed a page from Xamarin Forms.  You can register you services very similar to how XF does it, so that you can use your services inside of Shiny delegates and jobs
 
+In the usual "init" places, simply do the following
 
 ```csharp
 iOSShinyHost.Init(ShinyStartup.FromAssemblyRegistration(typeof(App).Assembly));
+```
 
+Now, somewhere in your shared project - add attributes similar to the following to wire up some of your stuff
+```csharp
 [assembly: ShinySqliteIntegration(true, true, true, true, true)]
 [assembly: ShinyJob(typeof(SampleJob), "MyIdentifier", BatteryNotLow = true, DeviceCharging = false, RequiredInternetAccess = Shiny.Jobs.InternetAccess.Any)]
 [assembly: ShinyAppCenterIntegration(Constants.AppCenterTokens, true, true)]
