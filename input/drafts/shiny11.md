@@ -16,7 +16,12 @@ Easier Boilerplate
 I found that users were often missing some of the unfortunate boilerplate code that is necessary to integrate with the OS.  With 1.1, I set out to make the discovery a bit easier to work with.  
 
 Shiny.Integrations.XamarinForms
+---
+Continuing on the path of easier boilerplate and integration, Shiny now integrates far more easily with Xamarin Forms.  If you already have an existing app that is making use of the DependencyService, you can now have Shiny dump its services into the DependencyService as well.  
 
+```csharp
+
+```
 
 AndroidX
 ---
@@ -24,10 +29,20 @@ AndroidX is now supported in most of the Shiny packages where possible.  Simply 
 
 There is really only 1 significant upgrade other than freeing yourself from those evil support libraries.  I've replaced the default JobScheduler engine with the new shiny WorkManager.  The awesome part, you don't have to change a thing in your job code to get the benefits of this!
 
+
 Other Core Updates
 ---
-Connectivity
-Network
+Power manager now has a watchable property that allows you to see if energy saver is turned on
+
+Connectivity adds a watchable property for cellular carrier.
+
+```csharp
+ShinyConnectivity.CellularCarrier; // AT&T, etc
+
+ShinyPowerManager.IsEnergySaverEnabled; // Boolean
+
+// both services implement INotifyPropertyChanged
+```
 
 Notifications
 ---
