@@ -13,13 +13,37 @@ It's only been a month since the 1.0 release and 1.1 is already here!  1.1 is pa
 Easier Boilerplate
 ---
 
-I found that users were often missing some of the unfortunate boilerplate code that is necessary to integrate with the OS.  With 1.1, I set out to make the discovery a bit easier to work with.  
+I found that users were often missing some of the unfortunate boilerplate code that is necessary to integrate with the OS.  With 1.1, I set out to make the discovery a bit easier to work with. 
 
-Shiny.Integrations.XamarinForms
+### Before & After
+```csharp
+```
+
+
+App State Delegates
 ---
-Continuing on the path of easier boilerplate and integration, Shiny now integrates far more easily with Xamarin Forms.  If you already have an existing app that is making use of the DependencyService, you can now have Shiny dump its services into the DependencyService as well.  
+
+Foreground on Jobs
+---
+
+
 
 ```csharp
+using Shiny; // important - this will link in the extension methods
+
+// iOS 
+public class YourAppDelegate : ApplicationDelegate
+{
+    public void FinishedLaunching() {
+        // 1.0
+        iOSShiny.Init(new YourStartup());
+
+        // 1.1
+        this.ShinyFinishedLaunching(new YourStartup());
+    }
+}
+
+// Android Activity
 
 ```
 
@@ -55,11 +79,12 @@ Location Updates
 ---
 Mostly bugfixes for this one with some minor updates
 * We are now checking for the new Android 10 background location permission as necessary
-* The addition of a pure GPS to Geofence module.  Some customers have stated they don't like the requirement on Google Play Services for many reasons, thus, I wanted to give this option.
+* The addition of a pure GPS to Geofence module.  Some customers have stated they don't like the requirement on Google Play Services for many reasons, thus, I wanted to give this option.  This is now also the fallback option (automagically) when Google Play Services is not available!
 
 ```csharp
 // in your shiny startup file
-services.UseGpsDirectGeofencing<YourGeofenceDelegate>()
+services.UseGpsDirectGeofencing<YourGeofenceDelegate>();
+
 ```
 
 
