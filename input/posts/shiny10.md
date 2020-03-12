@@ -64,7 +64,7 @@ A big thank you to all of those who have contributed in any way, shape, or form 
 
 
 ## Links
-* [All Shiny Articles](http://localhost:5080/tags/Shiny)
+* [All Shiny Articles](/tags/Shiny)
 * [Samples](https://github.com/shinyorg/shinysamples/tree/master/Samples)
 * [Documentation](https://shinylib.net)
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
@@ -76,5 +76,5 @@ A big thank you to all of those who have contributed in any way, shape, or form 
 * Shiny.Net.Http - [![NuGet](https://img.shields.io/nuget/v/Shiny.Net.Http.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Net.Http/)
 * Shiny.SpeechRecognition - [![NuGet](https://img.shields.io/nuget/v/Shiny.SpeechRecognition.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.SpeechRecognition/)
 * Shiny.Testing - [![NuGet](https://img.shields.io/nuget/v/Shiny.Testing.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Testing/)
-* Shiny.Push - [![NuGet](https://img.shields.io/nuget/v/Shiny.NFC.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Push/)
+* Shiny.Push - [![NuGet](https://img.shields.io/nuget/v/Shiny.Push.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Push/)
 * Shiny.NFC - [![NuGet](https://img.shields.io/nuget/v/Shiny.NFC.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.NFC/)
