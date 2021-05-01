@@ -6,10 +6,6 @@ SubTitle: The personal blog of Allan Ritchie
 PostSources: posts/{*,!*source}.md
 Image: images/toronto_pan.jpg
 LinksUseHttps: true
-GitHubOwner: aritchie
-GitHubName: aritchie.github.io
-GitHubToken: => Config.FromSetting<string>("BLOG_GITHUB_TOKEN")
-GitHubBranch: main
 SamplesUrl: https://github.com/shinyorg/shiny
 SamplesUrlDescription: Samples
 DocumentationUrl: https://shinylib.org
