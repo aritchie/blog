@@ -14,7 +14,7 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.202'
-        #dotnet-version: '3.1.100' # SDK Version to use.
+
     - run: dotnet run -- deploy -l Debug
       env:
         GITHUB_TOKEN: ${{ secrets.BLOG_GITHUB_TOKEN }}
