@@ -7,6 +7,8 @@ Tags:
     - Shiny
 ---
 
+# THIS ARTICLE WAS FOR SHINY 1.x AND NOW DEPRECATED
+
 ### What is it?
 Ever wanted to write a backgrounding experience that is consistent across all of the .NET platforms you work with?  Between Xamarin Android, Xamarin iOS, and the Universal Windows Platform (UWP) - there are a variety of issues that I've seen commonly occuring that makes this difficult.  As .NET developers, we often want our dependency injection, our async/awaits, and our general way of doing things in our ecosystem.  The mobile platforms really flipped us on our head.  Android has services & broadcast receivers, iOS has too many different ways of coming at backgrounding, and UWP is somewhere in between.
 
@@ -33,7 +35,6 @@ Out of the box, Shiny will offer:
 * HTTP File Transfers
 * Sensors
 * Notifications
-* Integrations with 3rd Party MVVM Frameworks like Prism, ReactiveUI, & MvvmCross
 
 ### Why Another Essentials or Set of Plugins?
 Well - to be fair, I've had most of these libraries before some of the other plugins existed.  I also set out to offer a DI and background experience in a cross platform way first.  I also wanted to open the door to other platforms like Tizen, macOS, Linux, Blazor, Uno, & possibly even Meadow as other platforms for the future.  This library has zero focus on UI and will only focus on service processes - I'll leave the frontend stuff to Xamarin Forms & Uno.
@@ -231,7 +232,5 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
 }
 ```
 
-### Like What You See?
-Head over to see the full [GitHub Samples](https://github.com/shinyorg/shinysamples) or official documentation located [here](https://shinydocs.azurewebsites.net).  Packages on nuget can be found [here](https://www.nuget.org/packages?q=shiny).
-
-Follow the [links here](/tags/shiny) for more upcoming articles
+## LINKS
+<?# DefaultBlogLinks /?>

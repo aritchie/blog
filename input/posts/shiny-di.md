@@ -6,6 +6,8 @@ Tags:
     - Shiny
 ---
 
+# THIS ARTICLE APPLIES TO ALL VERSIONS OF SHINY
+
 Shiny isn't all about backgrounding, DI, RX, and all of that cool stuff.  It actually provides a ton of utility functions as well.  
 
 I love Autofac and a lot of the functions it has.  It really is a great DI framework though is known for being a tad on the slow side.  With Shiny, I went with Microsoft.Extensions.DependencyInjection as the DI platform of choice.  It is fast, has "enough" features, built on a great set of abstractions, and has monolith company backing it.  However, it is no Autofac in terms of features - so I wanted to carry a few of them forward.  Namely, modules and startables.  I've also added a very useful feature in stateful delegates which is my personal favorite!  I'll explain what this in this article as well.
@@ -161,10 +163,4 @@ Modules & startup tasks provide a great way to modulizing your application and p
 
 
 ## Links
-* [Initial Shiny Setup](introducingshiny)
-* [Source Code](https://github.com/shinyorg/shiny)
-* [Samples](https://github.com/shinyorg/shinysamples)
-* [Documentation](https://shinylib.net)
-* [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
-* [Shiny TODOs Sample App](https://github.com/aritchie/stream-todo)
-
+<?# DefaultBlogLinks /?>

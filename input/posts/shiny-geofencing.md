@@ -6,6 +6,8 @@ Tags:
     - Shiny
 ---
 
+# THIS ARTICLE HAS BEEN UPDATED TO SHINY 2.0
+
 GPS & Geofencing is a common need for mobile and IoT platforms alike.  However, mobile platforms with backgrounding in this area are always painful and that is being nice.  We've tried several plugins over the years, but they have all some sort of pain point.  Shiny aims to solve all of these as it provides a lot of base infrastructure to make things... shiny ;)
 
 We'll talk about GPS in a future article.  In this article, we'll focus on the geofencing and add in some notifications to make things awesome!
@@ -88,15 +90,8 @@ public class SampleStartup : ShinyStartup
 }
 ```
 
-### Android
-Other than the normal Android setup for Shiny, you need to add the following to your manifest.xml - we'll need a few bluetooth permissions here
-```xml
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-```
-
 ### iOS
-Again, same typical iOS initialization.  Just add the following to your info.plist.  The UIBackgroundModes is required for geofencing.
+Only iOS requires a bit of extra configuration.  Just add the following to your info.plist.  The UIBackgroundModes is required for geofencing.
 
 ```xml
 <key>NSLocationAlwaysUsageDescription</key>
@@ -158,13 +153,10 @@ public class YourViewModel
 ```
 
 ## In Closing
-Geofencing + Notifications is a powerful combination for things like marketing.  Hopefully, Shiny helps make this combo easy for you!
+Geofencing + Notifications is a powerful combination.  Hopefully, Shiny helps make this combo easy for you!
 
 ## Links
-* [Initial Shiny Setup](introducingshiny)
-* [Source Code](https://github.com/shinyorg/shiny)
-* [Samples](https://github.com/shinyorg/shinysamples)
-* [Documentation](https://shinylib.net)
+<?# DefaultBlogLinks /?>
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
 * Shiny.Locations - [![NuGet](https://img.shields.io/nuget/v/Shiny.Locations.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
 * Shiny.Notifications - [![NuGet](https://img.shields.io/nuget/v/Shiny.Notifications.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Notifications/)

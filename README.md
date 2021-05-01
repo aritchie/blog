@@ -1,0 +1,1 @@
+﻿The static source generator code for allancritchie.net / aritchie.github.io

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <ShinyVersion>2.0.0.2608-preview</ShinyVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Devlead.Statiq" Version="0.8.0" />
+        <PackageReference Include="Statiq.Web" Version="1.0.0-beta.27" />
+
+        <PackageReference Include="Shiny" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Core" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Locations" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Net.Http" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Notifications" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Push" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Integrations.Sqlite" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Testing" Version="$(ShinyVersion)" />
+    </ItemGroup>
+
+</Project>

@@ -82,7 +82,7 @@ namespace YourNamespace
         public override void ConfigureServices(IServiceCollection builder)
         {
             // only necessary for the monitoring - for ranging only you can use UseBeacons()
-            builder.UseBeacons<MyBeaconDelegate>();
+            builder.UseBeaconRanging<MyBeaconDelegate>();
             builder.UseNotifications();
         }
     }
@@ -164,9 +164,7 @@ namespace YourNamespace
 Give Beacons a try - they are great for a variety of business applications from marketing to employee management
 
 ## Links
-* [Initial Shiny Setup](introducingshiny)
-* [Samples](https://github.com/shinyorg/shinysamples/tree/master/Samples/Beacons)
-* [Documentation](https://shinylib.net)
+<?# DefaultBlogLinks /?>
 * Shiny.Core - [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
 * Shiny.Beacons - [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
 * Shiny.Notifications - [![NuGet](https://img.shields.io/nuget/v/Shiny.Notifications.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Notifications/)

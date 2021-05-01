@@ -7,6 +7,8 @@ Tags:
     - Shiny
 ---
 
+# THIS ARTCILE HAS BEEN UPDATED TO SHINY 2.0
+
 <img src="images/shiny_logo.png" width="100" /> 
 
 Performing background jobs on mobile is a necessity these days whether you are synchronizing data with your background, triggering notifications to say happy birthday, or just tracking your user for every step they make.  With Shiny, I set out to make this process a breeze.  Android has such a beautiful scheduled jobs engine that keeps improving.  iOS is painful mainly because Apple hates your code that isn't UI.  UWP does have a background tasks which work quite well, but lack some structure.  I attempted to bring most of the "pretty" from Android to Xamarin cross platform! 
@@ -16,51 +18,8 @@ Jobs is something that is built into the main Shiny library as alot of what it d
 ---
 ## Getting Setup
 
-Obviously, first things first - install the [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/) package 
+Obviously, first things first - install the <?# NugetShield "Shiny.Core" /?> package into your head projects as well as your shared project.
 
-### Android
-Add the following to your AndroidManifest.xml
-
-```xml
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.BATTERY_STATS" />	
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-```
-
-You need to have an actual Application class in your android project.  You can do this two ways:
-```csharp
-[Application]
-public class YourApplication : Application
-{
-    public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
-    {
-    }
-
-
-    public override void OnCreate()
-    {
-        base.OnCreate();
-        Shiny.AndroidShinyHost.Init(this, new YourNamespace.Startup());
-    }
-}
-
-```
-
-### iOS
-iOS doesn't have a set period.  It runs on background fetch which means when iOS feels like running it will.  To be fair, it is fairly intelligent when it does the sync (it knows when the user intends to be active, what the network is like, etc).  
-
-To get iOS going, you have to wire the following into your AppDelegate:
-
-```csharp
-// in your FinishedLaunching method
-iOSShinyHost.Init();
-
-// and add this guy
-public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-{
-    Shiny.Jobs.JobManager.OnBackgroundFetch(completionHandler);
-}
-```
 
 And for your Info.plist
 ```xml
@@ -193,8 +152,8 @@ NOTE: you can see the result(s) of a job pass by taking a look at the result obj
 iOS is not "periodic" in the sense that you can rely on it to run every X mins.  In fact, it is quite intelligent about when/how it runs.  Do remember, you are piggybacking on "background fetch", so you really need to do some sort of remote data call if you don't want to aggrevate the apple gods that be.
 
 ## Links
-* [Initial Shiny Setup](introducingshiny)
-* [Source Code](https://github.com/shinyorg/shiny)
-* [Samples](https://github.com/shinyorg/shinysamples)
-* [Documentation](https://shinylib.net)
-* [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
+* <?# ConfiguredLink "Documentation" /?>
+* <?# ConfiguredLink "Samples" /?>
+* <?# ConfiguredLink "GitHub" /?>
+* <?# ConfiguredLink "AllNugets" /?>
+* <?# NugetShield "Shiny.Core" /?>
