@@ -7,19 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devlead.Statiq" Version="0.8.0" />
+        <PackageReference Include="Devlead.Statiq" Version="0.9.0" />
         <PackageReference Include="Statiq.Web" Version="1.0.0-beta.27" />
 
-        <PackageReference Include="Shiny" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Core" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Locations" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Net.Http" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Notifications" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Push" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Integrations.Sqlite" Version="$(ShinyVersion)" />
-        <PackageReference Include="Shiny.Testing" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Core" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.BluetoothLE" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.BluetoothLE.Hosting" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Locations" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Net.Http" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Notifications" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Push" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Integrations.Sqlite" Version="2.0.0.2636-preview" />
+        <PackageReference Include="Shiny.Testing" Version="2.0.0.2636-preview" />
     </ItemGroup>
 
 </Project>

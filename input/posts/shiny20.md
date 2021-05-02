@@ -42,11 +42,11 @@ tabs:
   - name: Android Before
     include: "../../includes/shiny20/androidbefore.md"
 
-  - name: iOS Before
-    include: "../../includes/shiny20/iosbefore.md"
-
   - name: Android After
     include: "../../includes/shiny20/androidafter.md"
+
+  - name: iOS Before
+    include: "../../includes/shiny20/iosbefore.md"
 
   - name: iOS After
     include: "../../includes/shiny20/iosafter.md"
@@ -180,6 +180,7 @@ Currently, Shiny is working with Native, Google Firebase Messaging, and Azure Pu
 * Push
 * Firebase
 * Azure Notification Hubs
+* OneSignal & AWS is in the works
 
 Why is this such an awesome API? Because you can swap between 
 push notification providers with 1 single line of code:
@@ -279,6 +280,16 @@ tabs:
 The problem with traditional peripheral managed is that with every connection, you had to rescan for all of the services and characteristics you had.  You also had to restore any notifications you had.
 This was painful
 
+<?# TabGroup ?>
+<?*
+tabs:
+  - name: Before
+    include: "../../includes/shiny20/bleperipheralbefore.md"
+
+  - name: After
+    include: "../../includes/shiny20/bleperipheralafter.md"
+?>
+<?#/ TabGroup ?>
 
 ## Beacons
 ---
@@ -291,6 +302,17 @@ on Android as well!
 #### Managed Scan
 This essentially works identical to the BLE managed scan.  
 * It will remove beacons from your list that haven't been "heard" in a configurable timestamp
+
+<?# TabGroup ?>
+<?*
+tabs:
+  - name: Before
+    include: "../../includes/shiny20/beaconscanbefore.md"
+
+  - name: After
+    include: "../../includes/shiny20/beaconscanafter.md"
+?>
+<?#/ TabGroup ?>
 
 ## LINKS
 * <?# ConfiguredLink "Documentation" /?>
