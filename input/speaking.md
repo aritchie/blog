@@ -1,6 +1,9 @@
 Title: Speaking
 ---
 
+Checkout [GitHub](https://github.com/aritchie/talks) for all of my slidedecks and code samples from my talks
+
+
 |Event|Talk|Date|Links|
 |-----|----|----|-----|
 |.NET Conf 2020|Shiny 101|March TBD|TBD|

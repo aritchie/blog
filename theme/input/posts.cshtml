@@ -1,9 +1,11 @@
+Title: Posts
 ArchiveSources: => GetString("PostSources")
 ArchiveOrderKey: Published
 ArchiveOrderDescending: true
 ---
 @foreach(IGrouping<int, IDocument> group in Document
     .GetChildren()
+    .Where(x => x.GetDateTime(WebKeys.Published) < DateTime.Now)
     .GroupBy(x => x.GetDateTime(WebKeys.Published).Year)
     .OrderByDescending(x => x.Key))
 {
