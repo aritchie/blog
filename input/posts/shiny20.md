@@ -1,5 +1,5 @@
 Title: Shiny 2.0 For Xamarin - Shinier Than Ever
-Published: 4/27/2021
+Published: 5/5/2021
 Image: images/shiny_logo.png
 Tags:
     - Xamarin
