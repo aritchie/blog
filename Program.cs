@@ -20,6 +20,11 @@ namespace Blog
                     "aritchie.github.io",
                     Config.FromSetting<string>("GITHUB_TOKEN")
                 )
+                .DeployToAzureAppService(
+                    "ftps://waws-prod-yq1-009.ftp.azurewebsites.windows.net/site/wwwroot",
+                    "acrblog\\allanritchie",
+                    "Blargh911!"
+                )
                 .AddTabGroupShortCode()
                 .AddIncludeCodeShortCode()
                 .AddShortcode<NugetShieldShortcode>("NugetShield")
