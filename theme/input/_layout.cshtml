@@ -34,7 +34,7 @@
   <meta name="msapplication-starturl" content="@Context.GetLink("/")" />
 
   @* TODO: More social graph meta tags *@
-  <meta property="og:title" content="@Document.GetString("PageTitle")" />
+  <meta property="og:title" content="@Document.GetString("Title")" />
   @if (Document.ContainsKey(WebKeys.Image))
   {
     <meta property="og:image" content="@Context.GetLink(Document.GetString(WebKeys.Image), true)" />
