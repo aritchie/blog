@@ -53,14 +53,14 @@ tabs:
 ?>
 <?#/ TabGroup ?>
 
-To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.
+To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.
 
 These new generators can even build your entire startup class, but that's a discussion for a future article :)
 
 ## Static Class Generation
 ---
 There are a lot of users that don't like dependency injection.  I can't see or live in a world without it (for now).  
-With those thoughts in mind, source generators once again came to the rescue.  All you need to do is install the <?! NugetShield "Shiny" /?> in the library where you want the classes generated and add the attribute in any file as shown below.
+With those thoughts in mind, source generators once again came to the rescue.  All you need to do is install the <?! NugetShield "Shiny" "Shiny" /?> in the library where you want the classes generated and add the attribute in any file as shown below.
 For any Shiny library you have installed in your library, the source generator will create a static equivalent class of the interface.
 
 ```csharp
@@ -85,8 +85,8 @@ While libraries like AppCenter and Firebase help with crashes, it can be quite d
 With that being said, I also didn't want to write new providers to plugin into Shiny.  There was an easy answer to this problem - Use Microsoft.Extensions.Logging - the exact same library used by ASP.NET Core devs!  It is a fantastical abstraction 
 to build on and support DI out of the gate!  The only thing that was missing was logging providers for AppCenter & Firebase - so I've added the following libs to Shiny
 
-<?# NugetShield "Shiny.Logging.Firebase" "label" /?>
-<?# NugetShield "Shiny.Logging.AppCenter" "label" /?>
+<?# NugetShield "Shiny.Logging.Firebase" "Shiny.Logging.Firebase" /?>
+<?# NugetShield "Shiny.Logging.AppCenter" "Shiny.Logging.AppCenter" /?>
 
 
 Wiring providers up is also almost just like ASP.NET Core.  In your Shiny startup file:
