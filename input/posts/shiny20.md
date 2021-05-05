@@ -367,7 +367,8 @@ tabs:
 <?#/ TabGroup ?>
 
 ## In Closing
-This article only scrapped the surface of the 2.0 upgrade.  There's more articles to come and the docs are shaping up nicely.
+This article only scrapped the surface of the 2.0 upgrade.  There's more articles to come and the docs are shaping up nicely.  There are also other packages like NFC, Speech to Text, BLE Hosting, Sensors, and HTTP Transfers that all still exists.  They just didn't see any
+huge feature updates in this release. 
 
 I want to thank my good friend [Dan Siegel](https://twitter.com/DanJSiegel) of Prism fam for all of the help, testing, tooling, suggesting, blog articles, and poking (cough...nagging).  Shiny and the Xamarin community as a whole is a better place because of him.
 His work on [Mobile Build Tools](https://mobilebuildtools.com/) was also immensely helpful for the Shiny samples and integration tests.
