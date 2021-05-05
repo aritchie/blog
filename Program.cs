@@ -22,7 +22,7 @@ namespace Blog
                 )
                 .DeployToAzureAppService(
                     "acrblog",
-                    "acrblog\\$acrblog",
+                    "$acrblog",
                     "tkYnfBba49SxktioengcZMWzulrFPWnJtNoi0kyp1hqfsiplK3Mxlo4ARfta"
                 )
                 .AddTabGroupShortCode()
