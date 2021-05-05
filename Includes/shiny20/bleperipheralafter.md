@@ -1,14 +1,29 @@
 ﻿```csharp
-var scanner = ShinyHost.Resolve<Shiny.Beacons.IBeaconRangingManager().CreateManagedScan();
+// after a scan, you should have an IPeripheral
+var managed = peripheral.CreateManaged(RxApp.MainThreadScheduler); // schedule 
+managed.StartRssi(); // and StopRssi() later if you don't want it monitored
 
+// now you can simply bind to these in your viewmodel
+managed.Status;
+managed.Rssi;
+managed.Name;
 
-// your viewmodel/view binding collection - note that you aren't managing it :)
-public ObservableCollection<ManagedBeacon> Beacons => this.scanner.Beacons;
+// and the traditional methods
+managed
+    .WhenNotificationReceived(
+        "serviceUUID",
+        "characteristicUUID"
+    )
+    .Subscribe(x => {
+        // data for your viewmodel
+    });
 
-// start the scan
-scanner.Start(new BeaconRegion("your id", "your uuid"), RxApp.MainThreadScheduler);
+// note that you don't have to request a connection
+await managed.EnableNotification(true, "serviceUUID", "characteristicUUID").ToTask(); // pass false when done
 
+var readData = await managed.Read("serviceUUID", "characteristicUUID").ToTask();
+await managed.Write("serviceUUID", "characteristicUUID", new byte[1] { 0x0 }).ToTask();
 
-// and when you're ready to stop
-scanner.Stop();
+// when you're done with this guy, just dispose of him and he'll clean himself up and cancel the connection
+managed.Dispose();
 ```

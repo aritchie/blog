@@ -85,8 +85,8 @@ While libraries like AppCenter and Firebase help with crashes, it can be quite d
 With that being said, I also didn't want to write new providers to plugin into Shiny.  There was an easy answer to this problem - Use Microsoft.Extensions.Logging - the exact same library used by ASP.NET Core devs!  It is a fantastical abstraction 
 to build on and support DI out of the gate!  The only thing that was missing was logging providers for AppCenter & Firebase - so I've added the following libs to Shiny
 
-<?# NugetShield "Shiny.Logging.Firebase" /?>
-<?# NugetShield "Shiny.Logging.AppCenter" /?>
+<?# NugetShield "Shiny.Logging.Firebase" "label" /?>
+<?# NugetShield "Shiny.Logging.AppCenter" "label" /?>
 
 
 Wiring providers up is also almost just like ASP.NET Core.  In your Shiny startup file:
@@ -293,7 +293,14 @@ tabs:
 
 #### Managed Peripheral
 The problem with traditional peripheral managed is that with every connection, you had to rescan for all of the services and characteristics you had.  You also had to restore any notifications you had.
-This was painful
+This was painful.
+
+Managed peripheral to the rescue. The managed peripheral will
+* Work like a ViewModel - you can even have it broadcast it's changes on the UI thread for you to bind to
+* Reconnect automatically
+* Restore any characteristic subscription
+* Read/Writes will redetect the characteristics as you used them.  This saves using GetCharacteristic to continously and thereby increasing performance
+* Keeps a list of characteristics you've used instead of having to call GetServices/GetCharacteristics over and over
 
 <?# TabGroup ?>
 <?*
@@ -329,7 +336,7 @@ Here's a quick look at the main beacon features
 Setting up background monitoring is pretty simple.  Once you've registered, simply call:
 
 Here's your delegate:
-<?! IncludeCode "../../CodeSamples/shiny20/MyBeaconMonitoringDelegate.cs" /?> 
+<?! IncludeCode "../../CodeSamples/shiny20/MyBeaconMonitorDelegate.cs" /?> 
 
 and the code to start monitoring:
 
