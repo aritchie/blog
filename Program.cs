@@ -21,7 +21,7 @@ namespace Blog
                     Config.FromSetting<string>("GITHUB_TOKEN")
                 )
                 .DeployToAzureAppService(
-                    "waws-prod-yq1-009.ftp.azurewebsites.windows.net",
+                    "acrblog",
                     "acrblog\\$acrblog",
                     "tkYnfBba49SxktioengcZMWzulrFPWnJtNoi0kyp1hqfsiplK3Mxlo4ARfta"
                 )
