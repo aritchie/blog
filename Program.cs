@@ -21,9 +21,9 @@ namespace Blog
                     Config.FromSetting<string>("GITHUB_TOKEN")
                 )
                 .DeployToAzureAppService(
-                    "ftps://waws-prod-yq1-009.ftp.azurewebsites.windows.net/site/wwwroot",
-                    "acrblog\\allanritchie",
-                    "Blargh911!"
+                    "waws-prod-yq1-009.ftp.azurewebsites.windows.net",
+                    "acrblog\\$acrblog",
+                    "tkYnfBba49SxktioengcZMWzulrFPWnJtNoi0kyp1hqfsiplK3Mxlo4ARfta"
                 )
                 .AddTabGroupShortCode()
                 .AddIncludeCodeShortCode()

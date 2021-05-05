@@ -79,7 +79,7 @@ Pretty statics and NO dependency injection to be seen anywhere.  You still have 
 
 ## Logging
 ---
-Logging is generally something you want in your app.  When you work in the background, you can't rely on the general dev experience of hoping the errors in your VS output window.  
+Logging is generally something you want in your app.  When you work in the background, you can't rely on the general dev experience of errors appearing in your VS output window.  
 While libraries like AppCenter and Firebase help with crashes, it can be quite dangerous to build them directly into all of your views/viewmodels/classes/etc. Logging providers also tend to disappear and change over time.
 
 With that being said, I also didn't want to write new providers to plugin into Shiny.  There was an easy answer to this problem - Use Microsoft.Extensions.Logging - the exact same library used by ASP.NET Core devs!  It is a fantastical abstraction 
