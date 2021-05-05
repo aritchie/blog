@@ -53,7 +53,7 @@ tabs:
 ?>
 <?#/ TabGroup ?>
 
-To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.
+To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.  Also note how the activity and appdelegate are partial
 
 These new generators can even build your entire startup class, but that's a discussion for a future article :)
 
@@ -370,7 +370,7 @@ tabs:
 This article only scrapped the surface of the 2.0 upgrade.  There's more articles to come and the docs are shaping up nicely.  There are also other packages like NFC, Speech to Text, BLE Hosting, Sensors, and HTTP Transfers that all still exists.  They just didn't see any
 huge feature updates in this release. 
 
-I want to thank my good friend [Dan Siegel](https://twitter.com/DanJSiegel) of Prism fam for all of the help, testing, tooling, suggesting, blog articles, and poking (cough...nagging).  Shiny and the Xamarin community as a whole is a better place because of him.
+I want to thank my good friend [Dan Siegel](https://twitter.com/DanJSiegel) of Prism fame for all of the help, testing, tooling, suggesting, blog articles, and poking (cough...nagging).  Shiny and the Xamarin community as a whole is a better place because of him.
 His work on [Mobile Build Tools](https://mobilebuildtools.com/) was also immensely helpful for the Shiny samples and integration tests.
 
 The future of Shiny now begins to look towards app services which moves from device & background servicing to truly solving real world business cases.  Some of the things I'm working on:
