@@ -1,7 +1,7 @@
 ﻿using Shiny.Push;
 using System.Threading.Tasks;
 
-namespace MyNamespace
+namespace Shiny20Sample
 {
     public class MyPushDelegate : IPushDelegate
     {

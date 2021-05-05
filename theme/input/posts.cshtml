@@ -5,7 +5,7 @@ ArchiveOrderDescending: true
 ---
 @foreach(IGrouping<int, IDocument> group in Document
     .GetChildren()
-    .Where(x => x.GetDateTime(WebKeys.Published) < DateTime.Now)
+    .Where(x => x.GetDateTime(WebKeys.Published) <= DateTime.Now)
     .GroupBy(x => x.GetDateTime(WebKeys.Published).Year)
     .OrderByDescending(x => x.Key))
 {
