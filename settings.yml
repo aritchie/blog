@@ -8,7 +8,7 @@ Image: images/toronto_pan.jpg
 LinksUseHttps: true
 SamplesUrl: https://github.com/shinyorg/shiny
 SamplesUrlDescription: Samples
-DocumentationUrl: https://shinylib.org
+DocumentationUrl: https://shinyorg.github.io
 DocumentationUrlDescription: Documentation
 GitHubUrl: https://github.com/shinyorg/shiny/tree/master/samples
 AllNugetsUrl: https://www.nuget.org/profiles/ShinyLib
