@@ -1,18 +1,22 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Text;
 using Statiq.Common;
 
 
 namespace Blog.Shortcodes
 {
-    public class DefaultBlogLinksShortcode : IShortcode
+    public class DefaultBlogLinksShortcode : SyncShortcode
     {
-        public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context) => new []
+        public override ShortcodeResult Execute(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
-            new ShortcodeResult("*" + document.GetConfiguredAnchorTag("Documentation")),
-            new ShortcodeResult("*" + document.GetConfiguredAnchorTag("Samples")),
-            new ShortcodeResult("*" + document.GetConfiguredAnchorTag("GitHub")),
-            new ShortcodeResult("*" + document.GetConfiguredAnchorTag("AllNugets"))
-        };
+            var links = new StringBuilder()
+                .AppendLine("*" + document.GetConfiguredAnchorTag("Documentation"))
+                .AppendLine("*" + document.GetConfiguredAnchorTag("Samples"))
+                .AppendLine("*" + document.GetConfiguredAnchorTag("GitHub"))
+                .AppendLine("*" + document.GetConfiguredAnchorTag("AllNugets"))
+                .ToString();
+
+            return new ShortcodeResult(links);
+        }
     }
 }

@@ -1,14 +1,13 @@
 ﻿using Statiq.Common;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 
 namespace Blog.Shortcodes
 {
-    public class NugetShieldShortcode : IShortcode
+    public class NugetShieldShortcode : SyncShortcode
     {
-        public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
+        public override ShortcodeResult Execute(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
             var packageName = args.FirstOrDefault().Value;
             var imageUrl = $"https://img.shields.io/nuget/v/{packageName}.svg?style=for-the-badge";
@@ -16,7 +15,7 @@ namespace Blog.Shortcodes
                 imageUrl += $"&label={args[1].Value}";
 
             var hrefUrl = $"https://www.nuget.org/packages/{packageName}/";
-            return new[] { new ShortcodeResult($"<a href=\"{hrefUrl}\" target=\"{packageName}\"><img src=\"{imageUrl}\" /></a>") };
+            return new ShortcodeResult($"<a href=\"{hrefUrl}\" target=\"{packageName}\"><img src=\"{imageUrl}\" /></a>");
         }
     }
 }
