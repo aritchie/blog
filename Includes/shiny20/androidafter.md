@@ -4,4 +4,9 @@
 public partial class MainActivity : Xamarin.Forms.Platform.Android.FormsAppCompatActivity
 {
 }
+
+[assembly: ShinyApplication(
+	ShinyStartupTypeName = "Samples.SampleStartup",
+	XamarinFormsAppTypeName = "Samples.App"
+)]
 ```
