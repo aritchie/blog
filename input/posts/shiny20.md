@@ -53,9 +53,11 @@ tabs:
 ?>
 <?#/ TabGroup ?>
 
-To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.  Also note how the activity and appdelegate are partial
-
+To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.  Also note how the activity and appdelegate are partial.
 These new generators can even build your entire startup class, but that's a discussion for a future article :)
+
+**NOTE: If you are using this on Azure DevOps or CI systems, MSBuild 16.8 is required which is not part of Mono yet.  You need to use a tool like Boots to update to the latest beta OR simply use the "BEFORE" versions above and don't install the Shiny package at all**
+
 
 ## Static Class Generation
 ---
