@@ -7,7 +7,7 @@ Checkout [GitHub](https://github.com/aritchie/talks) for all of my slidedecks an
 |Event|Talk|Date|Links|
 |-----|----|----|-----|
 |Cologne Xamarin User Group|Introducing Shiny|UPCOMING June 11, 2021|TBD|
-|Kerry Lothrop's #DevTalk Podcast|Introducing Shiny|May 10, 2021|TBD|
+|Kerry Lothrop's #DevTalk Podcast|Introducing Shiny|May 10, 2021|[kerry.lothrop.de](https://kerry.lothrop.de/devtalk-63-allan-ritchie/)|
 |Cape Town MS Developer User Group|Shiny 2.0|April 22, 2021|[YouTube](https://www.youtube.com/watch?v=Tfa84zjoHK0)|
 |Dan Siegel's Live Stream|Shiny 2.0|April 6, 2021|[YouTube](https://www.youtube.com/watch?v=hwHdvKCjtl8)|
 |.NET Dev Show|Introduction to Shiny.NET w/ Allan Ritchie|April 6, 2021|[YouTube](https://www.youtube.com/watch?v=lcOD7VtSX3w)|
