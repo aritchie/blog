@@ -1,8 +1,12 @@
 Title: Speaking
 ---
 
-Checkout [GitHub](https://github.com/aritchie/talks) for all of my slidedecks and code samples from my talks
+### Speaking Engagements
+Would you like to me speak at your user group, conference, or event - drop me an email [allan.ritchie@gmail.com](mailto:allan.ritchie@gmail.com).  I love
+to talk about my open source work, .NET in general, and all of my past experience around that.
 
+### Past Talks
+Checkout [GitHub](https://github.com/aritchie/talks) for all of my slidedecks and code samples from my talks
 
 |Event|Talk|Date|Links|
 |-----|----|----|-----|
