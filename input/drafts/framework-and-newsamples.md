@@ -18,8 +18,9 @@ a PR.  A lot of work goes into things, but stuff happens!
 
 Prism+ReactiveUI+Shiny
 Localization - Resource localization out of the box. Use it from your viewmodel, your view, no Xamarin Forms tricks - {Binding [YourResourceKey]}
-Dialogs - Built
+Dialogs - Built with the great XF.Material & RG Popups
 Global Command Exception Handling - It logs, it alerts, it localizes alerts - is there anything it doesn't do with almost no code?
+Global Navigation - Navigate from services 
 A Base ViewModel on steroids!
 
 Yes - Shiny.Framework is opinionated in the fact that some things are chosen for you.  In order to work with Prism, DryIoc is used behind the scenes for all things DI, but it is never seen once in your project.  Ignorance is bliss right?
