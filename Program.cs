@@ -20,11 +20,11 @@ namespace Blog
                     "aritchie.github.io",
                     Config.FromSetting<string>("GITHUB_TOKEN")
                 )
-                .DeployToAzureAppService(
-                    "acrblog",
-                    "$acrblog",
-                    "tkYnfBba49SxktioengcZMWzulrFPWnJtNoi0kyp1hqfsiplK3Mxlo4ARfta"
-                )
+                //.DeployToAzureAppService(
+                //    "acrblog",
+                //    "$acrblog",
+                //    "tkYnfBba49SxktioengcZMWzulrFPWnJtNoi0kyp1hqfsiplK3Mxlo4ARfta"
+                //)
                 .AddTabGroupShortCode()
                 .AddIncludeCodeShortCode()
                 .AddShortcode<NugetShieldShortcode>("NugetShield")
