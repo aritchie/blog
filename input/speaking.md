@@ -10,6 +10,7 @@ Checkout [GitHub](https://github.com/aritchie/talks) for all of my slidedecks an
 
 |Event|Talk|Date|Links|
 |-----|----|----|-----|
+|.NET Community Standup|Monthly|April 7, 2022|[YouTube](https://www.youtube.com/watch?v=Sa4pF1hAQHI&list=PLdo4fOcmZ0oX-DBuRG4u58ZTAJgBAeQ-t&index=2)|
 |XamExpertDay 2021|There’s More to Xamarin Than UI, Let’s do Some Background Magic with Shiny.NET|October 1, 2021|[YouTube](https://www.youtube.com/watch?v=5f8Gruz28DM)|
 |The Xamarin Show|Awesome Cross Platform with Shiny 2.0|June 10, 2021|[YouTube](https://www.youtube.com/watch?v=XEOw4Qe_fQk)|
 |Cologne Xamarin User Group|Shiny 2.0 For Xamarin - Shinier Than Ever|June 11, 2021|[YouTube](https://www.youtube.com/watch?v=9nCFwSTkeCg)|
