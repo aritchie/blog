@@ -2,25 +2,25 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <ShinyVersion>2.0.0.2608-preview</ShinyVersion>
+        <TargetFramework>net7.0</TargetFramework>
+        <ShinyVersion>2.1.0.2741</ShinyVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devlead.Statiq" Version="0.9.0" />
-        <PackageReference Include="Shiny.Beacons" Version="2.1.0.2741" />
-        <PackageReference Include="Statiq.Web" Version="1.0.0-beta.31" />
+        <PackageReference Include="Devlead.Statiq" Version="0.20.0" />        
+        <PackageReference Include="Statiq.Web" Version="1.0.0-beta.54" />
 
-        <PackageReference Include="Shiny" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Core" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.BluetoothLE" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.BluetoothLE.Hosting" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Locations" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Net.Http" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Notifications" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Push" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Integrations.Sqlite" Version="2.1.0.2741" />
-        <PackageReference Include="Shiny.Testing" Version="2.1.0.2741" />
+        <PackageReference Include="Shiny" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Beacons" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Core" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Locations" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Net.Http" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Notifications" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Push" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Integrations.Sqlite" Version="$(ShinyVersion)" />
+        <PackageReference Include="Shiny.Testing" Version="$(ShinyVersion)" />
     </ItemGroup>
 
 </Project>
