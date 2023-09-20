@@ -18,7 +18,6 @@ Want to help out?  There are several ways to do that
 ### SHINY PROJECT
 
 [![GitHub stars](https://img.shields.io/github/stars/shinyorg/shiny.svg?style=social&label=Stars)](https://github.com/shinyorg/shiny) 
-* [Documentation](https://shinylib.net)
-* [GitHub - Library](https://github.com/shinyorg/shiny)
-* [GitHub - Samples](https://samples.shinylib.net)
-* [Twitter](https://twitter.com/shinydotnet)
+* [Shiny.NET](https://shinylib.net)
+* [Shiny GitHub](https://github.com/shinyorg/shiny)
+* [Allan's GitHub](https://github.com/aritchie)

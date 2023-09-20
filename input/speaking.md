@@ -10,6 +10,7 @@ Checkout [GitHub](https://github.com/aritchie/talks) for all of my slidedecks an
 
 |Event|Talk|Date|Links|
 |-----|----|----|-----|
+|.NET Community Standup|Allan Ritchie is SHINY (v3 Release)|September 7, 2023|[YouTube](https://www.youtube.com/watch?v=oyLgrIzfVIg)|
 |Inside dotNET /w Cecil Phillip & Rodney Littles|Shiny Version 3|February 1, 2023|[YouTube](https://www.youtube.com/watch?v=98n3y2fYhVw)|
 |Microsoft Reactor|Introduction to .NET MAUI|September 28, 2022|[YouTube](https://www.youtube.com/watch?v=ZbKeM9wB4Ig)|
 |.NET Conf: Focus on MAUI|Unit Testing For Your MAUI Applications|August 9, 2022|[YouTube](https://www.youtube.com/watch?v=b4OJSmgMAaw)|
