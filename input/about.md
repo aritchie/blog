@@ -2,7 +2,7 @@ Title: About
 ---
 <img src="images/me.jpg" width="150" /> Hi There, my name is Allan Ritchie
 
-I'm a software engineer, architect, consultant, and open source maintainer.  I've worked on everything from web to mobile and everything in between.  I've worked with startups, enterprises, and general consultancies.  
+I'm a software engineer, architect, consultant, and open source maintainer.  I've worked on everything from web to mobile and all the "things" in between.  I've worked with startups, enterprises, and general consultancies.  
 
 In my early days, I started with Perl, PHP, Java, C++, and classic ASP.  Over the last 25 years, I've shipped software in many different industries from commercial property real estate, healthcare, logistics, and many more all ranging in size from startup to large enterprise. For the past 7 years, I've been focused on my own consultancy 'Shiny Soft' by helping companies deliver software to their customers.  This has included everything from mobile apps, web apps, backend services, and cloud infrastructure.
 
