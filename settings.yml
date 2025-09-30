@@ -6,10 +6,8 @@ SubTitle: The personal blog of Allan Ritchie
 PostSources: posts/{*,!*source}.md
 Image: images/toronto_pan.jpg
 LinksUseHttps: true
-SamplesUrl: https://samples.shinylib.net/
-SamplesUrlDescription: Samples
-DocumentationUrl: https://shinyorg.github.io/
+DocumentationUrl: https://shinylib.net/
 DocumentationUrlDescription: Documentation
-GitHubUrl: https://github.com/shinyorg/shiny/
-AllNugetsUrl: https://www.nuget.org/profiles/ShinyLib
+GitHubUrl: https://github.com/shinyorg/
+AllNugetsUrl: https://www.nuget.org/profiles/aritchie
 AllNugetsUrlDescription: NuGets

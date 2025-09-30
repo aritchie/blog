@@ -2,10 +2,35 @@ Title: About
 ---
 <img src="images/me.jpg" width="150" /> Hi There, my name is Allan Ritchie
 
-I'm a self-employed contractor bringing the mission of ".NET & Azure All The Things".  I write end-to-end solutions primarily for mobile clients with Microsoft Azure & DevOps - It is a beautiful world to work in most days :)
+I'm a software engineer, architect, consultant, and open source maintainer.  I've worked on everything from web to mobile and everything in between.  I've worked with startups, enterprises, and general consultancies.  
 
-I have over 25 years experience in software engineering. I love all things .NET and have been working with since the early 1.0 beta in 2001.  My open source contributions over the years, started in NHibernate and some ASP.NET frameworks like Anthem for those who are old enough to remember that.  Most of my notoriety these days in mobile OSS libraries.  I adopted Xamarin when they were part of Novell and got an early start with a test library called [Acr.UserDialogs](https://github.com/aritchie/userdialogs).  I have currently over 5 million downloads on [NuGet](https://nuget.org/profiles/aritchie) across listed and unlisted packages.
+In my early days, I started with Perl, PHP, Java, C++, and classic ASP.  Over the last 25 years, I've shipped software in many different industries from commercial property real estate, healthcare, logistics, and many more all ranging in size from startup to large enterprise.  
+For the past 7 years, I've been focused on my own consultancy 'Shiny Soft' by helping companies deliver software to their customers.  This has included everything from mobile apps, web apps, backend services, and cloud infrastructure.
 
-I'm also a former Xamarin MVP and current (8x) Microsoft MVP.  
+Over the last 15 years, I turned my work into a passion building open source.  When I started working in .NET, I worked in NHibernate and other big libraries before developing my own.  I'm author and maintainer of many libraries listed below and have amassed over 40 million downloads.
+I've also had the honour & privilege to spread my knowledge to other engineers through speaking and livestreaming all over the globe. My work earned several awards such as Xamarin MVP & in 2017, Microsoft also honoured me with [Microsoft MVP](https://mvp.microsoft.com/en-US/mvp/profile/501ddb3a-4d15-e711-810b-3863bb36edf8) for which I have received for the last 8 years running. 
 
-Please feel free to contact me using the links below if you are looking for some OSS or professional development help!
+My passion has always been helping people bring technology to their customers.  If you're looking for help with your next project, please get in touch!
+
+### GoneDotNet
+I co-host a weekly livestream on YouTube with my good friend [Jonathan Dick - redth](https://x.com/redth) called [Gone .NET](https://youtube.com/@GoneDotNet).  We don't just talk about all things .NET, we build some real world samples beyond the essentials. 
+
+<a href="youtube.com/@GoneDotNet" target="_blank">
+<img src="images/gonedotnet.jpg" />
+</a>
+
+### MY OPEN SOURCE PROJECTS
+
+* [Shiny](https://shinylib.net)
+* [Shiny Mobile](https://github.com/shinyorg/shiny)
+* [Shiny Mediator](https://github.com/shinyorg/mediator)
+* [App Extensions](https://github.com/shinyorg/extensions)
+* [Reflector](https://github.com/shinyorg/reflector)
+* [MAUI Shell Extensions](https://github.com/shinyorg/maui)
+* [App Templates](https://github.com/shinyorg/templates)
+* [Localization Generator](https://github.com/shinyorg/localizegen)
+* [Allan's GitHub](https://github.com/aritchie)
+* [Canadas Wonderland Ride Times](https://github.com/shinyorg/wonderland)
+* [Heads Up Clone](https://github.com/gonedotnet/headsup)
+* [Bluetooth Digital Scoreboard](https://github.com/aritchie/digitalscoreboard)
+* [Mediator Sample](https://github.com/shinyorg/mediatorsample)

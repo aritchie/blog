@@ -1,6 +1,11 @@
 Title: Speaking
 ---
 
+### Host on Gone .NET
+Want to hear me talk about .NET, join me & my good friend [Jonathan Dick - redth](https://x.com/redth) every week
+* [Website](https://gonedotnet.io)
+* [YouTube](https://www.youtube.com/@GoneDotNet)
+
 ### Speaking Engagements
 Would you like to me speak at your user group, conference, or event - drop me an email [allan.ritchie@gmail.com](mailto:allan.ritchie@gmail.com).  I love
 to talk about my open source work, .NET in general, and all of my past experience around that.
