@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Blog.Shortcodes;
-using Devlead.Statiq.Code;
-using Devlead.Statiq.Tabs;
 using Statiq.App;
 using Statiq.Common;
 using Statiq.Web;
@@ -25,8 +23,6 @@ namespace Blog
                 //    "$acrblog",
                 //    "tkYnfBba49SxktioengcZMWzulrFPWnJtNoi0kyp1hqfsiplK3Mxlo4ARfta"
                 //)
-                .AddTabGroupShortCode()
-                .AddIncludeCodeShortCode()
                 .AddShortcode<NugetShieldShortcode>("NugetShield")
                 .AddShortcode<ConfiguredLinkShortcode>("ConfiguredLink")
                 .AddShortcode<DefaultBlogLinksShortcode>("DefaultBlogLinks")

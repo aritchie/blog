@@ -36,22 +36,7 @@ Xamarin Forms, Xamarin Essentials, and other 3rd party source code.
 
 To get an idea, here is a before and after showing both iOS and Android boilerplate
 
-<?# TabGroup ?>
-<?*
-tabs:
-  - name: Android Before
-    include: "../../includes/shiny20/androidbefore.md"
 
-  - name: Android After
-    include: "../../includes/shiny20/androidafter.md"
-
-  - name: iOS Before
-    include: "../../includes/shiny20/iosbefore.md"
-
-  - name: iOS After
-    include: "../../includes/shiny20/iosafter.md"
-?>
-<?#/ TabGroup ?>
 
 To get this "voodoo" magic.  Simply install the <?# NugetShield "Shiny" "Shiny" /?> nuget package into your head projects and add the attribute as shown in the "after" tabs above.  Also note how the activity and appdelegate are partial.
 These new generators can even build your entire startup class, but that's a discussion for a future article :)
@@ -240,7 +225,8 @@ subscription.Dispose();
 The background, as with all things in Shiny, is where things begin to shine. The OnReceived is where most of the magic will happen for you.  From here, you can process a push notification
 and do things like call out to an HTTP service to refresh data, maybe acknowledge that your user is available for shift work if they have "punched" into your app.  
 
-<?! IncludeCode "../../CodeSamples/shiny20/MyPushDelegate.cs" /?> 
+```csharp
+```
 
 
 ### Tag Support
@@ -282,16 +268,6 @@ Scanning was riddled with potential issues
 
 It took a fair of code to manage this even with Shiny, but with the new managed scanner - take a look at the difference:
 
-<?# TabGroup ?>
-<?*
-tabs:
-  - name: Before
-    include: "../../includes/shiny20/blescanbefore.md"
-
-  - name: After
-    include: "../../includes/shiny20/blescanafter.md"
-?>
-<?#/ TabGroup ?>
 
 #### Managed Peripheral
 The problem with traditional peripheral managed is that with every connection, you had to rescan for all of the services and characteristics you had.  You also had to restore any notifications you had.
@@ -304,16 +280,6 @@ Managed peripheral to the rescue. The managed peripheral will
 * Read/Writes will redetect the characteristics as you used them.  This saves using GetCharacteristic to continously and thereby increasing performance
 * Keeps a list of characteristics you've used instead of having to call GetServices/GetCharacteristics over and over
 
-<?# TabGroup ?>
-<?*
-tabs:
-  - name: Before
-    include: "../../includes/shiny20/bleperipheralbefore.md"
-
-  - name: After
-    include: "../../includes/shiny20/bleperipheralafter.md"
-?>
-<?#/ TabGroup ?>
 
 ## Beacons
 ---
@@ -338,7 +304,8 @@ Here's a quick look at the main beacon features
 Setting up background monitoring is pretty simple.  Once you've registered, simply call:
 
 Here's your delegate:
-<?! IncludeCode "../../CodeSamples/shiny20/MyBeaconMonitorDelegate.cs" /?> 
+```csharp
+```
 
 and the code to start monitoring:
 
@@ -357,16 +324,6 @@ This essentially works identical to the new managed BLE scan shown earlier with 
 * It will remove beacons from your list that haven't been "heard" in a configurable timestamp
 * It will manage the individual items with proximity changes
 
-<?# TabGroup ?>
-<?*
-tabs:
-  - name: Before
-    include: "../../includes/shiny20/beaconscanbefore.md"
-
-  - name: After
-    include: "../../includes/shiny20/beaconscanafter.md"
-?>
-<?#/ TabGroup ?>
 
 ## In Closing
 This article only scrapped the surface of the 2.0 upgrade.  There's more articles to come and the docs are shaping up nicely.  There are also other packages like NFC, Speech to Text, BLE Hosting, Sensors, and HTTP Transfers that all still exists.  They just didn't see any
