@@ -1,7 +1,0 @@
-FeedSources: => GetString("PostSources")
-FeedFilter: => doc.GetDateTime("Published") <= DateTime.Now
-FeedOrderKey: Published
-FeedOrderDescending: true
-FeedSize: 10
-FeedRss: true
-FeedAtom: true
