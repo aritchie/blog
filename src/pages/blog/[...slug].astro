@@ -1,5 +1,6 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
+import Disqus from '../../components/Disqus.astro';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
@@ -17,4 +18,5 @@ const { Content } = await render(post);
 
 <BlogPost {...post.data}>
 	<Content />
+    <Disqus postId={post.id} postTitle={post.data.title} />
 </BlogPost>
