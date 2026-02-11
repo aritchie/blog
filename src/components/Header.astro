@@ -49,9 +49,14 @@ import logo from '../assets/logo.png'
 	header {
 		margin: 0;
 		padding: 0 1em;
-		background: white;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-		position: relative;
+		background: rgba(255, 255, 255, 0.65);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+		box-shadow: 0 2px 16px rgba(var(--black), 8%);
+		position: sticky;
+		top: 0;
+		z-index: 1000;
 	}
 	
 	nav {
@@ -173,7 +178,9 @@ import logo from '../assets/logo.png'
 			top: 100%;
 			left: 0;
 			right: 0;
-			background: white;
+			background: rgba(255, 255, 255, 0.65);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
 			flex-direction: column;
 			padding: 1em;
 			box-shadow: 0 4px 8px rgba(var(--black), 10%);
