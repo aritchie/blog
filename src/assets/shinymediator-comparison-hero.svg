@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="50%" style="stop-color:#16213e"/>
+      <stop offset="100%" style="stop-color:#0f3460"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e94560"/>
+      <stop offset="100%" style="stop-color:#f5a623"/>
+    </linearGradient>
+    <linearGradient id="accent2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00d2ff"/>
+      <stop offset="100%" style="stop-color:#3a7bd5"/>
+    </linearGradient>
+    <linearGradient id="accent3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="200" cy="315" r="120" fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.3"/>
+  <circle cx="600" cy="315" r="120" fill="none" stroke="url(#accent2)" stroke-width="2" opacity="0.3"/>
+  <circle cx="1000" cy="315" r="120" fill="none" stroke="url(#accent3)" stroke-width="2" opacity="0.3"/>
+
+  <!-- Connecting lines -->
+  <line x1="320" y1="315" x2="480" y2="315" stroke="#e94560" stroke-width="2" opacity="0.4" stroke-dasharray="8,4"/>
+  <line x1="720" y1="315" x2="880" y2="315" stroke="#00d2ff" stroke-width="2" opacity="0.4" stroke-dasharray="8,4"/>
+
+  <!-- VS labels -->
+  <text x="400" y="325" font-family="monospace" font-size="24" fill="#e94560" text-anchor="middle" font-weight="bold" opacity="0.6">vs</text>
+  <text x="800" y="325" font-family="monospace" font-size="24" fill="#00d2ff" text-anchor="middle" font-weight="bold" opacity="0.6">vs</text>
+
+  <!-- Library names -->
+  <text x="200" y="305" font-family="sans-serif" font-size="28" fill="#e94560" text-anchor="middle" font-weight="bold">MediatR</text>
+  <text x="200" y="340" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle" opacity="0.5">The OG</text>
+
+  <text x="600" y="305" font-family="sans-serif" font-size="28" fill="#00d2ff" text-anchor="middle" font-weight="bold">Shiny</text>
+  <text x="600" y="335" font-family="sans-serif" font-size="28" fill="#00d2ff" text-anchor="middle" font-weight="bold">Mediator</text>
+  <text x="600" y="365" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle" opacity="0.5">Batteries Included</text>
+
+  <text x="1000" y="305" font-family="sans-serif" font-size="28" fill="#43e97b" text-anchor="middle" font-weight="bold">Fast</text>
+  <text x="1000" y="335" font-family="sans-serif" font-size="28" fill="#43e97b" text-anchor="middle" font-weight="bold">Endpoints</text>
+  <text x="1000" y="365" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle" opacity="0.5">REPR Pattern</text>
+
+  <!-- Title -->
+  <text x="600" y="100" font-family="sans-serif" font-size="42" fill="#ffffff" text-anchor="middle" font-weight="bold">.NET Mediator Showdown</text>
+  <rect x="350" y="115" width="500" height="3" fill="url(#accent)" rx="2"/>
+
+  <!-- Bottom tagline -->
+  <text x="600" y="570" font-family="monospace" font-size="16" fill="#ffffff" text-anchor="middle" opacity="0.4">Choosing the right mediation library for your .NET project</text>
+</svg>

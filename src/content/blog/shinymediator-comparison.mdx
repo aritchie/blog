@@ -1,0 +1,266 @@
+---
+title: 'Shiny Mediator vs MediatR vs FastEndpoints'
+description: 'An honest comparison of three popular .NET mediation/CQRS libraries — what each does best and where they fall short'
+pubDate: 'Feb 11 2026'
+heroImage: '../../assets/shinymediator-comparison-hero.svg'
+---
+
+The .NET ecosystem has no shortage of libraries for structuring your application logic.  Whether you call it mediation, CQRS, vertical slice architecture, or the REPR pattern — the goal is the same: decouple your code, reduce dependency hell, and make your app maintainable as it grows.
+
+Three libraries dominate the conversation right now: [MediatR](https://github.com/jbogard/MediatR), [FastEndpoints](https://fast-endpoints.com), and [Shiny Mediator](https://shinylib.net/mediator/).  They overlap in some areas and diverge completely in others.  Let's break it down.
+
+## What Are We Comparing?
+
+Before we dive in, it's important to understand that these three libraries have **different primary goals**:
+
+- **MediatR** is a general-purpose in-process mediator.  It's the OG.  Request/response, notifications, pipeline behaviors — clean and minimal.
+- **FastEndpoints** is an ASP.NET-focused framework built around the REPR (Request-Endpoint-Response) pattern.  It replaces controllers and minimal APIs with a structured, performant endpoint model.
+- **Shiny Mediator** is a mediator built for **all .NET apps** — mobile (MAUI), Blazor, Uno Platform, ASP.NET, console — with a heavy emphasis on built-in middleware like caching, offline support, validation, and HTTP client generation.
+
+Comparing them 1:1 isn't entirely fair because they target different scenarios.  But developers evaluating their architecture options often end up choosing between these three, so let's look at where each shines.
+
+## The Quick Comparison
+
+| Feature | MediatR | FastEndpoints | Shiny Mediator |
+|---|---|---|---|
+| **Primary Focus** | In-process mediation | ASP.NET API endpoints | Cross-platform mediation |
+| **Target Platforms** | Any .NET | ASP.NET only | MAUI, Blazor, Uno, ASP.NET, Console |
+| **Request/Response** | ✅ | ✅ | ✅ |
+| **Commands (void)** | ✅ | ✅ | ✅ |
+| **Events/Notifications** | ✅ | ✅ (in-process pub/sub) | ✅ |
+| **Streaming** | ✅ IAsyncEnumerable | ❌ | ✅ IAsyncEnumerable + SSE |
+| **Pipeline/Middleware** | Behaviors (manual) | Pre/Post processors | Rich built-in middleware |
+| **Built-in Caching** | ❌ | ❌ | ✅ Attribute-driven |
+| **Built-in Offline** | ❌ | ❌ | ✅ Attribute-driven |
+| **Built-in Validation** | ❌ (DIY with behaviors) | ✅ FluentValidation | ✅ DataAnnotations + FluentValidation |
+| **Built-in Resilience** | ❌ | ❌ | ✅ Retry, circuit breaker |
+| **HTTP Client Generation** | ❌ | ❌ | ✅ From OpenAPI specs |
+| **ASP.NET Endpoint Gen** | ❌ | Core feature | ✅ Source generated |
+| **AOT/Trimming Support** | Reflection-based | ✅ | ✅ Full source generation |
+| **Registration** | Assembly scanning | Auto-discovery | Source generators |
+| **Licensing** | Paid (license key) | MIT | MIT |
+
+## MediatR — The Foundation
+
+MediatR is the library that put the mediator pattern on the map in .NET.  Jimmy Bogard built something elegant: define a request, implement a handler, and the mediator routes it.  Clean separation of concerns without the ceremony of full-blown CQRS frameworks.
+
+### What MediatR Does Well
+
+**Simplicity.**  MediatR's API surface is tiny and intuitive.  `IRequest<T>`, `IRequestHandler<TRequest, TResponse>`, `INotification`, `INotificationHandler<T>` — that's basically it.  If you've used it before, you can teach someone else in 10 minutes.
+
+**Ecosystem maturity.**  MediatR has been around for years.  The community knowledge, blog posts, Stack Overflow answers, and third-party extensions are extensive.  If you hit a wall, someone's already solved it.
+
+**Pipeline behaviors.**  The `IPipelineBehavior<TRequest, TResponse>` interface gives you a clean way to add cross-cutting concerns.  Logging, validation, transaction management — you build them as behaviors and register them in the pipeline.
+
+```csharp
+// MediatR pipeline behavior
+public class LoggingBehavior<TRequest, TResponse> 
+    : IPipelineBehavior<TRequest, TResponse>
+{
+    public async Task<TResponse> Handle(
+        TRequest request, 
+        RequestHandlerDelegate<TResponse> next, 
+        CancellationToken ct)
+    {
+        _logger.LogInformation("Handling {Request}", typeof(TRequest).Name);
+        var response = await next();
+        _logger.LogInformation("Handled {Request}", typeof(TRequest).Name);
+        return response;
+    }
+}
+```
+
+### Where MediatR Falls Short
+
+**You build everything yourself.**  MediatR gives you the pipe and says "good luck."  Need caching?  Write a behavior.  Need validation?  Write a behavior.  Need offline support?  Good luck, write... something.  Every team ends up building the same set of cross-cutting concerns from scratch.
+
+**Reflection-based registration.**  `RegisterServicesFromAssembly()` scans assemblies at startup to find handlers.  This works fine for server apps but is problematic for AOT scenarios on iOS, Blazor WASM, and trimmed deployments.
+
+**Paid licensing.**  MediatR recently moved to a paid model with a license key requirement.  Understandable for the maintainer, but it's a factor for teams evaluating options — especially for open-source projects or smaller teams.
+
+**Server-centric design.**  MediatR works anywhere .NET runs, but it wasn't designed with mobile or client-side apps in mind.  There's no concept of offline support, persistent caching, or UI-thread awareness.  Those are problems you solve yourself.
+
+## FastEndpoints — The API Specialist
+
+FastEndpoints takes a completely different approach.  Instead of a general-purpose mediator, it's a **structured way to build ASP.NET APIs**.  Each endpoint is a class with a request, a handler, and a response — the REPR pattern.  It's essentially "what if MVC controllers were good?"
+
+### What FastEndpoints Does Well
+
+**Performance.**  FastEndpoints benchmarks on par with raw minimal APIs and noticeably faster than MVC controllers.  If API throughput is your primary concern, it delivers.
+
+**Structured endpoints.**  No more 500-line controllers with 20 action methods.  Each endpoint is its own class with clear request/response types, validation, and configuration:
+
+```csharp
+// FastEndpoints style
+public class CreateOrderEndpoint : Endpoint<CreateOrderRequest, CreateOrderResponse>
+{
+    public override void Configure()
+    {
+        Post("/api/orders");
+        AllowAnonymous();
+    }
+
+    public override async Task HandleAsync(CreateOrderRequest req, CancellationToken ct)
+    {
+        var order = await orderService.Create(req);
+        await SendAsync(new CreateOrderResponse { OrderId = order.Id });
+    }
+}
+```
+
+**Built-in validation.**  FluentValidation is a first-class citizen.  Define a validator alongside your endpoint and it runs automatically before your handler — no extra wiring needed.
+
+**Developer experience for APIs.**  Swagger support, model binding from route/query/body/headers/claims, versioning, security policies, rate limiting — FastEndpoints has thought through the API development lifecycle.
+
+### Where FastEndpoints Falls Short
+
+**ASP.NET only.**  This is the big one.  FastEndpoints is exclusively a server-side framework.  If you're building a .NET MAUI app, a Blazor WebAssembly app, or a console tool — FastEndpoints has nothing for you.  Your business logic lives inside endpoint classes that are tightly coupled to the HTTP pipeline.
+
+**Not a mediator.**  FastEndpoints organizes your API layer, but it doesn't provide the same decoupling benefits as a mediator.  Your business logic lives in the endpoint handler.  If you want to reuse that logic from a background job, a CLI tool, or a mobile app, you need to extract it yourself.
+
+**No cross-cutting middleware pipeline.**  FastEndpoints has pre/post processors, but they're not the same as a mediator pipeline.  You can't easily add caching, offline support, or resilience as middleware that applies transparently to all operations.
+
+## Shiny Mediator — Batteries Included
+
+Full disclosure: I built Shiny Mediator, so take this section with a grain of salt.  That said, I built it because the alternatives didn't solve the problems I kept running into on mobile and cross-platform apps.
+
+Shiny Mediator is a mediator pattern implementation, but with a focus on making it work beautifully across **all** .NET platforms — MAUI, Blazor, Uno Platform, ASP.NET, and plain .NET.  The key differentiator is the amount of built-in middleware that ships out of the box.
+
+### What Shiny Mediator Does Well
+
+**Cross-platform middleware that "just works."**  This is the headline feature.  Instead of building your own caching behavior, your own offline layer, your own validation pipeline — you add an attribute:
+
+```csharp
+[MediatorSingleton]
+public partial class GetOrdersHandler : IRequestHandler<GetOrdersRequest, List<Order>>
+{
+    [Cache(AbsoluteExpirationSeconds = 300)]
+    [OfflineAvailable]
+    public async Task<List<Order>> Handle(
+        GetOrdersRequest request,
+        IMediatorContext context,
+        CancellationToken ct)
+    {
+        return await api.GetOrders(ct);
+    }
+}
+```
+
+Two attributes.  Cached for 5 minutes.  Available offline.  That's it.  No infrastructure code.  No behaviors to write.  No cache key management.
+
+The full middleware suite includes:
+- **Caching** — memory and persistent (survives app restarts on MAUI/Uno)
+- **Offline support** — stores last known good response, returns it when disconnected
+- **Validation** — DataAnnotations and FluentValidation with zero wiring
+- **Resilience** — retry and circuit breaker policies
+- **Performance logging** — via Microsoft.Extensions.Diagnostics
+- **Main thread dispatching** — critical for MAUI/Blazor UI updates
+- **Event throttling** — debounce for rapid-fire events like search-as-you-type
+- **Replayable streams** — replay the last emitted value for late subscribers
+- **Command scheduling** — execute commands on a schedule
+- **User error notifications** — surface exceptions to UI automatically
+
+**Full AOT and trimming support.**  Everything is source-generated.  Handler registration, request executors, JSON converters, contract keys, middleware attributes — all resolved at compile time.  Zero reflection at runtime.  This matters enormously for iOS (no JIT), Blazor WASM (every byte counts), and ASP.NET cold starts.
+
+```csharp
+// Source-generated registration — no assembly scanning
+services.AddShinyMediator(x => x.AddMediatorRegistry());
+```
+
+**MAUI and Blazor event integration.**  ViewModels and pages can implement `IEventHandler<T>` directly without being registered in DI.  The MAUI extension automatically discovers handlers on the navigation stack and cleans them up when pages are popped — no `MessagingCenter.Unsubscribe` nightmares.
+
+```csharp
+public class OrderListViewModel : IEventHandler<OrderCreatedEvent>
+{
+    // automatically receives events while this page is on the nav stack
+    // automatically stops receiving when popped — no cleanup needed
+    public async Task Handle(
+        OrderCreatedEvent @event, 
+        IMediatorContext context, 
+        CancellationToken ct)
+    {
+        await RefreshOrders();
+    }
+}
+```
+
+**HTTP client generation from OpenAPI.**  Point it at an OpenAPI spec and it generates contracts, handlers, JSON converters, and DI registration.  All your middleware (caching, offline, resilience) applies to HTTP calls automatically:
+
+```xml
+<ItemGroup>
+    <MediatorHttp Include="MyApi"
+                  Uri="https://myapi.com/openapi.json"
+                  Namespace="MyApp.Api"
+                  ContractPostfix="HttpRequest"
+                  GenerateJsonConverters="true"
+                  Visible="false" />
+</ItemGroup>
+```
+
+**ASP.NET endpoint generation.**  On the server side, handlers can be mapped directly to minimal API endpoints with attributes — similar to FastEndpoints, but your handler logic stays decoupled from HTTP:
+
+```csharp
+[MediatorScoped]
+[MediatorHttpGroup("/api/orders")]
+public class CreateOrderHandler : ICommandHandler<CreateOrderCommand>
+{
+    [MediatorHttpPost("CreateOrder", "/")]
+    public async Task Handle(
+        CreateOrderCommand command,
+        IMediatorContext context,
+        CancellationToken ct)
+    {
+        // this handler works from HTTP, background jobs, CLI, mobile — anywhere
+    }
+}
+```
+
+### Where Shiny Mediator Falls Short
+
+**Smaller ecosystem.**  MediatR has years of community content, extensions, and institutional knowledge.  Shiny Mediator is newer and has a smaller community.  You'll find fewer Stack Overflow answers and third-party integrations.
+
+**Learning curve for middleware configuration.**  The middleware system is powerful, but understanding the configuration hierarchy (contract → handler → namespace → global) and attribute interactions takes some time.
+
+**Tooling gaps.**  Finding the handler for a given contract still requires manual navigation.  IDE integration to "Go to Handler" from a contract isn't there yet (it's on the roadmap).
+
+## When to Use What
+
+### Choose MediatR when:
+- You're building a **server-only** application and want a minimal, well-understood mediator
+- Your team already has MediatR expertise and established patterns
+- You prefer building your own cross-cutting concerns via pipeline behaviors
+- You need the broadest ecosystem of community extensions and documentation
+
+### Choose FastEndpoints when:
+- You're building an **ASP.NET API** and want structured, performant endpoints
+- You want to replace MVC controllers with something cleaner
+- Your business logic lives entirely on the server
+- API performance benchmarks are a priority
+
+### Choose Shiny Mediator when:
+- You're building a **.NET MAUI, Blazor, or Uno Platform** app (this is where it really shines)
+- You want **offline support, caching, validation, and resilience** without building them yourself
+- You need **AOT/trimming compliance** for iOS or Blazor WASM
+- You're building a **full-stack .NET app** where the same patterns work on client and server
+- You want **HTTP client generation** from OpenAPI specs with middleware baked in
+- You value convention over configuration and want to write less infrastructure code
+
+## Can You Combine Them?
+
+Sort of.  FastEndpoints and Shiny Mediator can coexist in the same solution since they solve different problems at different layers — FastEndpoints for your API surface, Shiny Mediator for your business logic and cross-cutting concerns.  MediatR and Shiny Mediator would conflict since they're both mediators competing for the same handler registrations.
+
+In practice, if you're using Shiny Mediator with the ASP.NET extension, you get endpoint generation that covers most of what FastEndpoints offers for the API layer — so you probably don't need both.
+
+## The Bottom Line
+
+There's no single "best" library here.  They optimize for different things:
+
+- **MediatR** optimizes for **simplicity and ecosystem maturity**
+- **FastEndpoints** optimizes for **API performance and structure**
+- **Shiny Mediator** optimizes for **cross-platform apps and built-in middleware**
+
+If you're building mobile or client-side .NET apps, the choice is pretty clear — Shiny Mediator was built for exactly that scenario.  If you're building pure server APIs, you have a genuine three-way decision that depends on how much infrastructure code you want to write yourself.
+
+Give them all a look.  Check out the [Shiny Mediator docs](https://shinylib.net/mediator/), the [MediatR wiki](https://github.com/jbogard/MediatR/wiki), and the [FastEndpoints documentation](https://fast-endpoints.com).  Pick the one that solves *your* problems, not the one with the most GitHub stars.
+
+Happy coding.
