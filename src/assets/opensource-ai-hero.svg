@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#0a1a2e"/>
+    </linearGradient>
+    <linearGradient id="glow1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ccff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#9966ff" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="glow2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00ff88" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#00ccff" stop-opacity="0.05"/>
+    </linearGradient>
+    <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ccff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#00ccff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle background glow -->
+  <ellipse cx="350" cy="300" rx="300" ry="250" fill="url(#glow1)"/>
+  <ellipse cx="850" cy="330" rx="280" ry="230" fill="url(#glow2)"/>
+
+  <!-- Network graph - connection lines representing open source ecosystem -->
+  <g stroke-width="1" opacity="0.3">
+    <!-- Left cluster connections -->
+    <line x1="120" y1="180" x2="250" y2="250" stroke="#00ccff"/>
+    <line x1="80" y1="350" x2="250" y2="300" stroke="#00ccff"/>
+    <line x1="150" y1="460" x2="280" y2="350" stroke="#00ccff"/>
+    <line x1="250" y1="250" x2="250" y2="300" stroke="#00ccff"/>
+    <line x1="250" y1="300" x2="280" y2="350" stroke="#00ccff"/>
+    <line x1="250" y1="250" x2="400" y2="280" stroke="#00ccff"/>
+    <line x1="280" y1="350" x2="400" y2="320" stroke="#00ccff"/>
+
+    <!-- Center connections -->
+    <line x1="400" y1="280" x2="400" y2="320" stroke="#00ff88"/>
+    <line x1="400" y1="280" x2="500" y2="220" stroke="#00ff88"/>
+    <line x1="400" y1="320" x2="500" y2="380" stroke="#00ff88"/>
+    <line x1="500" y1="220" x2="600" y2="270" stroke="#00ff88"/>
+    <line x1="500" y1="380" x2="600" y2="340" stroke="#00ff88"/>
+
+    <!-- Right cluster connections -->
+    <line x1="600" y1="270" x2="600" y2="340" stroke="#9966ff"/>
+    <line x1="600" y1="270" x2="750" y2="230" stroke="#9966ff"/>
+    <line x1="600" y1="340" x2="750" y2="370" stroke="#9966ff"/>
+    <line x1="750" y1="230" x2="900" y2="200" stroke="#9966ff"/>
+    <line x1="750" y1="370" x2="900" y2="400" stroke="#9966ff"/>
+    <line x1="900" y1="200" x2="1020" y2="260" stroke="#9966ff"/>
+    <line x1="900" y1="400" x2="1020" y2="350" stroke="#9966ff"/>
+    <line x1="1020" y1="260" x2="1080" y2="180" stroke="#9966ff"/>
+    <line x1="1020" y1="350" x2="1100" y2="450" stroke="#9966ff"/>
+  </g>
+
+  <!-- Network nodes -->
+  <g>
+    <circle cx="120" cy="180" r="4" fill="#00ccff" opacity="0.6"/>
+    <circle cx="80" cy="350" r="3" fill="#00ccff" opacity="0.5"/>
+    <circle cx="150" cy="460" r="3.5" fill="#00ccff" opacity="0.5"/>
+    <circle cx="250" cy="250" r="5" fill="#00ccff" opacity="0.7"/>
+    <circle cx="250" cy="300" r="4" fill="#00ccff" opacity="0.6"/>
+    <circle cx="280" cy="350" r="4.5" fill="#00ccff" opacity="0.6"/>
+    <circle cx="400" cy="280" r="6" fill="#00ff88" opacity="0.8"/>
+    <circle cx="400" cy="320" r="5" fill="#00ff88" opacity="0.7"/>
+    <circle cx="500" cy="220" r="5" fill="#00ff88" opacity="0.7"/>
+    <circle cx="500" cy="380" r="4.5" fill="#00ff88" opacity="0.6"/>
+    <circle cx="600" cy="270" r="6" fill="#ffffff" opacity="0.9"/>
+    <circle cx="600" cy="340" r="5.5" fill="#ffffff" opacity="0.8"/>
+    <circle cx="750" cy="230" r="5" fill="#9966ff" opacity="0.7"/>
+    <circle cx="750" cy="370" r="4.5" fill="#9966ff" opacity="0.6"/>
+    <circle cx="900" cy="200" r="4" fill="#9966ff" opacity="0.6"/>
+    <circle cx="900" cy="400" r="3.5" fill="#9966ff" opacity="0.5"/>
+    <circle cx="1020" cy="260" r="4" fill="#9966ff" opacity="0.5"/>
+    <circle cx="1020" cy="350" r="3.5" fill="#9966ff" opacity="0.5"/>
+    <circle cx="1080" cy="180" r="3" fill="#9966ff" opacity="0.4"/>
+    <circle cx="1100" cy="450" r="3" fill="#9966ff" opacity="0.4"/>
+  </g>
+
+  <!-- Open source bracket icon (left side) -->
+  <g transform="translate(260, 300)" opacity="0.15">
+    <text font-family="monospace" font-size="120" fill="#00ccff" text-anchor="middle" dominant-baseline="central">&lt;/&gt;</text>
+  </g>
+
+  <!-- AI brain/circuit icon (right side) -->
+  <g transform="translate(940, 300)" opacity="0.12">
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#9966ff" stroke-width="2"/>
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#9966ff" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="20" fill="none" stroke="#9966ff" stroke-width="1"/>
+    <line x1="-60" y1="0" x2="60" y2="0" stroke="#9966ff" stroke-width="1"/>
+    <line x1="0" y1="-60" x2="0" y2="60" stroke="#9966ff" stroke-width="1"/>
+    <line x1="-42" y1="-42" x2="42" y2="42" stroke="#9966ff" stroke-width="0.8"/>
+    <line x1="42" y1="-42" x2="-42" y2="42" stroke="#9966ff" stroke-width="0.8"/>
+  </g>
+
+  <!-- Title text -->
+  <text x="600" y="190" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="300" font-size="20" fill="#ffffff" opacity="0.5" letter-spacing="8">THE IMPORTANCE OF</text>
+  <text x="600" y="270" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="64" fill="#ffffff">OPEN SOURCE</text>
+  <text x="600" y="340" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="300" font-size="32" fill="#00ff88" letter-spacing="12">IN THE AGE OF</text>
+  <text x="600" y="410" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="80" fill="#ffffff">AI</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="460" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="14" fill="#00ccff" opacity="0.6">human craft · community trust · sustained maintenance</text>
+
+  <!-- Bottom pills -->
+  <g font-family="system-ui,-apple-system,sans-serif" font-size="12" text-anchor="middle">
+    <rect x="200" y="540" width="120" height="30" rx="15" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+    <text x="260" y="560" fill="#00ff88" opacity="0.8">Maintainers</text>
+
+    <rect x="350" y="540" width="120" height="30" rx="15" fill="none" stroke="#00ccff" stroke-width="1" opacity="0.5"/>
+    <text x="410" y="560" fill="#00ccff" opacity="0.8">Community</text>
+
+    <rect x="500" y="540" width="100" height="30" rx="15" fill="none" stroke="#9966ff" stroke-width="1" opacity="0.5"/>
+    <text x="550" y="560" fill="#9966ff" opacity="0.8">Trust</text>
+
+    <rect x="630" y="540" width="120" height="30" rx="15" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+    <text x="690" y="560" fill="#00ff88" opacity="0.8">Ecosystem</text>
+
+    <rect x="780" y="540" width="120" height="30" rx="15" fill="none" stroke="#00ccff" stroke-width="1" opacity="0.5"/>
+    <text x="840" y="560" fill="#00ccff" opacity="0.8">Judgment</text>
+  </g>
+</svg>

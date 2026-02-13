@@ -1,0 +1,94 @@
+---
+title: 'The Importance of Open Source Libraries in the Age of AI'
+description: 'Why open source matters more than ever — AI amplifies its reach, but the human craft of building and maintaining libraries remains irreplaceable'
+pubDate: 'Feb 11 2026'
+heroImage: '../../assets/opensource-ai-hero.svg'
+---
+
+AI can generate code faster than any of us can type it.  Copilot, Claude, Gemini — they'll happily produce a dependency-injection container, a mediator pipeline, or a cross-platform abstraction layer before you finish your coffee.  So why do open source libraries still matter?
+
+They matter **more** than ever.  Here's why.
+
+---
+
+## 1. AI Writes Code — It Doesn't Maintain It
+
+The hardest part of software has never been writing the first version.  It's the years that follow: fixing edge cases, responding to breaking changes in upstream platforms, triaging bug reports, and evolving the API as the ecosystem shifts.
+
+An AI can scaffold a Bluetooth abstraction in minutes.  But who handles the iOS 19 breaking change six months later?  Who notices the Android 16 behavioral change that only manifests on Samsung devices?  Who responds at 11 PM to a GitHub issue from a developer shipping their app tomorrow?
+
+**Open source maintainers do.**  That sustained, human commitment to a library's lifecycle is something AI cannot replicate.  AI doesn't have context across years of design decisions, community feedback, and platform quirks.  Maintainers do.
+
+---
+
+## 2. AI Learns From Open Source
+
+This is the part that's easy to overlook: the AI models writing your code were **trained on open source**.  Every accurate suggestion Copilot makes about `HttpClient` usage, every correct pattern Claude produces for `IServiceCollection` — that knowledge was distilled from millions of open source repositories, documentation pages, and Stack Overflow answers written by real people.
+
+If the open source ecosystem dries up — if people stop building, documenting, and sharing libraries — the training data stagnates.  AI becomes confidently wrong about APIs that have evolved, patterns that have shifted, and best practices that have changed.
+
+Open source isn't just a beneficiary of AI.  **It's the foundation AI stands on.**
+
+---
+
+## 3. Libraries Are Opinions, Not Just Code
+
+A good library isn't a random collection of utility methods.  It's an **opinionated design** — a curated set of decisions about how something should work.
+
+When I built [Shiny](https://shinylib.net), the goal was never just "wrap platform APIs."  It was to make a set of deliberate choices: how permissions should flow, how background tasks should lifecycle, how the developer experience should feel across iOS, Android, and beyond.  Those choices came from years of building mobile apps, talking to developers, and seeing what breaks in production.
+
+AI can replicate code patterns, but it can't replicate the **judgment** behind an API's design.  That judgment is what makes a library worth depending on versus copying a snippet from a chatbot and hoping for the best.
+
+---
+
+## 4. Trust and Verification at Scale
+
+When you install a NuGet package with millions of downloads, you're not just getting code.  You're getting:
+
+- **Community validation** — thousands of developers have used it, reported bugs, and confirmed it works
+- **Security scrutiny** — maintainers and contributors have reviewed it over time
+- **Versioning contracts** — SemVer tells you what changed and whether it's safe to upgrade
+- **CI/CD pipelines** — automated tests run on every commit across multiple platforms
+
+AI-generated code gives you none of this.  It gives you something that *looks* right.  Maybe it *is* right.  But nobody has validated it at scale, nobody is watching for CVEs, and nobody will issue a patch when a vulnerability is discovered.
+
+In a world where AI makes it trivially easy to generate code, the **trust infrastructure** around open source libraries becomes even more valuable.
+
+---
+
+## 5. AI Makes Open Source More Accessible
+
+Here's the flip side — and it's genuinely exciting.
+
+AI is lowering the barrier to **contributing** to open source.  Developers who were intimidated by a large codebase can now use AI to understand it.  Maintainers can use AI to triage issues, draft documentation, write tests, and review PRs faster.
+
+I've seen this firsthand.  Contributors who might have struggled to set up a complex build pipeline can now ask an AI assistant to walk them through it.  Documentation that would have taken days to write gets a solid first draft in minutes.
+
+AI doesn't replace the open source community.  **It amplifies it.**
+
+---
+
+## 6. The "Just Generate It" Trap
+
+There's a tempting narrative right now: *why depend on a library when AI can generate the code for you?*
+
+Because generated code becomes **your** code.  You own every bug, every security vulnerability, every platform-specific edge case.  You've traded a dependency on a maintained library for a dependency on yourself — and unless you're planning to dedicate the same years of effort that library maintainers have, you're going to lose that trade.
+
+The best developers I know use AI to move faster **within** the ecosystem of well-maintained libraries, not to replace them.  They use Copilot to wire up Shiny Mediator handlers faster, not to rewrite a mediator from scratch.
+
+---
+
+## So What Should We Do?
+
+If you benefit from open source — and if you're a .NET developer reading this, you absolutely do — here's how to keep the ecosystem healthy in the age of AI:
+
+1. **Sponsor maintainers.**  If a library saves your team time, that time has value.  Share some of it back.
+2. **Contribute.**  Even small things — documentation fixes, bug reports with reproduction steps, answering questions in discussions — keep projects alive.
+3. **Choose maintained libraries over generated code** for anything you'll ship to production and maintain long-term.
+4. **Use AI to contribute better**, not to avoid contributing at all.
+
+The age of AI hasn't diminished the importance of open source.  It's revealed just how essential it always was.
+
+---
+
+*If you want to support the Shiny ecosystem, check out [shinylib.net](https://shinylib.net) or [sponsor the project on GitHub](https://github.com/sponsors/aritchie).*

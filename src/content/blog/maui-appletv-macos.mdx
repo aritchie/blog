@@ -1,0 +1,127 @@
+---
+title: ".NET MAUI on Apple TV & macOS (AppKit) — Yes, Really"
+description: 'An exploration of the GoneDotNet/mauiplatforms project that brings .NET MAUI to Apple TV (tvOS) and native macOS (AppKit) — platforms Microsoft never officially supported'
+pubDate: 'Feb 12 2026'
+heroImage: '../../assets/maui-appletv-macos-hero.svg'
+---
+
+.NET MAUI officially targets iOS, Android, macOS (via Mac Catalyst), and Windows. That's the list. Apple TV? Not on it. Native macOS AppKit? Nope — you get Mac Catalyst, which is really an iPad app wearing a trench coat.
+
+The [GoneDotNet/mauiplatforms](https://github.com/GoneDotNet/mauiplatforms) project changes that. It provides custom .NET MAUI backends for **Apple TV (tvOS via UIKit)** and **macOS (native AppKit)** — two platforms that Microsoft has no plans to support.
+
+---
+
+## See It Running
+
+Before diving into the technical details, see for yourself. These are the sample apps running on each platform:
+
+### Apple TV (tvOS Simulator)
+
+<video controls width="100%">
+  <source src="https://github.com/GoneDotNet/mauiplatforms/raw/main/maui_appletv.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+### macOS (Native AppKit)
+
+<video controls width="100%">
+  <source src="https://github.com/GoneDotNet/mauiplatforms/raw/main/maui_macos.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+---
+
+## How It Works
+
+Both backends use the **platform-agnostic MAUI NuGet packages** — the `net10.0` fallback assemblies that ship with MAUI. Since tvOS and macOS (AppKit) aren't recognized TFMs by MAUI, NuGet resolves to these fallback assemblies where `ToPlatform()` returns `object` and layout methods are no-ops.
+
+The project provides custom handler implementations that bridge MAUI's layout and rendering system to the native platform UI frameworks:
+
+- **tvOS** — maps MAUI controls to UIKit views (UILabel, UIButton, UIScrollView, etc.)
+- **macOS** — maps MAUI controls to AppKit views (NSTextField, NSButton, NSScrollView, etc.)
+
+Custom base handlers (`TvOSViewHandler` / `MacOSViewHandler`) override the no-op `PlatformArrange` and `GetDesiredSize` to bridge MAUI's layout system to native view frames. On macOS, all container views override `IsFlipped => true` because NSView uses bottom-left origin by default, while MAUI expects top-left coordinates.
+
+---
+
+## What's Implemented
+
+The handler coverage is impressive for a community project. Both platforms share a common set of control handlers:
+
+| Control | tvOS (UIKit) | macOS (AppKit) |
+|---|---|---|
+| Label | UILabel | NSTextField |
+| Button | UIButton | NSButton |
+| Entry | UITextField | NSTextField |
+| Editor | ❌ | NSTextView |
+| Picker | UIButton + UIAlertController | NSPopUpButton |
+| Slider | Custom TvOSSliderView | NSSlider |
+| Switch | UIButton (toggle) | NSSwitch |
+| CheckBox | ❌ | NSButton (checkbox) |
+| ActivityIndicator | UIActivityIndicatorView | NSProgressIndicator |
+| ProgressBar | UIProgressView | NSProgressIndicator |
+| Image | UIImageView | NSImageView |
+| ScrollView | UIScrollView | NSScrollView |
+| CollectionView | UIScrollView | NSScrollView |
+| CarouselView | UIScrollView (paging) | ❌ |
+| NavigationPage | ✅ Stack navigation | ✅ Stack navigation |
+| TabbedPage | Custom tab bar | NSSegmentedControl |
+| WebView | ❌ | WKWebView |
+| BlazorWebView | ❌ | ✅ Custom implementation |
+| DatePicker / TimePicker | ❌ | NSDatePicker |
+| Border / Shadow / ShapeView | ✅ CAShapeLayer | ✅ CAShapeLayer |
+
+That's a *lot* of controls. And there's Essentials support too — AppInfo, DeviceInfo, Connectivity, Battery (macOS), DeviceDisplay, FileSystem, Preferences, SecureStorage, FilePicker (macOS), MediaPicker (macOS), and TextToSpeech all have platform-specific implementations.
+
+---
+
+## BlazorWebView on macOS
+
+One of the standout features is a working **BlazorWebView on native macOS AppKit**. The built-in MAUI BlazorWebView internally casts its handler to the iOS/Catalyst `BlazorWebViewHandler`, which obviously fails on AppKit.
+
+The project works around this with a custom `MacOSBlazorWebView` control backed by WKWebView, a custom `app://` URL scheme handler, and a bridge between MAUI's `IDispatcher` and Blazor's abstract `Dispatcher`. It even serves static content from the macOS app bundle's Resources directory.
+
+```csharp
+var blazorView = new MacOSBlazorWebView
+{
+    HostPage = "wwwroot/index.html",
+    HeightRequest = 400
+};
+blazorView.RootComponents.Add(new BlazorRootComponent
+{
+    Selector = "#app",
+    ComponentType = typeof(MyApp.Components.Counter)
+});
+```
+
+---
+
+## Building & Running
+
+Everything is CLI-only — JetBrains Rider and Visual Studio won't compile these projects because the `net10.0-tvos` and `net10.0-macos` TFMs aren't recognized by IDE build systems. You'll need the .NET 10 SDK with the tvOS and macOS workloads installed:
+
+```bash
+dotnet workload install tvos macos
+
+# Build & run the tvOS sample (launches in simulator)
+dotnet build samples/SampleTv/SampleTv.csproj -t:Run
+
+# Build & run the macOS sample
+dotnet build samples/SampleMac/SampleMac.csproj
+open samples/SampleMac/bin/Debug/net10.0-macos/osx-arm64/MAUI\ macOS.app
+```
+
+Sample apps use pure C# pages (no XAML) to avoid XAML compilation issues on unsupported platforms.
+
+---
+
+## Why This Matters
+
+This project is a proof of concept that demonstrates MAUI's architecture is flexible enough to target platforms beyond Microsoft's official support matrix. The platform-agnostic fallback assemblies that ship with MAUI NuGet packages — originally there for compatibility — become the foundation for entirely new platform backends.
+
+It also opens up interesting possibilities:
+- **Apple TV apps** built with .NET and MAUI's familiar API surface
+- **Native macOS apps** without the compromises of Mac Catalyst
+- A template for bringing MAUI to **other platforms** in the future
+
+Check out the full project at [github.com/GoneDotNet/mauiplatforms](https://github.com/GoneDotNet/mauiplatforms).
