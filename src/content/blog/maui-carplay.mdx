@@ -1,0 +1,414 @@
+---
+title: "CarPlay & Android Auto with .NET MAUI"
+description: 'A practical guide to extending your .NET MAUI apps to the car dashboard — Apple CarPlay and Android Auto from the same codebase'
+pubDate: 'Feb 20 2026'
+heroImage: '../../assets/maui-carplay-hero.svg'
+draft: true
+---
+
+Your .NET MAUI app lives on a phone. But what if it could also live on the car dashboard? Apple CarPlay and Android Auto let you project a purpose-built interface onto the vehicle's infotainment screen — and yes, you can do this from .NET MAUI. No Xcode-only projects, no separate native apps. Same solution, same shared services, same DI container.
+
+I've been building this out across two projects: [Shiny KML Recorder](https://github.com/shinyorg/kmlrecorder) (a GPS trip recorder with live map drawing on CarPlay) and [Beat The Bank](https://github.com/aritchie/beatthebank) (a speech-driven game that runs on the car screen). Both are .NET MAUI apps that extend to the car with platform-specific code under `Platforms/iOS/CarPlay` and `Platforms/Android`.
+
+---
+
+## The Big Picture
+
+CarPlay and Android Auto are **not** web views or screen mirrors. They are template-based UI systems — the car provides the rendering, and your app provides the data and actions. On iOS, you work with `CPTemplate` subclasses (lists, grids, maps, information panels). On Android, you use the AndroidX Car App Library with `Screen`, `Template`, and `Pane` objects.
+
+The good news: your .NET MAUI app's DI container, services, and business logic are all accessible from these platform-specific entry points via `IPlatformApplication.Current!.Services`. You write the car UI in native APIs, but everything behind it is your existing shared code.
+
+---
+
+## Apple CarPlay
+
+### Entitlements & Project Setup
+
+CarPlay requires an Apple Developer entitlement. You need to request the appropriate capability for your App ID in the [Apple Developer Portal](https://developer.apple.com/account/resources/identifiers/list). The available entitlements include `carplay-driving-task`, `carplay-maps`, `carplay-navigation`, and others depending on your app category.
+
+In your `.csproj`, use an MSBuild property to toggle CarPlay support and conditionally include the entitlement and source files:
+
+```xml
+<PropertyGroup>
+    <AddCarPlay>true</AddCarPlay>
+</PropertyGroup>
+
+<PropertyGroup Condition="'$(AddCarPlay)' == 'true'">
+    <DefineConstants>$(DefineConstants);CARPLAY</DefineConstants>
+</PropertyGroup>
+
+<ItemGroup Condition="'$(AddCarPlay)' != 'true'">
+    <Compile Remove="Platforms\iOS\CarPlay\**" />
+    <None Remove="Platforms\iOS\CarPlay\**" />
+</ItemGroup>
+
+<ItemGroup Condition="'$(AddCarPlay)' == 'true'">
+    <CustomEntitlements Include="com.apple.developer.carplay-driving-task"
+                        Type="Boolean"
+                        Value="true"
+                        Visible="false"/>
+</ItemGroup>
+```
+
+This keeps CarPlay code completely out of the build when you don't need it.
+
+### Scene Configuration
+
+CarPlay uses iOS Scene Delegates. When CarPlay connects, iOS asks your app for a scene configuration. You override `GetConfiguration` in your `AppDelegate` to route CarPlay sessions to your `CarPlaySceneDelegate`:
+
+```csharp
+[Register("AppDelegate")]
+public class AppDelegate : MauiUIApplicationDelegate
+{
+    protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+
+#if CARPLAY
+    [Export("application:configurationForConnectingSceneSession:options:")]
+    public override UISceneConfiguration GetConfiguration(
+        UIApplication application,
+        UISceneSession connectingSceneSession,
+        UISceneConnectionOptions options)
+    {
+        if (connectingSceneSession.Role.GetConstant()
+            == UIWindowSceneSessionRole.CarTemplateApplication.GetConstant())
+        {
+            var config = new UISceneConfiguration("CarPlay", connectingSceneSession.Role);
+            config.DelegateType = typeof(CarPlaySceneDelegate);
+            return config;
+        }
+
+        var defaultConfig = base.GetConfiguration(application, connectingSceneSession, options);
+        defaultConfig.DelegateType = typeof(SceneDelegate);
+        return defaultConfig;
+    }
+#endif
+}
+```
+
+You also need a `SceneDelegate` for the normal phone UI — this is required when you use scene manifests:
+
+```csharp
+[Register("SceneDelegate")]
+public class SceneDelegate : MauiUISceneDelegate { }
+```
+
+And the corresponding `Info.plist` scene manifest:
+
+```xml
+<key>UIApplicationSceneManifest</key>
+<dict>
+    <key>UIApplicationSupportsMultipleScenes</key>
+    <true/>
+    <key>UISceneConfigurations</key>
+    <dict>
+        <key>UIWindowSceneSessionRoleApplication</key>
+        <array>
+            <dict>
+                <key>UISceneClassName</key>
+                <string>UIWindowScene</string>
+                <key>UISceneConfigurationName</key>
+                <string>__MAUI_DEFAULT_SCENE_CONFIGURATION__</string>
+                <key>UISceneDelegateClassName</key>
+                <string>SceneDelegate</string>
+            </dict>
+        </array>
+        <key>CPTemplateApplicationSceneSessionRoleApplication</key>
+        <array>
+            <dict>
+                <key>UISceneClassName</key>
+                <string>CPTemplateApplicationScene</string>
+                <key>UISceneConfigurationName</key>
+                <string>CarPlay</string>
+                <key>UISceneDelegateClassName</key>
+                <string>CarPlaySceneDelegate</string>
+            </dict>
+        </array>
+    </dict>
+</dict>
+```
+
+### The CarPlay Scene Delegate
+
+This is the entry point for your CarPlay experience. When the car connects, `DidConnect` fires and you get a `CPInterfaceController` — your handle for pushing and managing templates on the car screen:
+
+```csharp
+[Register("CarPlaySceneDelegate")]
+public class CarPlaySceneDelegate : CPTemplateApplicationSceneDelegate
+{
+    CPInterfaceController? interfaceController;
+
+    public override void DidConnect(
+        CPTemplateApplicationScene templateApplicationScene,
+        CPInterfaceController interfaceController)
+    {
+        this.interfaceController = interfaceController;
+        // Build and set your root template here
+    }
+
+    public override void DidDisconnect(
+        CPTemplateApplicationScene templateApplicationScene,
+        CPInterfaceController interfaceController)
+    {
+        // Clean up resources
+        this.interfaceController = null;
+    }
+}
+```
+
+### Accessing MAUI Services
+
+Here's the key pattern. Your CarPlay code runs in a separate scene, but it can resolve services from MAUI's DI container:
+
+```csharp
+var services = IPlatformApplication.Current!.Services;
+var scope = services.CreateScope();
+var viewModel = scope.ServiceProvider.GetRequiredService<GameViewModel>();
+```
+
+In [Beat The Bank](https://github.com/aritchie/beatthebank), the `CarPlayGameManager` creates a scoped `GameViewModel` — the *same* ViewModel used by the phone UI — and subscribes to its `PropertyChanged` events to update the CarPlay template whenever game state changes:
+
+```csharp
+public class CarPlayGameManager
+{
+    readonly CPInterfaceController interfaceController;
+    IServiceScope? scope;
+    GameViewModel? viewModel;
+    CPInformationTemplate? template;
+
+    public void StartGame(string playerName)
+    {
+        var services = IPlatformApplication.Current!.Services;
+        this.scope = services.CreateScope();
+        this.viewModel = this.scope.ServiceProvider.GetRequiredService<GameViewModel>();
+        this.viewModel.Name = playerName;
+        this.viewModel.PropertyChanged += this.OnViewModelPropertyChanged;
+
+        this.template = this.BuildTemplate();
+        this.interfaceController.PushTemplate(this.template, true, null);
+    }
+
+    void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            this.template.Items = this.BuildInfoItems();
+            this.template.Actions = this.BuildActions();
+        });
+    }
+}
+```
+
+### CarPlay Templates
+
+Apple provides several template types. Here's how two of them look in practice:
+
+**CPInformationTemplate** — Used in Beat The Bank to show game state with action buttons:
+
+```csharp
+var template = new CPInformationTemplate(
+    "Beat The Bank",
+    CPInformationTemplateLayout.TwoColumn,
+    new CPInformationItem[]
+    {
+        new(playerName, "Player"),
+        new($"${amount:N0}", "Amount"),
+        new(vault.ToString(), "Vault")
+    },
+    new CPTextButton[]
+    {
+        new("Continue", CPTextButtonStyle.Confirm, _ => vm.ContinueCommand.Execute(null)),
+        new("Stop", CPTextButtonStyle.Cancel, _ => vm.StopCommand.Execute(null))
+    }
+);
+```
+
+**CPGridTemplate** — Used in KML Recorder for a simple Start/Stop toggle:
+
+```csharp
+var toggleButton = new CPGridButton(
+    new[] { isRecording ? "Stop" : "Start" },
+    UIImage.GetSystemImage(isRecording ? "stop.fill" : "record.circle")!,
+    async _ => await ToggleRecording()
+);
+var template = new CPGridTemplate("KML Recorder", new[] { toggleButton });
+interfaceController.SetRootTemplate(template, true, null);
+```
+
+### CarPlay with Maps
+
+The [KML Recorder](https://github.com/shinyorg/kmlrecorder) goes a step further — if you have the `carplay-maps` entitlement, you get a `UIWindow` in `DidConnect` and can embed an `MKMapView` that renders directly on the car screen:
+
+```csharp
+[Export("templateApplicationScene:didConnectInterfaceController:toWindow:")]
+public void DidConnect(CPTemplateApplicationScene scene,
+    CPInterfaceController interfaceController, UIWindow window)
+{
+    this.interfaceController = interfaceController;
+    this.carWindow = window;
+
+    mapViewController = new CarPlayMapViewController();
+    window.RootViewController = mapViewController;
+}
+```
+
+The `CarPlayMapViewController` hosts an `MKMapView` with user tracking and draws the GPS route as an `MKPolyline` overlay, updated on a 5-second timer:
+
+```csharp
+public class CarPlayMapViewController : UIViewController, IMKMapViewDelegate
+{
+    MKMapView mapView = null!;
+    MKPolyline? currentPolyline;
+
+    public override void ViewDidLoad()
+    {
+        base.ViewDidLoad();
+        mapView = new MKMapView(View!.Bounds)
+        {
+            ShowsUserLocation = true
+        };
+        mapView.SetUserTrackingMode(MKUserTrackingMode.Follow, false);
+        View.AddSubview(mapView);
+    }
+
+    public void UpdateRoute(IList<LogRecord> points)
+    {
+        if (currentPolyline != null)
+            mapView.RemoveOverlay(currentPolyline);
+
+        var coordinates = points
+            .Select(p => new CLLocationCoordinate2D(p.Latitude, p.Longitude))
+            .ToArray();
+
+        currentPolyline = MKPolyline.FromCoordinates(coordinates);
+        mapView.AddOverlay(currentPolyline);
+    }
+}
+```
+
+---
+
+## Android Auto
+
+Android Auto uses the [AndroidX Car App Library](https://developer.android.com/training/cars). The setup is different from CarPlay but the architectural pattern is the same — a platform-specific entry point that resolves services from MAUI's DI container.
+
+### NuGet Packages
+
+Add the Car App library and its dependencies:
+
+```xml
+<ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+    <PackageReference Include="Xamarin.AndroidX.Car.App.App" Version="1.7.0.2" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.10.0.1" />
+</ItemGroup>
+```
+
+### CarAppService & Session
+
+The entry point is a `CarAppService` — an Android `Service` that creates a `Session`, which in turn creates your `Screen`:
+
+```csharp
+[Android.App.Service(Exported = true, Label = "KML Recorder")]
+[Android.App.IntentFilter(
+    new[] { "androidx.car.app.CarAppService" },
+    Categories = new[] { "androidx.car.app.category.IOT" }
+)]
+public class KmlCarAppService : CarAppService
+{
+    public override HostValidator CreateHostValidator()
+        => HostValidator.AllowAllHostsValidator;
+
+    public override Session OnCreateSession()
+        => new KmlCarSession();
+}
+
+public class KmlCarSession : Session
+{
+    public override Screen OnCreateScreen(Intent intent)
+        => new KmlCarScreen(this.CarContext);
+}
+```
+
+### The Screen Template
+
+Your `Screen` returns a template. Call `Invalidate()` to trigger a re-render when state changes:
+
+```csharp
+public class KmlCarScreen : Screen
+{
+    public KmlCarScreen(CarContext carContext) : base(carContext) { }
+
+    public override ITemplate OnGetTemplate()
+    {
+        var logService = Resolve<ILogService>();
+        var isRecording = logService.DateCheckedIn != null;
+
+        var action = new Action.Builder()
+            .SetTitle(isRecording ? "Stop Recording" : "Start Recording")
+            .SetOnClickListener(new ClickListener(async () =>
+            {
+                await ToggleRecording();
+                Invalidate(); // triggers OnGetTemplate again
+            }))
+            .Build();
+
+        var pane = new Pane.Builder()
+            .AddAction(action)
+            .SetLoading(false)
+            .Build();
+
+        return new PaneTemplate.Builder(pane)
+            .SetTitle("KML Recorder")
+            .SetHeaderAction(Action.AppIcon)
+            .Build();
+    }
+
+    T Resolve<T>() where T : notnull
+        => IPlatformApplication.Current!.Services.GetRequiredService<T>();
+}
+```
+
+### AndroidManifest.xml
+
+Register the automotive app descriptor metadata:
+
+```xml
+<application>
+    <meta-data android:name="com.google.android.gms.car.application"
+               android:resource="@xml/automotive_app_desc" />
+</application>
+```
+
+---
+
+## Key Patterns & Takeaways
+
+**1. MSBuild toggle** — Both projects use an MSBuild property (`AddCarPlay`/`AddCarplay`) to gate all car-related code behind a compiler directive. This means you can disable it for builds where you haven't provisioned the entitlements yet.
+
+**2. `IPlatformApplication.Current!.Services`** — This is the bridge. Both CarPlay and Android Auto code resolve services from MAUI's DI container, meaning your ViewModels, database services, mediator handlers, and everything else just work.
+
+**3. Scoped services** — Create a scope per car session. Dispose it on disconnect. This keeps resource lifetimes clean and prevents leaks.
+
+**4. Template-based UI** — You don't draw pixels on the car screen. You fill templates with data and actions. This is a deliberate constraint from Apple and Google for driver safety.
+
+**5. Shared ViewModels** — Beat The Bank demonstrates that your existing ViewModel can drive the car UI too. The `CarPlayGameManager` subscribes to `PropertyChanged` on the same `GameViewModel` used by the phone, rebuilding the `CPInformationTemplate` items whenever game state updates.
+
+**6. Main thread updates** — Car UI updates must happen on the main thread. Use `MainThread.BeginInvokeOnMainThread()` on iOS and `Invalidate()` on Android Auto.
+
+---
+
+## Testing
+
+For **CarPlay**, the iOS Simulator includes a CarPlay simulator window. Open it via *I/O → External Displays → CarPlay* in the Simulator menu. Your app will appear if the entitlements are configured correctly.
+
+For **Android Auto**, use the [Desktop Head Unit (DHU)](https://developer.android.com/training/cars/testing) emulator that ships with the Android SDK. Run `desktop-head-unit` and connect to a running emulator or device.
+
+---
+
+## Source Code
+
+Both projects are on GitHub:
+
+- **[shinyorg/kmlrecorder](https://github.com/shinyorg/kmlrecorder)** — GPS trip recorder with CarPlay map display and Android Auto Start/Stop control
+- **[aritchie/beatthebank](https://github.com/aritchie/beatthebank)** — Speech-driven vault game with CarPlay information template and leaderboard
+
+They're both .NET 10 / MAUI 10 projects targeting iOS, Android, and (for Beat The Bank) Mac Catalyst. Clone either one and flip `AddCarPlay` to `true` in the `.csproj` to see it in action.
