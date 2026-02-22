@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0f3460"/>
+      <stop offset="100%" style="stop-color:#533483"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#0d1117"/>
+    </linearGradient>
+    <linearGradient id="toggleOn" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#34d058"/>
+      <stop offset="100%" style="stop-color:#28a745"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <line x1="0" y1="150" x2="1200" y2="150" stroke="#512BD4" stroke-width="0.3" opacity="0.15"/>
+  <line x1="0" y1="300" x2="1200" y2="300" stroke="#512BD4" stroke-width="0.3" opacity="0.15"/>
+  <line x1="0" y1="450" x2="1200" y2="450" stroke="#512BD4" stroke-width="0.3" opacity="0.15"/>
+
+  <!-- Phone frame -->
+  <rect x="380" y="40" width="440" height="500" rx="30" fill="url(#phoneGrad)" stroke="#533483" stroke-width="2"/>
+  <rect x="395" y="60" width="410" height="460" rx="18" fill="url(#screenGrad)"/>
+
+  <!-- Status bar -->
+  <text x="420" y="82" fill="#8b949e" font-family="system-ui" font-size="11">9:41</text>
+  <text x="770" y="82" fill="#8b949e" font-family="system-ui" font-size="11" text-anchor="end">100%</text>
+
+  <!-- Screen title -->
+  <text x="600" y="110" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="18" font-weight="bold">Settings</text>
+
+  <!-- Section 1: Header -->
+  <text x="415" y="140" fill="#512BD4" font-family="system-ui" font-size="11" font-weight="bold">APPEARANCE</text>
+
+  <!-- Row 1: Toggle cell (Dark Mode) -->
+  <rect x="405" y="148" width="390" height="44" rx="8" fill="#161b22"/>
+  <text x="420" y="175" fill="#e6edf3" font-family="system-ui" font-size="14">Dark Mode</text>
+  <rect x="730" y="160" width="44" height="22" rx="11" fill="url(#toggleOn)"/>
+  <circle cx="763" cy="171" r="9" fill="white"/>
+
+  <!-- Row 2: Toggle cell (Notifications) -->
+  <rect x="405" y="198" width="390" height="44" rx="8" fill="#161b22"/>
+  <text x="420" y="225" fill="#e6edf3" font-family="system-ui" font-size="14">Notifications</text>
+  <rect x="730" y="210" width="44" height="22" rx="11" fill="#30363d"/>
+  <circle cx="741" cy="221" r="9" fill="#8b949e"/>
+
+  <!-- Section 2: Header -->
+  <text x="415" y="268" fill="#512BD4" font-family="system-ui" font-size="11" font-weight="bold">ACCOUNT</text>
+
+  <!-- Row 3: Text entry cell -->
+  <rect x="405" y="276" width="390" height="44" rx="8" fill="#161b22"/>
+  <text x="420" y="303" fill="#e6edf3" font-family="system-ui" font-size="14">Username</text>
+  <text x="775" y="303" text-anchor="end" fill="#8b949e" font-family="system-ui" font-size="14">aritchie</text>
+
+  <!-- Row 4: Picker cell -->
+  <rect x="405" y="326" width="390" height="44" rx="8" fill="#161b22"/>
+  <text x="420" y="353" fill="#e6edf3" font-family="system-ui" font-size="14">Theme</text>
+  <text x="755" y="353" text-anchor="end" fill="#8b949e" font-family="system-ui" font-size="14">Purple</text>
+  <text x="775" y="353" fill="#30363d" font-family="system-ui" font-size="14">&gt;</text>
+
+  <!-- Section 3: Header -->
+  <text x="415" y="396" fill="#512BD4" font-family="system-ui" font-size="11" font-weight="bold">DATA</text>
+
+  <!-- Row 5: Slider cell -->
+  <rect x="405" y="404" width="390" height="44" rx="8" fill="#161b22"/>
+  <text x="420" y="425" fill="#e6edf3" font-family="system-ui" font-size="14">Cache Size</text>
+  <rect x="540" y="430" width="200" height="4" rx="2" fill="#30363d"/>
+  <rect x="540" y="430" width="130" height="4" rx="2" fill="#512BD4"/>
+  <circle cx="670" cy="432" r="7" fill="#512BD4" stroke="#e6edf3" stroke-width="1.5"/>
+
+  <!-- Row 6: Button cell -->
+  <rect x="405" y="454" width="390" height="44" rx="8" fill="#161b22"/>
+  <text x="600" y="481" text-anchor="middle" fill="#e94560" font-family="system-ui" font-size="14" font-weight="bold">Clear All Data</text>
+
+  <!-- Title -->
+  <text x="600" y="580" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="36" font-weight="bold">Shiny.Maui.TableView</text>
+  <text x="600" y="612" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">Settings-style pages for .NET MAUI</text>
+
+  <!-- Decorative dots -->
+  <circle cx="150" cy="200" r="3" fill="#512BD4" opacity="0.4"/>
+  <circle cx="180" cy="180" r="2" fill="#e94560" opacity="0.3"/>
+  <circle cx="120" cy="350" r="2" fill="#533483" opacity="0.3"/>
+  <circle cx="1050" cy="220" r="3" fill="#533483" opacity="0.4"/>
+  <circle cx="1020" cy="190" r="2" fill="#512BD4" opacity="0.3"/>
+  <circle cx="1080" cy="380" r="2" fill="#e94560" opacity="0.3"/>
+</svg>

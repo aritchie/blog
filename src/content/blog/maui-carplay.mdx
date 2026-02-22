@@ -3,7 +3,6 @@ title: "CarPlay & Android Auto with .NET MAUI"
 description: 'A practical guide to extending your .NET MAUI apps to the car dashboard — Apple CarPlay and Android Auto from the same codebase'
 pubDate: 'Feb 20 2026'
 heroImage: '../../assets/maui-carplay-hero.svg'
-draft: true
 ---
 
 Your .NET MAUI app lives on a phone. But what if it could also live on the car dashboard? Apple CarPlay and Android Auto let you project a purpose-built interface onto the vehicle's infotainment screen — and yes, you can do this from .NET MAUI. No Xcode-only projects, no separate native apps. Same solution, same shared services, same DI container.
@@ -26,31 +25,16 @@ The good news: your .NET MAUI app's DI container, services, and business logic a
 
 CarPlay requires an Apple Developer entitlement. You need to request the appropriate capability for your App ID in the [Apple Developer Portal](https://developer.apple.com/account/resources/identifiers/list). The available entitlements include `carplay-driving-task`, `carplay-maps`, `carplay-navigation`, and others depending on your app category.
 
-In your `.csproj`, use an MSBuild property to toggle CarPlay support and conditionally include the entitlement and source files:
+In your `.csproj`, add the entitlement for CarPlay:
 
 ```xml
-<PropertyGroup>
-    <AddCarPlay>true</AddCarPlay>
-</PropertyGroup>
-
-<PropertyGroup Condition="'$(AddCarPlay)' == 'true'">
-    <DefineConstants>$(DefineConstants);CARPLAY</DefineConstants>
-</PropertyGroup>
-
-<ItemGroup Condition="'$(AddCarPlay)' != 'true'">
-    <Compile Remove="Platforms\iOS\CarPlay\**" />
-    <None Remove="Platforms\iOS\CarPlay\**" />
-</ItemGroup>
-
-<ItemGroup Condition="'$(AddCarPlay)' == 'true'">
+<ItemGroup>
     <CustomEntitlements Include="com.apple.developer.carplay-driving-task"
                         Type="Boolean"
                         Value="true"
                         Visible="false"/>
 </ItemGroup>
 ```
-
-This keeps CarPlay code completely out of the build when you don't need it.
 
 ### Scene Configuration
 
@@ -62,7 +46,6 @@ public class AppDelegate : MauiUIApplicationDelegate
 {
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 
-#if CARPLAY
     [Export("application:configurationForConnectingSceneSession:options:")]
     public override UISceneConfiguration GetConfiguration(
         UIApplication application,
@@ -81,7 +64,6 @@ public class AppDelegate : MauiUIApplicationDelegate
         defaultConfig.DelegateType = typeof(SceneDelegate);
         return defaultConfig;
     }
-#endif
 }
 ```
 
@@ -382,17 +364,15 @@ Register the automotive app descriptor metadata:
 
 ## Key Patterns & Takeaways
 
-**1. MSBuild toggle** — Both projects use an MSBuild property (`AddCarPlay`/`AddCarplay`) to gate all car-related code behind a compiler directive. This means you can disable it for builds where you haven't provisioned the entitlements yet.
+**1. `IPlatformApplication.Current!.Services`** — This is the bridge. Both CarPlay and Android Auto code resolve services from MAUI's DI container, meaning your ViewModels, database services, mediator handlers, and everything else just work.
 
-**2. `IPlatformApplication.Current!.Services`** — This is the bridge. Both CarPlay and Android Auto code resolve services from MAUI's DI container, meaning your ViewModels, database services, mediator handlers, and everything else just work.
+**2. Scoped services** — Create a scope per car session. Dispose it on disconnect. This keeps resource lifetimes clean and prevents leaks.
 
-**3. Scoped services** — Create a scope per car session. Dispose it on disconnect. This keeps resource lifetimes clean and prevents leaks.
+**3. Template-based UI** — You don't draw pixels on the car screen. You fill templates with data and actions. This is a deliberate constraint from Apple and Google for driver safety.
 
-**4. Template-based UI** — You don't draw pixels on the car screen. You fill templates with data and actions. This is a deliberate constraint from Apple and Google for driver safety.
+**4. Shared ViewModels** — Beat The Bank demonstrates that your existing ViewModel can drive the car UI too. The `CarPlayGameManager` subscribes to `PropertyChanged` on the same `GameViewModel` used by the phone, rebuilding the `CPInformationTemplate` items whenever game state updates.
 
-**5. Shared ViewModels** — Beat The Bank demonstrates that your existing ViewModel can drive the car UI too. The `CarPlayGameManager` subscribes to `PropertyChanged` on the same `GameViewModel` used by the phone, rebuilding the `CPInformationTemplate` items whenever game state updates.
-
-**6. Main thread updates** — Car UI updates must happen on the main thread. Use `MainThread.BeginInvokeOnMainThread()` on iOS and `Invalidate()` on Android Auto.
+**5. Main thread updates** — Car UI updates must happen on the main thread. Use `MainThread.BeginInvokeOnMainThread()` on iOS and `Invalidate()` on Android Auto.
 
 ---
 
@@ -411,4 +391,4 @@ Both projects are on GitHub:
 - **[shinyorg/kmlrecorder](https://github.com/shinyorg/kmlrecorder)** — GPS trip recorder with CarPlay map display and Android Auto Start/Stop control
 - **[aritchie/beatthebank](https://github.com/aritchie/beatthebank)** — Speech-driven vault game with CarPlay information template and leaderboard
 
-They're both .NET 10 / MAUI 10 projects targeting iOS, Android, and (for Beat The Bank) Mac Catalyst. Clone either one and flip `AddCarPlay` to `true` in the `.csproj` to see it in action.
+They're both .NET 10 / MAUI 10 projects targeting iOS, Android, and (for Beat The Bank) Mac Catalyst.

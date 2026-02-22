@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f3460"/>
+      <stop offset="100%" style="stop-color:#533483"/>
+    </linearGradient>
+    <linearGradient id="docGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#161b22"/>
+      <stop offset="100%" style="stop-color:#0d1117"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle connection lines -->
+  <line x1="380" y1="260" x2="480" y2="180" stroke="#512BD4" stroke-width="1" opacity="0.2"/>
+  <line x1="380" y1="260" x2="480" y2="310" stroke="#512BD4" stroke-width="1" opacity="0.2"/>
+  <line x1="380" y1="260" x2="480" y2="430" stroke="#512BD4" stroke-width="1" opacity="0.2"/>
+
+  <!-- SQLite database cylinder -->
+  <ellipse cx="310" cy="200" rx="90" ry="25" fill="url(#dbGrad)" stroke="#533483" stroke-width="1.5"/>
+  <rect x="220" y="200" width="180" height="120" fill="url(#dbGrad)"/>
+  <ellipse cx="310" cy="320" rx="90" ry="25" fill="url(#dbGrad)" stroke="#533483" stroke-width="1.5"/>
+  <ellipse cx="310" cy="200" rx="90" ry="25" fill="#0f3460" stroke="#533483" stroke-width="1.5"/>
+  <line x1="220" y1="200" x2="220" y2="320" stroke="#533483" stroke-width="1.5"/>
+  <line x1="400" y1="200" x2="400" y2="320" stroke="#533483" stroke-width="1.5"/>
+
+  <!-- Database label -->
+  <text x="310" y="255" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="16" font-weight="bold">SQLite</text>
+  <text x="310" y="278" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="12">json_extract</text>
+
+  <!-- Arrow from DB to docs -->
+  <path d="M400,260 L460,260" stroke="#512BD4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#512BD4"/>
+    </marker>
+  </defs>
+
+  <!-- Document 1 -->
+  <rect x="480" y="120" width="320" height="115" rx="10" fill="url(#docGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="500" y="145" fill="#512BD4" font-family="monospace" font-size="12">{</text>
+  <text x="515" y="163" fill="#e94560" font-family="monospace" font-size="12">"id"</text>
+  <text x="553" y="163" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="565" y="163" fill="#34d058" font-family="monospace" font-size="12">"usr_001"</text>
+  <text x="640" y="163" fill="#8b949e" font-family="monospace" font-size="12">,</text>
+  <text x="515" y="181" fill="#e94560" font-family="monospace" font-size="12">"name"</text>
+  <text x="569" y="181" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="581" y="181" fill="#34d058" font-family="monospace" font-size="12">"Allan Ritchie"</text>
+  <text x="715" y="181" fill="#8b949e" font-family="monospace" font-size="12">,</text>
+  <text x="515" y="199" fill="#e94560" font-family="monospace" font-size="12">"role"</text>
+  <text x="561" y="199" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="573" y="199" fill="#34d058" font-family="monospace" font-size="12">"admin"</text>
+  <text x="500" y="221" fill="#512BD4" font-family="monospace" font-size="12">}</text>
+
+  <!-- Document 2 -->
+  <rect x="480" y="248" width="320" height="115" rx="10" fill="url(#docGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="500" y="273" fill="#512BD4" font-family="monospace" font-size="12">{</text>
+  <text x="515" y="291" fill="#e94560" font-family="monospace" font-size="12">"id"</text>
+  <text x="553" y="291" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="565" y="291" fill="#34d058" font-family="monospace" font-size="12">"cfg_001"</text>
+  <text x="640" y="291" fill="#8b949e" font-family="monospace" font-size="12">,</text>
+  <text x="515" y="309" fill="#e94560" font-family="monospace" font-size="12">"theme"</text>
+  <text x="577" y="309" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="589" y="309" fill="#34d058" font-family="monospace" font-size="12">"dark"</text>
+  <text x="637" y="309" fill="#8b949e" font-family="monospace" font-size="12">,</text>
+  <text x="515" y="327" fill="#e94560" font-family="monospace" font-size="12">"cache"</text>
+  <text x="577" y="327" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="589" y="327" fill="#79c0ff" font-family="monospace" font-size="12">true</text>
+  <text x="500" y="349" fill="#512BD4" font-family="monospace" font-size="12">}</text>
+
+  <!-- Document 3 -->
+  <rect x="480" y="376" width="320" height="115" rx="10" fill="url(#docGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="500" y="401" fill="#512BD4" font-family="monospace" font-size="12">{</text>
+  <text x="515" y="419" fill="#e94560" font-family="monospace" font-size="12">"id"</text>
+  <text x="553" y="419" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="565" y="419" fill="#34d058" font-family="monospace" font-size="12">"log_042"</text>
+  <text x="640" y="419" fill="#8b949e" font-family="monospace" font-size="12">,</text>
+  <text x="515" y="437" fill="#e94560" font-family="monospace" font-size="12">"event"</text>
+  <text x="577" y="437" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="589" y="437" fill="#34d058" font-family="monospace" font-size="12">"sync_complete"</text>
+  <text x="723" y="437" fill="#8b949e" font-family="monospace" font-size="12">,</text>
+  <text x="515" y="455" fill="#e94560" font-family="monospace" font-size="12">"count"</text>
+  <text x="577" y="455" fill="#8b949e" font-family="monospace" font-size="12">:</text>
+  <text x="589" y="455" fill="#79c0ff" font-family="monospace" font-size="12">247</text>
+  <text x="500" y="477" fill="#512BD4" font-family="monospace" font-size="12">}</text>
+
+  <!-- LINQ query badge -->
+  <rect x="840" y="275" width="200" height="70" rx="10" fill="#161b22" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="940" y="300" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">LINQ</text>
+  <text x="940" y="318" text-anchor="middle" fill="#512BD4" font-family="monospace" font-size="11">.Where(x =&gt;</text>
+  <text x="940" y="334" text-anchor="middle" fill="#512BD4" font-family="monospace" font-size="11">  x.Role == "admin")</text>
+
+  <!-- Title -->
+  <text x="600" y="560" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="36" font-weight="bold">Shiny.SqliteDocumentDb</text>
+  <text x="600" y="592" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">Schema-free JSON documents in SQLite</text>
+
+  <!-- Decorative dots -->
+  <circle cx="100" cy="150" r="3" fill="#512BD4" opacity="0.4"/>
+  <circle cx="130" cy="130" r="2" fill="#e94560" opacity="0.3"/>
+  <circle cx="80" cy="400" r="2" fill="#533483" opacity="0.3"/>
+  <circle cx="1100" cy="150" r="3" fill="#533483" opacity="0.4"/>
+  <circle cx="1070" cy="130" r="2" fill="#512BD4" opacity="0.3"/>
+  <circle cx="1120" cy="420" r="2" fill="#e94560" opacity="0.3"/>
+</svg>
