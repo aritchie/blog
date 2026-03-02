@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="polyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#512BD4" stop-opacity="0.3"/>
+      <stop offset="100%" style="stop-color:#533483" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e94560"/>
+      <stop offset="100%" style="stop-color:#c23152"/>
+    </linearGradient>
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f3460"/>
+      <stop offset="100%" style="stop-color:#533483"/>
+    </linearGradient>
+    <radialGradient id="pulseGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#512BD4" stop-opacity="0.4"/>
+      <stop offset="100%" style="stop-color:#512BD4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Grid lines (map grid) -->
+  <line x1="100" y1="0" x2="100" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="250" y1="0" x2="250" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="400" y1="0" x2="400" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="550" y1="0" x2="550" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="700" y1="0" x2="700" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="850" y1="0" x2="850" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="1000" y1="0" x2="1000" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="1150" y1="0" x2="1150" y2="500" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="0" y1="80" x2="1200" y2="80" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="0" y1="180" x2="1200" y2="180" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="0" y1="280" x2="1200" y2="280" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="0" y1="380" x2="1200" y2="380" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+  <line x1="0" y1="480" x2="1200" y2="480" stroke="#512BD4" stroke-width="0.3" opacity="0.12"/>
+
+  <!-- Large polygon region (state boundary) -->
+  <polygon points="200,120 350,80 520,100 620,170 580,320 450,380 280,350 180,250"
+           fill="url(#polyGrad)" stroke="#512BD4" stroke-width="2" stroke-dasharray="6,3"/>
+
+  <!-- Second polygon region -->
+  <polygon points="650,100 830,80 950,150 920,300 780,340 640,280 620,170"
+           fill="url(#polyGrad)" stroke="#533483" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+  <!-- Third polygon (smaller, city boundary) -->
+  <polygon points="350,180 420,160 460,200 440,260 370,270 330,230"
+           fill="#512BD4" fill-opacity="0.15" stroke="#512BD4" stroke-width="1.5"/>
+
+  <!-- R*Tree bounding boxes (faint) -->
+  <rect x="175" y="75" width="450" height="310" rx="0" fill="none" stroke="#e94560" stroke-width="0.8" opacity="0.2" stroke-dasharray="3,3"/>
+  <rect x="325" y="155" width="140" height="120" rx="0" fill="none" stroke="#e94560" stroke-width="0.8" opacity="0.3" stroke-dasharray="3,3"/>
+
+  <!-- Location points (cities/POIs) -->
+  <!-- Point 1 - with GPS pulse -->
+  <circle cx="400" cy="220" r="30" fill="url(#pulseGrad)"/>
+  <circle cx="400" cy="220" r="18" fill="url(#pulseGrad)"/>
+  <!-- Pin -->
+  <path d="M400,205 C400,195 390,188 384,195 C378,202 400,225 400,225 C400,225 422,202 416,195 C410,188 400,195 400,205Z" fill="url(#pinGrad)"/>
+  <circle cx="400" cy="200" r="4" fill="#1a1a2e"/>
+
+  <!-- Point 2 -->
+  <circle cx="720" cy="190" r="5" fill="#512BD4" stroke="#e6edf3" stroke-width="1.5"/>
+
+  <!-- Point 3 -->
+  <circle cx="480" cy="300" r="5" fill="#512BD4" stroke="#e6edf3" stroke-width="1.5"/>
+
+  <!-- Point 4 -->
+  <circle cx="300" cy="260" r="5" fill="#512BD4" stroke="#e6edf3" stroke-width="1.5"/>
+
+  <!-- Point 5 -->
+  <circle cx="850" cy="220" r="5" fill="#533483" stroke="#e6edf3" stroke-width="1.5"/>
+
+  <!-- Point 6 -->
+  <circle cx="560" cy="150" r="5" fill="#512BD4" stroke="#e6edf3" stroke-width="1.5"/>
+
+  <!-- Distance radius circle -->
+  <circle cx="400" cy="220" r="100" fill="none" stroke="#e94560" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+  <text x="505" y="218" fill="#e94560" font-family="monospace" font-size="10" opacity="0.6">50km</text>
+
+  <!-- SQLite database cylinder (bottom left) -->
+  <ellipse cx="140" cy="410" rx="65" ry="18" fill="url(#dbGrad)" stroke="#533483" stroke-width="1.5"/>
+  <rect x="75" y="410" width="130" height="70" fill="url(#dbGrad)"/>
+  <ellipse cx="140" cy="480" rx="65" ry="18" fill="url(#dbGrad)" stroke="#533483" stroke-width="1.5"/>
+  <ellipse cx="140" cy="410" rx="65" ry="18" fill="#0f3460" stroke="#533483" stroke-width="1.5"/>
+  <line x1="75" y1="410" x2="75" y2="480" stroke="#533483" stroke-width="1.5"/>
+  <line x1="205" y1="410" x2="205" y2="480" stroke="#533483" stroke-width="1.5"/>
+  <text x="140" y="442" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="13" font-weight="bold">SQLite</text>
+  <text x="140" y="460" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">R*Tree Index</text>
+
+  <!-- Arrow from DB to map -->
+  <path d="M205,430 C280,430 280,350 350,320" stroke="#512BD4" stroke-width="1.5" fill="none" opacity="0.5" stroke-dasharray="4,3"/>
+
+  <!-- Query code snippet (right side) -->
+  <rect x="940" y="340" width="230" height="120" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+  <text x="955" y="362" fill="#8b949e" font-family="monospace" font-size="10">// Two-pass query</text>
+  <text x="955" y="380" fill="#512BD4" font-family="monospace" font-size="10">table</text>
+  <text x="993" y="380" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="999" y="380" fill="#34d058" font-family="monospace" font-size="10">Query()</text>
+  <text x="970" y="396" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="976" y="396" fill="#34d058" font-family="monospace" font-size="10">Intersecting(poly)</text>
+  <text x="970" y="412" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="976" y="412" fill="#34d058" font-family="monospace" font-size="10">OrderByDistance(pt)</text>
+  <text x="970" y="428" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="976" y="428" fill="#34d058" font-family="monospace" font-size="10">Limit(</text>
+  <text x="1022" y="428" fill="#79c0ff" font-family="monospace" font-size="10">10</text>
+  <text x="1036" y="428" fill="#34d058" font-family="monospace" font-size="10">)</text>
+  <text x="970" y="444" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="976" y="444" fill="#34d058" font-family="monospace" font-size="10">ToList();</text>
+
+  <!-- Pipeline labels -->
+  <rect x="940" y="80" width="100" height="26" rx="13" fill="#161b22" stroke="#512BD4" stroke-width="1"/>
+  <text x="990" y="98" text-anchor="middle" fill="#512BD4" font-family="monospace" font-size="11">Pass 1: SQL</text>
+
+  <path d="M990,106 L990,130" stroke="#512BD4" stroke-width="1" opacity="0.5"/>
+
+  <rect x="940" y="130" width="100" height="26" rx="13" fill="#161b22" stroke="#e94560" stroke-width="1"/>
+  <text x="990" y="148" text-anchor="middle" fill="#e94560" font-family="monospace" font-size="11">Pass 2: C#</text>
+
+  <!-- Geofence label -->
+  <rect x="930" y="240" width="120" height="26" rx="13" fill="#161b22" stroke="#34d058" stroke-width="1"/>
+  <text x="990" y="258" text-anchor="middle" fill="#34d058" font-family="system-ui" font-size="11">GPS Geofencing</text>
+
+  <!-- Title -->
+  <text x="600" y="550" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="36" font-weight="bold">Shiny.Spatial</text>
+  <text x="600" y="582" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">Dependency-free spatial database &amp; GPS geofencing for .NET</text>
+
+  <!-- Decorative dots -->
+  <circle cx="50" cy="100" r="3" fill="#512BD4" opacity="0.4"/>
+  <circle cx="70" cy="70" r="2" fill="#e94560" opacity="0.3"/>
+  <circle cx="1150" cy="480" r="3" fill="#533483" opacity="0.4"/>
+  <circle cx="1130" cy="500" r="2" fill="#512BD4" opacity="0.3"/>
+</svg>

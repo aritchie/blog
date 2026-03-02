@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0f3460"/>
+      <stop offset="100%" style="stop-color:#533483"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#0d1117"/>
+    </linearGradient>
+    <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#512BD4"/>
+      <stop offset="100%" style="stop-color:#e94560"/>
+    </linearGradient>
+    <linearGradient id="noteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#512BD4"/>
+      <stop offset="100%" style="stop-color:#533483"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Floating music notes (left side) -->
+  <text x="120" y="180" fill="#512BD4" font-size="48" opacity="0.25">&#9835;</text>
+  <text x="200" y="120" fill="#e94560" font-size="32" opacity="0.2">&#9834;</text>
+  <text x="80" y="320" fill="#533483" font-size="36" opacity="0.2">&#9833;</text>
+  <text x="170" y="400" fill="#512BD4" font-size="28" opacity="0.15">&#9835;</text>
+
+  <!-- Floating music notes (right side) -->
+  <text x="1020" y="160" fill="#533483" font-size="40" opacity="0.2">&#9834;</text>
+  <text x="1080" y="300" fill="#512BD4" font-size="48" opacity="0.25">&#9835;</text>
+  <text x="1000" y="420" fill="#e94560" font-size="32" opacity="0.2">&#9833;</text>
+  <text x="1100" y="200" fill="#512BD4" font-size="28" opacity="0.15">&#9835;</text>
+
+  <!-- Phone frame -->
+  <rect x="420" y="30" width="360" height="460" rx="30" fill="url(#phoneGrad)" stroke="#533483" stroke-width="2"/>
+  <rect x="435" y="50" width="330" height="420" rx="18" fill="url(#screenGrad)"/>
+
+  <!-- Status bar -->
+  <text x="458" y="72" fill="#8b949e" font-family="system-ui" font-size="11">9:41</text>
+  <text x="738" y="72" fill="#8b949e" font-family="system-ui" font-size="11" text-anchor="end">100%</text>
+
+  <!-- Screen title -->
+  <text x="600" y="100" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="16" font-weight="bold">My Music</text>
+
+  <!-- Track list -->
+  <!-- Track 1 (playing) -->
+  <rect x="450" y="115" width="300" height="50" rx="8" fill="#161b22" stroke="#512BD4" stroke-width="1"/>
+  <!-- Album art placeholder -->
+  <rect x="458" y="122" width="36" height="36" rx="4" fill="url(#noteGrad)"/>
+  <text x="476" y="146" text-anchor="middle" fill="#e6edf3" font-size="16">&#9835;</text>
+  <!-- Track info -->
+  <text x="504" y="140" fill="#e6edf3" font-family="system-ui" font-size="12" font-weight="bold">Bohemian Rhapsody</text>
+  <text x="504" y="155" fill="#8b949e" font-family="system-ui" font-size="10">Queen</text>
+  <!-- Playing indicator -->
+  <rect x="718" y="132" width="3" height="14" rx="1" fill="#512BD4" opacity="0.8"/>
+  <rect x="724" y="128" width="3" height="22" rx="1" fill="#512BD4"/>
+  <rect x="730" y="135" width="3" height="10" rx="1" fill="#512BD4" opacity="0.6"/>
+  <rect x="736" y="130" width="3" height="18" rx="1" fill="#512BD4" opacity="0.9"/>
+
+  <!-- Track 2 -->
+  <rect x="450" y="172" width="300" height="50" rx="8" fill="#161b22"/>
+  <rect x="458" y="179" width="36" height="36" rx="4" fill="#0f3460"/>
+  <text x="476" y="203" text-anchor="middle" fill="#8b949e" font-size="16">&#9834;</text>
+  <text x="504" y="197" fill="#e6edf3" font-family="system-ui" font-size="12">Hotel California</text>
+  <text x="504" y="212" fill="#8b949e" font-family="system-ui" font-size="10">Eagles</text>
+  <text x="740" y="200" text-anchor="end" fill="#8b949e" font-family="system-ui" font-size="10">6:30</text>
+
+  <!-- Track 3 -->
+  <rect x="450" y="229" width="300" height="50" rx="8" fill="#161b22"/>
+  <rect x="458" y="236" width="36" height="36" rx="4" fill="#0f3460"/>
+  <text x="476" y="260" text-anchor="middle" fill="#8b949e" font-size="16">&#9834;</text>
+  <text x="504" y="254" fill="#e6edf3" font-family="system-ui" font-size="12">Stairway to Heaven</text>
+  <text x="504" y="269" fill="#8b949e" font-family="system-ui" font-size="10">Led Zeppelin</text>
+  <text x="740" y="257" text-anchor="end" fill="#8b949e" font-family="system-ui" font-size="10">8:02</text>
+
+  <!-- Track 4 -->
+  <rect x="450" y="286" width="300" height="50" rx="8" fill="#161b22"/>
+  <rect x="458" y="293" width="36" height="36" rx="4" fill="#0f3460"/>
+  <text x="476" y="317" text-anchor="middle" fill="#8b949e" font-size="16">&#9834;</text>
+  <text x="504" y="311" fill="#e6edf3" font-family="system-ui" font-size="12">Imagine</text>
+  <text x="504" y="326" fill="#8b949e" font-family="system-ui" font-size="10">John Lennon</text>
+  <text x="740" y="314" text-anchor="end" fill="#8b949e" font-family="system-ui" font-size="10">3:07</text>
+
+  <!-- Now Playing bar -->
+  <rect x="435" y="350" width="330" height="70" rx="0" fill="#161b22"/>
+  <rect x="435" y="348" width="330" height="2" fill="#30363d"/>
+
+  <!-- Album art in now playing -->
+  <rect x="445" y="358" width="52" height="52" rx="6" fill="url(#noteGrad)"/>
+  <text x="471" y="390" text-anchor="middle" fill="#e6edf3" font-size="24">&#9835;</text>
+
+  <!-- Now playing info -->
+  <text x="508" y="378" fill="#e6edf3" font-family="system-ui" font-size="13" font-weight="bold">Bohemian Rhapsody</text>
+  <text x="508" y="395" fill="#8b949e" font-family="system-ui" font-size="11">Queen</text>
+
+  <!-- Progress bar -->
+  <rect x="445" y="410" width="310" height="3" rx="1.5" fill="#30363d"/>
+  <rect x="445" y="410" width="180" height="3" rx="1.5" fill="url(#progressGrad)"/>
+  <circle cx="625" cy="411.5" r="5" fill="#e94560"/>
+
+  <!-- Playback controls -->
+  <text x="545" y="447" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">&#9198;</text>
+  <!-- Pause button -->
+  <rect x="590" y="430" width="5" height="16" rx="1" fill="#e6edf3"/>
+  <rect x="600" y="430" width="5" height="16" rx="1" fill="#e6edf3"/>
+  <text x="655" y="447" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">&#9197;</text>
+
+  <!-- Platform badges -->
+  <!-- iOS badge -->
+  <rect x="260" y="250" width="100" height="32" rx="16" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="310" y="271" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="13">iOS</text>
+
+  <!-- Android badge -->
+  <rect x="840" y="250" width="100" height="32" rx="16" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="890" y="271" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="13">Android</text>
+
+  <!-- Connection lines from badges to phone -->
+  <line x1="360" y1="266" x2="420" y2="266" stroke="#512BD4" stroke-width="1.5" opacity="0.4" stroke-dasharray="4,4"/>
+  <line x1="780" y1="266" x2="840" y2="266" stroke="#512BD4" stroke-width="1.5" opacity="0.4" stroke-dasharray="4,4"/>
+
+  <!-- Title -->
+  <text x="600" y="550" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="36" font-weight="bold">Shiny.Music</text>
+  <text x="600" y="582" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">Cross-platform music library access for .NET MAUI</text>
+
+  <!-- Decorative dots -->
+  <circle cx="100" cy="150" r="3" fill="#512BD4" opacity="0.4"/>
+  <circle cx="130" cy="130" r="2" fill="#e94560" opacity="0.3"/>
+  <circle cx="80" cy="450" r="2" fill="#533483" opacity="0.3"/>
+  <circle cx="1100" cy="150" r="3" fill="#533483" opacity="0.4"/>
+  <circle cx="1070" cy="130" r="2" fill="#512BD4" opacity="0.3"/>
+  <circle cx="1120" cy="450" r="2" fill="#e94560" opacity="0.3"/>
+</svg>
