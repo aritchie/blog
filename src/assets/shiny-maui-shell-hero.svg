@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="50%" stop-color="#302b63"/>
+      <stop offset="100%" stop-color="#24243e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f093fb"/>
+      <stop offset="100%" stop-color="#f5576c"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Grid pattern -->
+  <g opacity="0.06" stroke="#fff" stroke-width="1">
+    <line x1="0" y1="0" x2="0" y2="630"/><line x1="60" y1="0" x2="60" y2="630"/>
+    <line x1="120" y1="0" x2="120" y2="630"/><line x1="180" y1="0" x2="180" y2="630"/>
+    <line x1="240" y1="0" x2="240" y2="630"/><line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="360" y1="0" x2="360" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/>
+    <line x1="480" y1="0" x2="480" y2="630"/><line x1="540" y1="0" x2="540" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/><line x1="660" y1="0" x2="660" y2="630"/>
+    <line x1="720" y1="0" x2="720" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/>
+    <line x1="840" y1="0" x2="840" y2="630"/><line x1="900" y1="0" x2="900" y2="630"/>
+    <line x1="960" y1="0" x2="960" y2="630"/><line x1="1020" y1="0" x2="1020" y2="630"/>
+    <line x1="1080" y1="0" x2="1080" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/>
+    <line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="0" y1="540" x2="1200" y2="540"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="180" cy="315" r="200" fill="url(#accent)" opacity="0.08"/>
+  <circle cx="1020" cy="315" r="250" fill="url(#glow)" opacity="0.06"/>
+
+  <!-- Navigation arrow icon -->
+  <g transform="translate(520, 120)">
+    <rect x="0" y="0" width="160" height="160" rx="30" fill="url(#accent)" opacity="0.9"/>
+    <path d="M50 80 L80 50 L110 80 M80 50 L80 120" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="350" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="#ffffff" letter-spacing="-1">
+    Shiny MAUI Shell
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="405" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#a0aec0">
+    Navigation That Actually Works
+  </text>
+
+  <!-- Tags -->
+  <g transform="translate(600, 460)" text-anchor="middle">
+    <rect x="-240" y="-18" width="120" height="36" rx="18" fill="url(#accent)" opacity="0.3"/>
+    <text x="-180" y="6" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">Type-Safe</text>
+
+    <rect x="-80" y="-18" width="160" height="36" rx="18" fill="url(#accent)" opacity="0.3"/>
+    <text x="0" y="6" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">Source Generated</text>
+
+    <rect x="120" y="-18" width="110" height="36" rx="18" fill="url(#accent)" opacity="0.3"/>
+    <text x="175" y="6" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">Testable</text>
+  </g>
+
+  <!-- Code snippet decoration -->
+  <g transform="translate(100, 500)" opacity="0.15">
+    <text font-family="monospace" font-size="14" fill="#667eea">await navigator.NavigateToDetail(itemId);</text>
+  </g>
+  <g transform="translate(750, 530)" opacity="0.12">
+    <text font-family="monospace" font-size="14" fill="#f093fb">[ShellMap&lt;DetailPage&gt;("Detail")]</text>
+  </g>
+</svg>

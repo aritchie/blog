@@ -1,0 +1,513 @@
+---
+title: 'Shiny MAUI Shell — Navigation That Actually Works'
+description: 'How Shiny MAUI Shell transforms .NET MAUI navigation from error-prone string routing into type-safe, testable, source-generated goodness.'
+pubDate: 'Mar 25 2026'
+heroImage: '../../assets/shiny-maui-shell-hero.svg'
+---
+
+If you've built anything non-trivial with .NET MAUI Shell, you've felt the pain. String-based routes. No ViewModel lifecycle. No way to unit test navigation. Manual `BindingContext` wiring. The constant dance with `Shell.Current` — a static singleton that laughs at your dependency injection setup.
+
+Shiny MAUI Shell fixes all of it.
+
+---
+
+## The Problem with Default MAUI Shell
+
+Let's be honest about what default Shell navigation looks like in a real app:
+
+```csharp
+// Registering routes — just strings, hope you don't typo
+Routing.RegisterRoute("detail", typeof(DetailPage));
+Routing.RegisterRoute("settings", typeof(SettingsPage));
+
+// Navigating — more strings, more hope
+await Shell.Current.GoToAsync($"detail?id={itemId}&page={pageNum}");
+
+// Receiving parameters — manual parsing in code-behind
+[QueryProperty(nameof(Id), "id")]
+[QueryProperty(nameof(Page), "page")]
+public partial class DetailPage : ContentPage
+{
+    public string Id { get; set; }
+    public string Page { get; set; }
+}
+```
+
+What's wrong with this?
+
+- **Strings everywhere.** Rename a route? Find-and-replace across your entire codebase and pray.
+- **No compile-time safety.** Typo in `"detial"` instead of `"detail"`? You'll find out at runtime.
+- **`Shell.Current` is untestable.** Good luck mocking a static singleton in your unit tests.
+- **No ViewModel lifecycle.** MAUI doesn't know or care when your ViewModel should initialize, appear, or clean up.
+- **Manual wiring.** You're setting `BindingContext` in code-behind like it's 2015.
+- **No navigation guards.** Want to prevent navigation when there are unsaved changes? Build it yourself.
+
+---
+
+## Enter Shiny MAUI Shell
+
+Shiny MAUI Shell wraps the standard MAUI Shell and gives you what should have been there from the start: type-safe navigation, source-generated routes, ViewModel lifecycle management, testable services, and zero boilerplate wiring.
+
+### Setup
+
+Install the NuGet package and add one line to your `MauiProgram.cs`:
+
+```csharp
+var builder = MauiApp.CreateBuilder()
+    .UseMauiApp<App>()
+    .UseShinyShell(x => x.AddGeneratedMaps());
+```
+
+That's it. The source generator handles the rest.
+
+---
+
+## Source Generation: The Star of the Show
+
+This is where Shiny MAUI Shell really shines. Decorate your ViewModel with two attributes and the source generator writes all the boilerplate for you.
+
+### Your Code
+
+```csharp
+[ShellMap<DetailPage>("Detail")]
+public partial class DetailViewModel : ObservableObject, IQueryAttributable
+{
+    [ShellProperty]
+    [ObservableProperty]
+    string itemId;
+
+    [ShellProperty(required: false)]
+    [ObservableProperty]
+    int page;
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue(nameof(ItemId), out var id))
+            ItemId = id?.ToString();
+        if (query.TryGetValue(nameof(Page), out var p))
+            Page = int.TryParse(p?.ToString(), out var val) ? val : 0;
+    }
+}
+```
+
+### What Gets Generated
+
+Three files appear at compile time — zero runtime cost.
+
+**Route constants** so you never type a string route again:
+
+```csharp
+public static class Routes
+{
+    public const string Detail = "Detail";
+}
+```
+
+**Strongly-typed navigation extension methods:**
+
+```csharp
+public static class NavigationExtensions
+{
+    public static Task NavigateToDetail(
+        this INavigator navigator,
+        string itemId,
+        int page = default)
+    {
+        return navigator.NavigateTo<DetailViewModel>(x =>
+        {
+            x.ItemId = itemId;
+            x.Page = page;
+        });
+    }
+}
+```
+
+**DI registration** for all your page/ViewModel mappings:
+
+```csharp
+public static class NavigationBuilderExtensions
+{
+    public static ShinyAppBuilder AddGeneratedMaps(this ShinyAppBuilder builder)
+    {
+        builder.Add<DetailPage, DetailViewModel>("Detail");
+        return builder;
+    }
+}
+```
+
+Invalid route names? The generator emits a **SHINY001** compiler error. You catch it before your app even runs.
+
+---
+
+## Navigation: Side by Side
+
+Here's the real comparison. Default MAUI Shell vs Shiny MAUI Shell, doing the same thing.
+
+### Navigating Forward
+
+```csharp
+// Default MAUI — string concatenation, no type safety
+await Shell.Current.GoToAsync($"detail?id={itemId}&page={pageNum}");
+
+// Shiny — source-generated, strongly typed
+await navigator.NavigateToDetail(itemId, pageNum);
+```
+
+### Navigating with ViewModel Configuration
+
+```csharp
+// Default MAUI — not possible without code-behind hacks
+
+// Shiny — configure the destination ViewModel directly
+await navigator.NavigateTo<DetailViewModel>(vm =>
+{
+    vm.ItemId = itemId;
+    vm.Page = pageNum;
+});
+```
+
+### Going Back
+
+```csharp
+// Default MAUI
+await Shell.Current.GoToAsync("..");
+
+// Shiny — go back with return data
+await navigator.GoBack(("Result", true), ("ItemId", selectedId));
+```
+
+### Pop to Root
+
+```csharp
+// Default MAUI
+await Shell.Current.GoToAsync("//main");
+
+// Shiny
+await navigator.PopToRoot();
+```
+
+### Switch the Entire Shell
+
+```csharp
+// Default MAUI — not supported without hacking Application.Current.MainPage
+
+// Shiny — first-class support
+await navigator.SwitchShell<MainAppShell>();
+```
+
+This is huge for login/logout flows where you need to swap between an authentication shell and your main app shell.
+
+---
+
+## Testable By Default
+
+Default MAUI Shell navigation depends on `Shell.Current` — a static singleton tied to the UI framework. You can't mock it. You can't test it. You just... hope it works.
+
+Shiny MAUI Shell gives you `INavigator` and `IDialogs` — proper interfaces that you inject through DI and mock in tests:
+
+```csharp
+public class DetailViewModel(INavigator navigator, IDialogs dialogs)
+{
+    public async Task Save()
+    {
+        // Save logic here
+        await dialogs.Alert("Success", "Item saved!");
+        await navigator.GoBack();
+    }
+
+    public async Task Delete()
+    {
+        var confirmed = await dialogs.Confirm("Delete?", "This cannot be undone.");
+        if (confirmed)
+        {
+            // Delete logic
+            await navigator.GoBack(("Deleted", true));
+        }
+    }
+}
+```
+
+Testing this is straightforward:
+
+```csharp
+[Fact]
+public async Task Save_ShowsAlert_ThenNavigatesBack()
+{
+    var navigator = Substitute.For<INavigator>();
+    var dialogs = Substitute.For<IDialogs>();
+    var vm = new DetailViewModel(navigator, dialogs);
+
+    await vm.Save();
+
+    await dialogs.Received(1).Alert("Success", "Item saved!");
+    await navigator.Received(1).GoBack();
+}
+```
+
+Try doing that with `Shell.Current.GoToAsync`. I'll wait.
+
+---
+
+## ViewModel Lifecycle: Finally
+
+Default MAUI has no concept of a ViewModel lifecycle. Your ViewModel doesn't know when its page appears, disappears, or gets popped off the stack. Shiny gives you four interfaces — implement only what you need.
+
+### IPageLifecycleAware
+
+```csharp
+public class DetailViewModel : ObservableObject, IPageLifecycleAware
+{
+    public void OnAppearing()
+    {
+        // Refresh data, start timers, resume subscriptions
+    }
+
+    public void OnDisappearing()
+    {
+        // Pause work, save state
+    }
+}
+```
+
+### INavigationConfirmation
+
+Guard against accidental navigation when there are unsaved changes:
+
+```csharp
+public class EditViewModel : ObservableObject, INavigationConfirmation
+{
+    bool hasUnsavedChanges;
+
+    public async Task<bool> CanNavigate()
+    {
+        if (!hasUnsavedChanges)
+            return true;
+
+        return await dialogs.Confirm(
+            "Unsaved Changes",
+            "You have unsaved changes. Discard them?"
+        );
+    }
+}
+```
+
+The user tries to navigate away, gets a confirmation dialog, and can cancel. No custom back button handlers. No page-level overrides. Just implement the interface.
+
+### INavigationAware
+
+Mutate parameters as you leave a page:
+
+```csharp
+public class DetailViewModel : ObservableObject, INavigationAware
+{
+    public void OnNavigatingFrom(IDictionary<string, object> parameters)
+    {
+        parameters["LastViewed"] = CurrentItemId;
+        parameters["Timestamp"] = DateTime.UtcNow;
+    }
+}
+```
+
+### IDisposable
+
+When a page is permanently removed from the navigation stack, `Dispose()` is called on the ViewModel. Clean up event subscriptions, cancel tokens, release resources.
+
+---
+
+## Dialogs Without the Singleton
+
+Every MAUI developer has written this at some point:
+
+```csharp
+await Shell.Current.DisplayAlert("Error", "Something went wrong", "OK");
+```
+
+Besides being untestable, it requires your ViewModel to know about `Shell.Current`. Shiny's `IDialogs` wraps all of this cleanly:
+
+```csharp
+public class MyViewModel(IDialogs dialogs)
+{
+    async Task ShowDialogs()
+    {
+        // Alert
+        await dialogs.Alert("Title", "Message");
+
+        // Confirm
+        bool confirmed = await dialogs.Confirm("Delete?", "Are you sure?");
+
+        // Prompt
+        string name = await dialogs.Prompt("Name", "Enter your name", placeholder: "John");
+
+        // Action Sheet
+        string choice = await dialogs.ActionSheet(
+            "Options", "Cancel", "Delete", "Edit", "Share"
+        );
+    }
+}
+```
+
+Thread-safe, automatically marshalled to the UI thread, fully mockable.
+
+---
+
+## Navigation Events
+
+Need cross-cutting concerns like analytics or logging? Subscribe to navigation events:
+
+```csharp
+public class AnalyticsTracker : IMauiInitializeService
+{
+    public void Initialize(IServiceProvider services)
+    {
+        var navigator = services.GetRequiredService<INavigator>();
+
+        navigator.Navigating += (_, args) =>
+        {
+            Analytics.Track("page_leaving", new Dictionary<string, string>
+            {
+                ["from"] = args.FromUri,
+                ["to"] = args.ToUri,
+                ["type"] = args.NavigationType.ToString()
+            });
+        };
+
+        navigator.Navigated += (_, args) =>
+        {
+            Analytics.Track("page_viewed", new Dictionary<string, string>
+            {
+                ["page"] = args.ToUri,
+                ["viewModel"] = args.ToViewModel?.GetType().Name
+            });
+        };
+    }
+}
+```
+
+---
+
+## Automatic Page-ViewModel Binding
+
+No more setting `BindingContext` in code-behind. When you register a page/ViewModel pair, Shiny's `ShinyRouteFactory` automatically:
+
+1. Creates the page instance
+2. Resolves the ViewModel from DI
+3. Sets the BindingContext
+4. Wires up all lifecycle events
+
+Your page code-behind becomes what it should be — empty:
+
+```csharp
+public partial class DetailPage : ContentPage
+{
+    public DetailPage() => InitializeComponent();
+}
+```
+
+---
+
+## The Full Picture
+
+Here's what a complete, production-ready ViewModel looks like with Shiny MAUI Shell:
+
+```csharp
+[ShellMap<DetailPage>("Detail")]
+public partial class DetailViewModel(
+    INavigator navigator,
+    IDialogs dialogs,
+    IMyApiService api,
+    ILogger<DetailViewModel> logger
+) : ObservableObject,
+    IQueryAttributable,
+    IPageLifecycleAware,
+    INavigationConfirmation,
+    IDisposable
+{
+    [ShellProperty]
+    [ObservableProperty]
+    string itemId;
+
+    [ObservableProperty]
+    ItemModel item;
+
+    bool hasUnsavedChanges;
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue(nameof(ItemId), out var id))
+            ItemId = id?.ToString();
+    }
+
+    public async void OnAppearing()
+    {
+        Item = await api.GetItem(ItemId);
+        logger.LogInformation("Loaded item {Id}", ItemId);
+    }
+
+    public void OnDisappearing() { }
+
+    public async Task<bool> CanNavigate()
+    {
+        if (!hasUnsavedChanges) return true;
+        return await dialogs.Confirm("Unsaved Changes", "Discard?");
+    }
+
+    [RelayCommand]
+    async Task Save()
+    {
+        await api.SaveItem(Item);
+        hasUnsavedChanges = false;
+        await dialogs.Alert("Saved", "Item saved successfully.");
+        await navigator.GoBack();
+    }
+
+    public void Dispose() =>
+        logger.LogInformation("DetailViewModel disposed");
+}
+```
+
+And navigating to it from anywhere:
+
+```csharp
+// One line. Type-safe. Source-generated. Testable.
+await navigator.NavigateToDetail("abc-123");
+```
+
+---
+
+## Quick Comparison
+
+| Capability | Default MAUI Shell | Shiny MAUI Shell |
+|---|---|---|
+| Route registration | Manual strings | Source-generated |
+| Navigation calls | String-based | Strongly-typed methods |
+| Parameter passing | Query string concatenation | Lambda configuration |
+| Compile-time validation | None | SHINY001 errors |
+| ViewModel lifecycle | None | Appearing, Disappearing, Dispose |
+| Navigation guards | None | `INavigationConfirmation` |
+| Dialogs | `Shell.Current` singleton | Injectable `IDialogs` |
+| Unit testability | Effectively impossible | First-class support |
+| Page-ViewModel binding | Manual code-behind | Automatic via DI |
+| Shell switching | Hack required | `SwitchShell<T>()` |
+| Back navigation with data | Manual | `GoBack(params)` |
+| Navigation events | None | `Navigating` / `Navigated` |
+
+---
+
+## Getting Started
+
+```bash
+dotnet add package Shiny.Maui.Shell
+```
+
+```csharp
+// MauiProgram.cs
+var builder = MauiApp.CreateBuilder()
+    .UseMauiApp<App>()
+    .UseShinyShell(x => x.AddGeneratedMaps());
+```
+
+Decorate your ViewModels with `[ShellMap]` and `[ShellProperty]`, implement the lifecycle interfaces you need, inject `INavigator` and `IDialogs`, and let the source generator handle the rest.
+
+Your navigation code becomes type-safe, testable, and maintainable. The way it should have been from the start.
+
+Check it out on [GitHub](https://github.com/shinyorg/ShinyMaui).
