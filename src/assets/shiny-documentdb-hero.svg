@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="dbGradSqlite" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f3460"/>
+      <stop offset="100%" style="stop-color:#533483"/>
+    </linearGradient>
+    <linearGradient id="dbGradPg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#336791"/>
+      <stop offset="100%" style="stop-color:#1f4060"/>
+    </linearGradient>
+    <linearGradient id="dbGradMySql" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00758f"/>
+      <stop offset="100%" style="stop-color:#004d61"/>
+    </linearGradient>
+    <linearGradient id="dbGradMsSql" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#cc2927"/>
+      <stop offset="100%" style="stop-color:#8b1a19"/>
+    </linearGradient>
+    <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#512BD4"/>
+      <stop offset="100%" style="stop-color:#7b4ff5"/>
+    </linearGradient>
+    <linearGradient id="docGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#161b22"/>
+      <stop offset="100%" style="stop-color:#0d1117"/>
+    </linearGradient>
+    <radialGradient id="glowPurple" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#512BD4" stop-opacity="0.25"/>
+      <stop offset="100%" style="stop-color:#512BD4" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#512BD4"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <line x1="200" y1="0" x2="200" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="1000" y1="0" x2="1000" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="130" x2="1200" y2="130" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="260" x2="1200" y2="260" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="390" x2="1200" y2="390" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+
+  <!-- ===== DATABASE CYLINDERS (left side) ===== -->
+
+  <!-- SQLite (top-left) -->
+  <g transform="translate(105, 72)">
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="url(#dbGradSqlite)" stroke="#533483" stroke-width="1.2"/>
+    <rect x="-62" y="0" width="124" height="56" fill="url(#dbGradSqlite)"/>
+    <ellipse cx="0" cy="56" rx="62" ry="17" fill="url(#dbGradSqlite)" stroke="#533483" stroke-width="1.2"/>
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="#0f3460" stroke="#533483" stroke-width="1.2"/>
+    <line x1="-62" y1="0" x2="-62" y2="56" stroke="#533483" stroke-width="1.2"/>
+    <line x1="62" y1="0" x2="62" y2="56" stroke="#533483" stroke-width="1.2"/>
+    <text x="0" y="30" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="14" font-weight="bold">SQLite</text>
+  </g>
+
+  <!-- PostgreSQL (bottom-left) -->
+  <g transform="translate(105, 218)">
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="url(#dbGradPg)" stroke="#4a8db7" stroke-width="1.2"/>
+    <rect x="-62" y="0" width="124" height="56" fill="url(#dbGradPg)"/>
+    <ellipse cx="0" cy="56" rx="62" ry="17" fill="url(#dbGradPg)" stroke="#4a8db7" stroke-width="1.2"/>
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="#336791" stroke="#4a8db7" stroke-width="1.2"/>
+    <line x1="-62" y1="0" x2="-62" y2="56" stroke="#4a8db7" stroke-width="1.2"/>
+    <line x1="62" y1="0" x2="62" y2="56" stroke="#4a8db7" stroke-width="1.2"/>
+    <text x="0" y="30" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="13" font-weight="bold">PostgreSQL</text>
+  </g>
+
+  <!-- MySQL (top-right of db column) -->
+  <g transform="translate(105, 364)">
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="url(#dbGradMySql)" stroke="#00a4c4" stroke-width="1.2"/>
+    <rect x="-62" y="0" width="124" height="56" fill="url(#dbGradMySql)"/>
+    <ellipse cx="0" cy="56" rx="62" ry="17" fill="url(#dbGradMySql)" stroke="#00a4c4" stroke-width="1.2"/>
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="#00758f" stroke="#00a4c4" stroke-width="1.2"/>
+    <line x1="-62" y1="0" x2="-62" y2="56" stroke="#00a4c4" stroke-width="1.2"/>
+    <line x1="62" y1="0" x2="62" y2="56" stroke="#00a4c4" stroke-width="1.2"/>
+    <text x="0" y="30" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="14" font-weight="bold">MySQL</text>
+  </g>
+
+  <!-- SQL Server (bottom) -->
+  <g transform="translate(310, 146)">
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="url(#dbGradMsSql)" stroke="#e04040" stroke-width="1.2"/>
+    <rect x="-62" y="0" width="124" height="56" fill="url(#dbGradMsSql)"/>
+    <ellipse cx="0" cy="56" rx="62" ry="17" fill="url(#dbGradMsSql)" stroke="#e04040" stroke-width="1.2"/>
+    <ellipse cx="0" cy="0" rx="62" ry="17" fill="#cc2927" stroke="#e04040" stroke-width="1.2"/>
+    <line x1="-62" y1="0" x2="-62" y2="56" stroke="#e04040" stroke-width="1.2"/>
+    <line x1="62" y1="0" x2="62" y2="56" stroke="#e04040" stroke-width="1.2"/>
+    <text x="0" y="24" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="12" font-weight="bold">SQL</text>
+    <text x="0" y="40" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="12" font-weight="bold">Server</text>
+  </g>
+
+  <!-- ===== CONNECTION LINES FROM DBs TO HUB ===== -->
+
+  <!-- Hub glow -->
+  <circle cx="490" cy="265" r="100" fill="url(#glowPurple)"/>
+
+  <!-- Lines from each DB to the hub -->
+  <path d="M167,100 C300,100 380,220 440,250" stroke="#533483" stroke-width="1.8" fill="none" opacity="0.5"/>
+  <path d="M167,246 C300,246 380,255 440,260" stroke="#4a8db7" stroke-width="1.8" fill="none" opacity="0.5"/>
+  <path d="M167,392 C300,392 380,300 440,275" stroke="#00a4c4" stroke-width="1.8" fill="none" opacity="0.5"/>
+  <path d="M372,174 C410,200 430,230 440,255" stroke="#e04040" stroke-width="1.8" fill="none" opacity="0.5"/>
+
+  <!-- ===== CENTRAL HUB (IDocumentStore) ===== -->
+  <rect x="440" y="218" width="200" height="90" rx="16" fill="#161b22" stroke="url(#hubGrad)" stroke-width="2.5"/>
+
+  <!-- Hub icon - curly braces representing JSON/document -->
+  <text x="462" y="254" fill="#512BD4" font-family="monospace" font-size="28" font-weight="bold">{</text>
+  <text x="618" y="254" fill="#512BD4" font-family="monospace" font-size="28" font-weight="bold">}</text>
+
+  <text x="540" y="256" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="15" font-weight="bold">IDocumentStore</text>
+  <text x="540" y="278" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="11">One API, Any Backend</text>
+  <text x="540" y="296" text-anchor="middle" fill="#512BD4" font-family="monospace" font-size="10">IDatabaseProvider</text>
+
+  <!-- ===== ARROWS FROM HUB TO DOCUMENTS ===== -->
+  <path d="M640,245 L700,180" stroke="#512BD4" stroke-width="1.8" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+  <path d="M640,263 L700,263" stroke="#512BD4" stroke-width="1.8" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+  <path d="M640,280 L700,345" stroke="#512BD4" stroke-width="1.8" fill="none" opacity="0.5" marker-end="url(#arrowhead)"/>
+
+  <!-- ===== JSON DOCUMENTS (right side) ===== -->
+
+  <!-- Document 1 -->
+  <rect x="710" y="115" width="290" height="105" rx="10" fill="url(#docGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="728" y="139" fill="#512BD4" font-family="monospace" font-size="12">{</text>
+  <text x="743" y="156" fill="#e94560" font-family="monospace" font-size="11">"id"</text>
+  <text x="779" y="156" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="790" y="156" fill="#34d058" font-family="monospace" font-size="11">"usr_001"</text>
+  <text x="860" y="156" fill="#8b949e" font-family="monospace" font-size="11">,</text>
+  <text x="743" y="173" fill="#e94560" font-family="monospace" font-size="11">"name"</text>
+  <text x="795" y="173" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="806" y="173" fill="#34d058" font-family="monospace" font-size="11">"Alice"</text>
+  <text x="862" y="173" fill="#8b949e" font-family="monospace" font-size="11">,</text>
+  <text x="743" y="190" fill="#e94560" font-family="monospace" font-size="11">"age"</text>
+  <text x="779" y="190" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="790" y="190" fill="#79c0ff" font-family="monospace" font-size="11">25</text>
+  <text x="728" y="207" fill="#512BD4" font-family="monospace" font-size="12">}</text>
+
+  <!-- Document 2 -->
+  <rect x="710" y="232" width="290" height="64" rx="10" fill="url(#docGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="728" y="255" fill="#512BD4" font-family="monospace" font-size="12">{</text>
+  <text x="743" y="272" fill="#e94560" font-family="monospace" font-size="11">"id"</text>
+  <text x="779" y="272" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="790" y="272" fill="#34d058" font-family="monospace" font-size="11">"ord_042"</text>
+  <text x="864" y="272" fill="#8b949e" font-family="monospace" font-size="11">,</text>
+  <text x="878" y="272" fill="#e94560" font-family="monospace" font-size="11">"status"</text>
+  <text x="940" y="272" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="951" y="272" fill="#34d058" font-family="monospace" font-size="11">"shipped"</text>
+  <text x="728" y="287" fill="#512BD4" font-family="monospace" font-size="12">}</text>
+
+  <!-- Document 3 -->
+  <rect x="710" y="308" width="290" height="105" rx="10" fill="url(#docGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="728" y="332" fill="#512BD4" font-family="monospace" font-size="12">{</text>
+  <text x="743" y="349" fill="#e94560" font-family="monospace" font-size="11">"id"</text>
+  <text x="779" y="349" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="790" y="349" fill="#34d058" font-family="monospace" font-size="11">"cfg_001"</text>
+  <text x="864" y="349" fill="#8b949e" font-family="monospace" font-size="11">,</text>
+  <text x="743" y="366" fill="#e94560" font-family="monospace" font-size="11">"theme"</text>
+  <text x="803" y="366" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="814" y="366" fill="#34d058" font-family="monospace" font-size="11">"dark"</text>
+  <text x="860" y="366" fill="#8b949e" font-family="monospace" font-size="11">,</text>
+  <text x="743" y="383" fill="#e94560" font-family="monospace" font-size="11">"cache"</text>
+  <text x="803" y="383" fill="#8b949e" font-family="monospace" font-size="11">:</text>
+  <text x="814" y="383" fill="#79c0ff" font-family="monospace" font-size="11">true</text>
+  <text x="728" y="400" fill="#512BD4" font-family="monospace" font-size="12">}</text>
+
+  <!-- ===== LINQ QUERY BADGE (bottom right) ===== -->
+  <rect x="870" y="430" width="260" height="62" rx="10" fill="#161b22" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="886" y="452" fill="#8b949e" font-family="monospace" font-size="10">store</text>
+  <text x="920" y="452" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="926" y="452" fill="#34d058" font-family="monospace" font-size="10">Query</text>
+  <text x="958" y="452" fill="#8b949e" font-family="monospace" font-size="10">&lt;</text>
+  <text x="965" y="452" fill="#79c0ff" font-family="monospace" font-size="10">User</text>
+  <text x="991" y="452" fill="#8b949e" font-family="monospace" font-size="10">&gt;()</text>
+  <text x="900" y="468" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="906" y="468" fill="#34d058" font-family="monospace" font-size="10">Where</text>
+  <text x="940" y="468" fill="#8b949e" font-family="monospace" font-size="10">(</text>
+  <text x="946" y="468" fill="#e6edf3" font-family="monospace" font-size="10">u =&gt; u.Age &gt; 18</text>
+  <text x="1066" y="468" fill="#8b949e" font-family="monospace" font-size="10">)</text>
+  <text x="900" y="484" fill="#8b949e" font-family="monospace" font-size="10">.</text>
+  <text x="906" y="484" fill="#34d058" font-family="monospace" font-size="10">ToList</text>
+  <text x="946" y="484" fill="#8b949e" font-family="monospace" font-size="10">();</text>
+
+  <!-- ===== v3 BADGE ===== -->
+  <rect x="1040" y="120" width="60" height="30" rx="15" fill="#512BD4" fill-opacity="0.2" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="1070" y="140" text-anchor="middle" fill="#7b4ff5" font-family="system-ui" font-size="14" font-weight="bold">v3</text>
+
+  <!-- ===== TITLE ===== -->
+  <text x="600" y="548" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="38" font-weight="bold">Shiny.DocumentDb</text>
+  <text x="600" y="582" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">One API — SQLite · PostgreSQL · SQL Server · MySQL</text>
+
+  <!-- Decorative dots -->
+  <circle cx="50" cy="80" r="3" fill="#512BD4" opacity="0.4"/>
+  <circle cx="75" cy="60" r="2" fill="#e94560" opacity="0.3"/>
+  <circle cx="40" cy="450" r="2" fill="#533483" opacity="0.3"/>
+  <circle cx="1160" cy="80" r="3" fill="#533483" opacity="0.4"/>
+  <circle cx="1140" cy="60" r="2" fill="#512BD4" opacity="0.3"/>
+  <circle cx="1160" cy="500" r="2" fill="#e94560" opacity="0.3"/>
+</svg>

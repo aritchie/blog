@@ -1,0 +1,240 @@
+---
+title: 'Shiny.DocumentDb v3 — One API, Four Databases'
+description: 'The SQLite document store grows up. v3 adds MySQL, SQL Server, and PostgreSQL support with a clean provider abstraction — same fluent LINQ queries, same AOT support, any backend.'
+pubDate: 'Mar 26 2026'
+heroImage: '../../assets/shiny-documentdb-hero.svg'
+---
+
+When I first released [Shiny.SqliteDocumentDb](/blog/shiny-sqlitedocumentdb), the pitch was simple: throw an object in, get it back out, no schema, no migrations.  It worked.  People used it for mobile apps, desktop apps, local caches — exactly the use cases I designed it for.
+
+Then the questions started: *"Can I use this on my server with Postgres?"*  *"We love the API but we're standardized on SQL Server."*  *"Any chance of MySQL support?"*
+
+Fair enough.  The API was never SQLite-specific — `json_extract` has equivalents in every major database.  So I rebuilt the internals around a provider abstraction and shipped support for **MySQL**, **SQL Server**, and **PostgreSQL** alongside SQLite.  Same API, same LINQ expressions, same AOT support, different backend.
+
+Welcome to [Shiny.DocumentDb v3](https://github.com/shinyorg/DocumentDb).
+
+---
+
+## What Changed
+
+The library has a new name, a new repo, and a new architecture — but the API you already know is the same.
+
+### New Repository
+
+The project moved from [shinyorg/SqliteDocumentDb](https://github.com/shinyorg/SqliteDocumentDb) to [shinyorg/DocumentDb](https://github.com/shinyorg/DocumentDb).  The old repo will remain as an archive but won't receive updates.
+
+### New Packages
+
+Instead of a single `Shiny.SqliteDocumentDb` package, v3 splits into a core library and per-provider packages:
+
+```bash
+# Pick your database
+dotnet add package Shiny.DocumentDb.Sqlite
+dotnet add package Shiny.DocumentDb.MySql
+dotnet add package Shiny.DocumentDb.SqlServer
+dotnet add package Shiny.DocumentDb.PostgreSql
+
+# Optional — generic DI extensions (bring your own provider)
+dotnet add package Shiny.DocumentDb.Extensions.DependencyInjection
+```
+
+Each provider package includes its own DI extension methods.  The core `Shiny.DocumentDb` package is pulled in as a transitive dependency — you never reference it directly.
+
+### Provider Abstraction
+
+The heart of v3 is the `IDatabaseProvider` interface.  Each database implements its own SQL generation for JSON operations, index DDL, schema creation, and connection management.  The `DocumentStore` doesn't know or care which database is behind it.
+
+```csharp
+// SQLite
+var store = new DocumentStore(new DocumentStoreOptions
+{
+    DatabaseProvider = new SqliteDatabaseProvider("Data Source=mydata.db")
+});
+
+// PostgreSQL
+var store = new DocumentStore(new DocumentStoreOptions
+{
+    DatabaseProvider = new PostgreSqlDatabaseProvider("Host=localhost;Database=mydb;Username=postgres;Password=pass")
+});
+
+// SQL Server
+var store = new DocumentStore(new DocumentStoreOptions
+{
+    DatabaseProvider = new SqlServerDatabaseProvider("Server=localhost;Database=mydb;Trusted_Connection=true")
+});
+
+// MySQL
+var store = new DocumentStore(new DocumentStoreOptions
+{
+    DatabaseProvider = new MySqlDatabaseProvider("Server=localhost;Database=mydb;User=root;Password=pass")
+});
+```
+
+Swap the provider, keep everything else.  Your queries, projections, indexes, transactions — all identical regardless of backend.
+
+---
+
+## Why Multiple Databases?
+
+SQLite is still the right choice for mobile and embedded apps.  But the document store pattern is useful far beyond the device.
+
+**Server-side caches and config stores.**  If your API already talks to PostgreSQL, adding SQLite for a settings store means managing a second database engine.  Now you can use the same Postgres connection for both relational tables and document storage.
+
+**Team standardization.**  Enterprise teams standardized on SQL Server don't want to introduce SQLite into their server stack just for a document store.  Now they don't have to.
+
+**Prototyping to production.**  Start with SQLite locally, deploy to PostgreSQL in production.  Change one line — the connection string and provider — and your entire data layer moves with you.
+
+**Existing infrastructure.**  If you already have MySQL running, you don't need another database engine to get schema-free document storage.  Drop in the MySQL provider and you're done.
+
+---
+
+## Same API, Different SQL
+
+The fluent query builder translates your LINQ expressions into the appropriate SQL dialect for each provider.  You write this:
+
+```csharp
+var results = await store.Query<Order>()
+    .Where(o => o.ShippingAddress.City == "Portland")
+    .OrderBy(o => o.CustomerName)
+    .Paginate(0, 20)
+    .ToList();
+```
+
+And the provider generates the right SQL:
+
+| Provider | JSON Extract |
+|---|---|
+| SQLite | `json_extract(Data, '$.shippingAddress.city')` |
+| MySQL | `JSON_EXTRACT(Data, '$.shippingAddress.city')` |
+| SQL Server | `JSON_VALUE(Data, '$.shippingAddress.city')` |
+| PostgreSQL | `"Data"::jsonb->>'shippingAddress.city'` |
+
+Everything you've already learned — nested property queries, `Any()`, `Count()`, string methods, projections, aggregates, streaming — works identically across all four providers.
+
+---
+
+## Dependency Injection
+
+Each provider package ships its own extension method:
+
+```csharp
+// SQLite
+services.AddSqliteDocumentStore("Data Source=mydata.db");
+
+// MySQL
+services.AddMySqlDocumentStore("Server=localhost;Database=mydb;User=root;Password=pass");
+
+// SQL Server
+services.AddSqlServerDocumentStore("Server=localhost;Database=mydb;Trusted_Connection=true");
+
+// PostgreSQL
+services.AddPostgreSqlDocumentStore("Host=localhost;Database=mydb;Username=postgres;Password=pass");
+```
+
+All register `IDocumentStore` as a singleton.  Full options configuration is supported on every provider:
+
+```csharp
+services.AddPostgreSqlDocumentStore(opts =>
+{
+    opts.DatabaseProvider = new PostgreSqlDatabaseProvider("Host=localhost;Database=mydb;...");
+    opts.TypeNameResolution = TypeNameResolution.FullName;
+    opts.JsonSerializerOptions = ctx.Options;
+    opts.UseReflectionFallback = false;
+    opts.MapTypeToTable<User>();
+    opts.MapTypeToTable<Order>("orders");
+});
+```
+
+If you need provider-agnostic registration — say the provider is determined at runtime — use the standalone DI package:
+
+```csharp
+services.AddDocumentStore(opts =>
+{
+    opts.DatabaseProvider = ResolveProvider(config);
+});
+```
+
+---
+
+## Migration from v2
+
+If you're coming from `Shiny.SqliteDocumentDb` v2, here's the short version:
+
+1. **Replace the package:**
+   ```bash
+   dotnet remove package Shiny.SqliteDocumentDb
+   dotnet remove package Shiny.SqliteDocumentDb.Extensions.DependencyInjection
+   dotnet add package Shiny.DocumentDb.Sqlite
+   ```
+
+2. **Update the constructor:**
+   ```csharp
+   // Before (v2)
+   var store = new SqliteDocumentStore("Data Source=mydata.db");
+
+   // After (v3) — SqliteDocumentStore still works as a convenience wrapper
+   var store = new SqliteDocumentStore("Data Source=mydata.db");
+
+   // Or use the new provider-based constructor
+   var store = new DocumentStore(new DocumentStoreOptions
+   {
+       DatabaseProvider = new SqliteDatabaseProvider("Data Source=mydata.db")
+   });
+   ```
+
+3. **Update DI registration:**
+   ```csharp
+   // Before (v2)
+   services.AddSqliteDocumentStore("Data Source=mydata.db");
+
+   // After (v3) — same method name, different package
+   services.AddSqliteDocumentStore("Data Source=mydata.db");
+   ```
+
+4. **Update namespaces.** The core types moved from `Shiny.SqliteDocumentDb` to `Shiny.DocumentDb`. Provider-specific types are in `Shiny.DocumentDb.Sqlite`, `Shiny.DocumentDb.MySql`, etc.
+
+**Your existing SQLite databases are fully compatible** — the table schema hasn't changed.  No data migration required.
+
+---
+
+## Everything Else Carries Forward
+
+All the features from v1 and v2 are here, unchanged:
+
+- **Fluent query builder** with `.Where()`, `.OrderBy()`, `.Paginate()`, `.Select()`, `.GroupBy()`
+- **Streaming** with `.ToAsyncEnumerable()`
+- **Expression-based JSON indexes** via `CreateIndexAsync<T>()`
+- **Table-per-type mapping** with `MapTypeToTable<T>()`
+- **Custom Id properties** on mapped types
+- **Document diffing** with `GetDiff()` returning RFC 6902 `JsonPatchDocument<T>`
+- **Batch insert** with prepared command reuse
+- **Surgical field updates** with `SetProperty()` and `RemoveProperty()`
+- **JSON Merge Patch** via `Upsert()`
+- **Aggregate projections** with `Sql.Count()`, `Sql.Max()`, `Sql.Min()`, `Sql.Sum()`, `Sql.Avg()`
+- **Full AOT/trimming support** with optional `JsonTypeInfo<T>` auto-resolution
+- **Transactions** with automatic commit/rollback
+- **Backup** (SQLite only, via the Online Backup API)
+
+---
+
+## When to Use Which Provider
+
+| Scenario | Provider |
+|---|---|
+| Mobile app (iOS, Android, Mac Catalyst) | SQLite |
+| Desktop app with local storage | SQLite |
+| Server-side cache alongside existing PostgreSQL | PostgreSQL |
+| Enterprise environment standardized on SQL Server | SQL Server |
+| Existing MySQL infrastructure | MySQL |
+| Prototype locally, deploy to cloud DB | SQLite → PostgreSQL/SQL Server |
+| Embedded / edge / offline-first | SQLite |
+
+---
+
+## Get Started
+
+```bash
+dotnet add package Shiny.DocumentDb.Sqlite      # or .MySql, .SqlServer, .PostgreSql
+```
+
+Full documentation at [shinylib.net/sqlite-docdb](https://shinylib.net/sqlite-docdb/) and the [GitHub repository](https://github.com/shinyorg/DocumentDb).
