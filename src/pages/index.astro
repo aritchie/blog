@@ -6,6 +6,8 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import me from '../assets/me.jpg';
+import mvp from '../assets/msft_mvp.png';
 
 const posts = (await getCollection('blog'))
 	.filter((post) => (import.meta.env.DEV || post.data.draft !== true) && post.data.pubDate <= new Date())
@@ -19,7 +21,42 @@ const posts = (await getCollection('blog'))
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main {
-				width: 960px;
+				width: 1200px;
+			}
+			.layout {
+				display: flex;
+				flex-wrap: nowrap;
+				gap: 2rem;
+				align-items: flex-start;
+			}
+			.sidebar {
+				width: 240px;
+				flex-shrink: 0;
+				text-align: center;
+				position: sticky;
+				top: 2rem;
+			}
+			.sidebar img {
+				border-radius: 50%;
+				margin-bottom: 1rem;
+			}
+			.sidebar .about-text {
+				font-size: 0.9rem;
+				color: rgb(var(--gray-dark));
+				line-height: 1.5;
+				text-align: left;
+			}
+			.sidebar .mvp-link {
+				display: inline-block;
+				margin-top: 1rem;
+			}
+			.sidebar .mvp-link img {
+				border-radius: 0;
+				width: 120px;
+			}
+			.posts {
+				flex: 1;
+				min-width: 0;
 			}
 			ul {
 				display: flex;
@@ -71,6 +108,18 @@ const posts = (await getCollection('blog'))
 				box-shadow: var(--box-shadow);
 			}
 			@media (max-width: 720px) {
+				.layout {
+					flex-direction: column;
+				}
+				.sidebar {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+				}
+				.sidebar .about-text {
+					text-align: center;
+				}
 				ul {
 					gap: 0.5em;
 				}
@@ -90,25 +139,39 @@ const posts = (await getCollection('blog'))
 	<body>
 		<Header />
 		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+			<div class="layout">
+				<aside class="sidebar">
+					<Image src={me} width={200} height={200} alt="Allan Ritchie" />
+					<p class="about-text">
+						Software engineer, architect, and open source maintainer with 25+ years of experience. Author of .NET libraries with over 40 million downloads. Co-host of <a href="https://youtube.com/@GoneDotNet">Gone .NET</a>.
+					</p>
+					<a class="mvp-link" href="https://mvp.microsoft.com/en-US/mvp/profile/501ddb3a-4d15-e711-810b-3863bb36edf8" target="_blank">
+						<Image src={mvp} width={120} height={120} alt="Microsoft MVP" />
+					</a>
+					<p class="about-text">
+						Check out all of my <a href="/projects/">open source projects</a>.
+					</p>
+				</aside>
+				<section class="posts">
+					<ul>
+						{
+							posts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										{post.data.heroImage && (
+											<Image width={720} height={360} src={post.data.heroImage} alt="" />
+										)}
+										<h4 class="title">{post.data.title}</h4>
+										<p class="date">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+									</a>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+			</div>
 		</main>
 		<Footer />
 	</body>
