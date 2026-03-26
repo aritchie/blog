@@ -3,50 +3,181 @@ title: Projects
 description: A list of my open source projects, sample apps, and ways you can support my work
 ---
 
+<style>{`
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .project-card {
+    border: 1px solid rgb(var(--gray-light));
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .project-card:hover {
+    box-shadow: var(--box-shadow);
+    border-color: var(--accent);
+  }
+  .project-card a {
+    text-decoration: none;
+  }
+  .project-card .project-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.4rem 0;
+    color: var(--accent);
+  }
+  .project-card .project-desc {
+    font-size: 0.85rem;
+    color: rgb(var(--gray-dark));
+    margin: 0;
+    line-height: 1.4;
+  }
+  .nuget-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .nuget-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: #004880;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.75rem;
+    line-height: 20px;
+  }
+  .nuget-badge img {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+`}</style>
+
 ### MY OPEN SOURCE PROJECTS
 
-| Library | Description |
-| --- | --- |
-| [Shiny](https://shinylib.net) | .NET Framework for Backgrounding & Device Hardware Services (iOS, Android, & Catalyst) |
-| [Shiny Mobile](https://github.com/shinyorg/shiny) | Cross platform framework for device services and background processes |
-| [Shiny Mediator](https://github.com/shinyorg/mediator) | A Mediator for your .NET Apps with some of the most awesome middleware around |
-| [App Extensions](https://github.com/shinyorg/extensions) | Make .NET Dependency Injection less boilerplatey & add a pinch of persistent service magic |
-| [Reflector](https://github.com/shinyorg/reflector) | .NET Reflection without doing the actual reflection... powered by source generators |
-| [MAUI Shell Extensions](https://github.com/shinyorg/maui) | .NET MAUI Shell navigation made pleasant! |
-| [App Templates](https://github.com/shinyorg/templates) | dotnet CLI & Visual Studio Templates |
-| [Localization Generator](https://github.com/shinyorg/localizegen) | Make IStringLocalizer strongly typed! |
-| [MAUI TableView](https://github.com/shinyorg/tableview) | A settings-style TableView for .NET MAUI - pure MAUI approach with cascading styles, 14 cell types, and full MVVM support |
-| [DocumentDB](https://github.com/shinyorg/documentdb) | A multi-database document store for .NET with LINQ querying and full AOT/trimming support |
-| [MAUI Platforms](https://github.com/shinyorg/mauiplatforms) | .NET MAUI backends for Apple TV (tvOS) & macOS (AppKit) - platforms not officially supported by MAUI |
-| [OBD](https://github.com/shinyorg/obd) | .NET library for communicating with vehicles through OBD-II adapters via pluggable transports like Bluetooth LE |
-| [Music](https://github.com/shinyorg/music) | Unified .NET API for device music libraries on Android & iOS - permissions, metadata querying, playback, and file copying |
-| [Contact Store](https://github.com/shinyorg/contactstore) | Cross-platform device contact management for .NET MAUI with full CRUD, LINQ querying, and permissions support |
-| [MSBuild Permissions](https://github.com/shinyorg/msbuildpermissions) | Declare .NET MAUI permissions once in your csproj and auto-generate Android manifest & iOS plist entries |
-| [GeoSpatial DB](https://github.com/shinyorg/geospatialdb) | A GeoSpatial datastore & geofencing library based on SQLite R*Tree indexing - dependency-free and great for .NET MAUI |
+<div class="project-grid">
+  <div class="project-card">
+    <a href="https://shinylib.net"><p class="project-name">Shiny</p></a>
+    <p class="project-desc">.NET Framework for Backgrounding & Device Hardware Services (iOS, Android, & Catalyst)</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/shiny"><p class="project-name">Shiny Mobile</p></a>
+    <p class="project-desc">Cross platform framework for device services and background processes</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/mediator"><p class="project-name">Shiny Mediator</p></a>
+    <p class="project-desc">A Mediator for your .NET Apps with some of the most awesome middleware around</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/extensions"><p class="project-name">App Extensions</p></a>
+    <p class="project-desc">Make .NET Dependency Injection less boilerplatey & add a pinch of persistent service magic</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/reflector"><p class="project-name">Reflector</p></a>
+    <p class="project-desc">.NET Reflection without doing the actual reflection... powered by source generators</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/maui"><p class="project-name">MAUI Shell Extensions</p></a>
+    <p class="project-desc">.NET MAUI Shell navigation made pleasant!</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/templates"><p class="project-name">App Templates</p></a>
+    <p class="project-desc">dotnet CLI & Visual Studio Templates</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/localizegen"><p class="project-name">Localization Generator</p></a>
+    <p class="project-desc">Make IStringLocalizer strongly typed!</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/tableview"><p class="project-name">MAUI TableView</p></a>
+    <p class="project-desc">A settings-style TableView for .NET MAUI - pure MAUI approach with cascading styles, 14 cell types, and full MVVM support</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/documentdb"><p class="project-name">DocumentDB</p></a>
+    <p class="project-desc">A multi-database document store for .NET with LINQ querying and full AOT/trimming support</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/mauiplatforms"><p class="project-name">MAUI Platforms</p></a>
+    <p class="project-desc">.NET MAUI backends for Apple TV (tvOS) & macOS (AppKit) - platforms not officially supported by MAUI</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/obd"><p class="project-name">OBD</p></a>
+    <p class="project-desc">.NET library for communicating with vehicles through OBD-II adapters via pluggable transports like Bluetooth LE</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/music"><p class="project-name">Music</p></a>
+    <p class="project-desc">Unified .NET API for device music libraries on Android & iOS - permissions, metadata querying, playback, and file copying</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/contactstore"><p class="project-name">Contact Store</p></a>
+    <p class="project-desc">Cross-platform device contact management for .NET MAUI with full CRUD, LINQ querying, and permissions support</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/msbuildpermissions"><p class="project-name">MSBuild Permissions</p></a>
+    <p class="project-desc">Declare .NET MAUI permissions once in your csproj and auto-generate Android manifest & iOS plist entries</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/geospatialdb"><p class="project-name">GeoSpatial DB</p></a>
+    <p class="project-desc">A GeoSpatial datastore & geofencing library based on SQLite R*Tree indexing - dependency-free and great for .NET MAUI</p>
+  </div>
+</div>
 
-<div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; margin-bottom: 1.5rem;">
-  <a href="https://nuget.org/profiles/aritchie" target="_blank" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: #004880; color: #fff; text-decoration: none; font-size: 0.75rem; line-height: 20px; vertical-align: middle;">
-    <img src="https://www.nuget.org/Content/gallery/img/logo-header.svg" alt="NuGet" width="20" height="20" style="display: block; margin: 0; padding: 0; vertical-align: middle;" />
-    <span style="display: inline-block; vertical-align: middle;">aritchie</span>
+<div class="nuget-badges">
+  <a class="nuget-badge" href="https://nuget.org/profiles/aritchie" target="_blank">
+    <img src="https://www.nuget.org/Content/gallery/img/logo-header.svg" alt="NuGet" width="20" height="20" />
+    <span>aritchie</span>
   </a>
-  <a href="https://nuget.org/profiles/ShinyLib" target="_blank" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: #004880; color: #fff; text-decoration: none; font-size: 0.75rem; line-height: 20px; vertical-align: middle;">
-    <img src="https://www.nuget.org/Content/gallery/img/logo-header.svg" alt="NuGet" width="20" height="20" style="display: block; margin: 0; padding: 0; vertical-align: middle;" />
-    <span style="display: inline-block; vertical-align: middle;">ShinyLib</span>
+  <a class="nuget-badge" href="https://nuget.org/profiles/ShinyLib" target="_blank">
+    <img src="https://www.nuget.org/Content/gallery/img/logo-header.svg" alt="NuGet" width="20" height="20" />
+    <span>ShinyLib</span>
   </a>
 </div>
 
 ### SAMPLE APPS
 
-| App | Description |
-| --- | --- |
-| [Canadas Wonderland Ride Times](https://github.com/shinyorg/wonderland) | A great example of mediator plus a background Shiny job |
-| [Heads Up Clone](https://github.com/gonedotnet/headsup) | A clone of the popular Heads Up party game built with .NET MAUI |
-| [Bluetooth Digital Scoreboard](https://github.com/aritchie/digitalscoreboard) | A BLE Client & Hosting sample using Shiny |
-| [Mediator Sample](https://github.com/shinyorg/mediatorsample) | End to end mediator sample |
-| [Where Are You](https://github.com/GoneDotNet/whereareyou) | .NET MAUI Background GPS Done Right with Shiny Locations & .NET Orleans |
-| [Beat The Bank](https://github.com/aritchie/beatthebank) | A speech-to-text/text-to-speech game built with .NET MAUI, Shiny Mediator, & Community Toolkit |
-| [KML Recorder](https://github.com/shinyorg/kmlrecorder) | A .NET MAUI app for recording GPS coordinates and exporting as KML/GeoJSON with CarPlay & Android Auto support |
-| [TUNE Games](https://github.com/aritchie/tunegames) | A music guessing/trivia game built with .NET MAUI and Shiny.Music |
+<div class="project-grid">
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/wonderland"><p class="project-name">Canadas Wonderland Ride Times</p></a>
+    <p class="project-desc">A great example of mediator plus a background Shiny job</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/gonedotnet/headsup"><p class="project-name">Heads Up Clone</p></a>
+    <p class="project-desc">A clone of the popular Heads Up party game built with .NET MAUI</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/aritchie/digitalscoreboard"><p class="project-name">Bluetooth Digital Scoreboard</p></a>
+    <p class="project-desc">A BLE Client & Hosting sample using Shiny</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/mediatorsample"><p class="project-name">Mediator Sample</p></a>
+    <p class="project-desc">End to end mediator sample</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/GoneDotNet/whereareyou"><p class="project-name">Where Are You</p></a>
+    <p class="project-desc">.NET MAUI Background GPS Done Right with Shiny Locations & .NET Orleans</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/aritchie/beatthebank"><p class="project-name">Beat The Bank</p></a>
+    <p class="project-desc">A speech-to-text/text-to-speech game built with .NET MAUI, Shiny Mediator, & Community Toolkit</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/shinyorg/kmlrecorder"><p class="project-name">KML Recorder</p></a>
+    <p class="project-desc">A .NET MAUI app for recording GPS coordinates and exporting as KML/GeoJSON with CarPlay & Android Auto support</p>
+  </div>
+  <div class="project-card">
+    <a href="https://github.com/aritchie/tunegames"><p class="project-name">TUNE Games</p></a>
+    <p class="project-desc">A music guessing/trivia game built with .NET MAUI and Shiny.Music</p>
+  </div>
+</div>
 
 ## SUPPORT MY WORK
 
