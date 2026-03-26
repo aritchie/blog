@@ -1,0 +1,353 @@
+---
+title: 'Shiny.Maui.ContactStore — Device Contact Access That Does It All'
+description: 'A cross-platform .NET MAUI library that gives you full CRUD access to device contacts with LINQ queries, native query translation, and zero platform ceremony.'
+pubDate: 'Mar 26 2026'
+heroImage: '../../assets/shiny-contactstore-hero.svg'
+---
+
+If you've ever needed to go beyond reading contacts in a .NET MAUI app — creating them, updating them, searching by phone number — you've probably ended up writing platform-specific code. MAUI Essentials gives you a solid contact picker, but it was never designed for full contact management. That's a different problem, and it's the one Shiny.Maui.ContactStore was built to solve.
+
+Full CRUD. LINQ queries with native translation. One API. Both platforms.
+
+---
+
+## The Gap
+
+MAUI Essentials handles the common case well — picking a contact with a native UI. But some apps need more: bulk queries, creating contacts on behalf of the user, syncing from a backend, or searching across thousands of entries. For that, you're dropping down to platform APIs.
+
+**Platform code looks like this:**
+
+```csharp
+// Android — ContentResolver queries, cursor management, raw column constants
+var cursor = ContentResolver.Query(
+    ContactsContract.CommonDataKinds.Phone.ContentUri,
+    null,
+    ContactsContract.CommonDataKinds.Phone.InterfaceConsts.DisplayName + " LIKE ?",
+    new[] { "%John%" },
+    null
+);
+
+// iOS — CNContactStore, predicates, key descriptors
+var store = new CNContactStore();
+var keys = new[] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers };
+var predicate = CNContact.GetPredicateForContacts("John");
+var contacts = store.GetUnifiedContacts(predicate, keys, out var error);
+```
+
+Two completely different APIs. Different data models. Different permission flows. Different query mechanisms. And you get to maintain both.
+
+Multiply that by create, update, and delete operations, and the platform code adds up fast.
+
+---
+
+## Enter Shiny.Maui.ContactStore
+
+One interface. One model. Full CRUD. LINQ queries. Both platforms.
+
+```csharp
+// Inject it
+public class MyViewModel(IContactStore contactStore)
+{
+    // Query with LINQ — predicates translate to native queries
+    var johns = contactStore.Query()
+        .Where(c => c.GivenName.Contains("John"))
+        .OrderBy(c => c.FamilyName)
+        .Take(20)
+        .ToList();
+
+    // Create a contact
+    var id = await contactStore.Create(new Contact
+    {
+        GivenName = "Jane",
+        FamilyName = "Doe",
+        Phones = { new ContactPhone { Number = "555-0123", Type = PhoneType.Mobile } },
+        Emails = { new ContactEmail { Address = "jane@example.com", Type = EmailType.Work } }
+    });
+
+    // Update it
+    var contact = await contactStore.GetById(id);
+    contact.Organization = new ContactOrganization { Company = "Acme Inc", Title = "Engineer" };
+    await contactStore.Update(contact);
+
+    // Delete it
+    await contactStore.Delete(id);
+}
+```
+
+That's real code. No platform-specific anything. No `#if ANDROID`. No partial classes with conditional compilation. Just C#.
+
+---
+
+## The LINQ Query Provider
+
+This is where it gets interesting. `contactStore.Query()` returns an `IQueryable<Contact>` backed by a custom query provider that translates your LINQ expressions into native platform queries wherever possible.
+
+### What Gets Translated Natively
+
+String operations on name fields and contact collections get pushed down to the platform:
+
+```csharp
+// These all translate to native queries — fast, efficient
+contactStore.Query().Where(c => c.GivenName.StartsWith("J"));
+contactStore.Query().Where(c => c.FamilyName.Contains("Smith"));
+contactStore.Query().Where(c => c.DisplayName.EndsWith("son"));
+
+// Collection queries work too
+contactStore.Query().Where(c => c.Phones.Any(p => p.Number.Contains("555")));
+contactStore.Query().Where(c => c.Emails.Any(e => e.Address.Contains("@acme.com")));
+```
+
+### Combine Filters, Add Paging
+
+```csharp
+var results = contactStore.Query()
+    .Where(c => c.GivenName.StartsWith("J") && c.FamilyName.Contains("Smith"))
+    .OrderBy(c => c.FamilyName)
+    .ThenBy(c => c.GivenName)
+    .Skip(20)
+    .Take(10)
+    .ToList();
+```
+
+### Smart Fallback
+
+Filters the provider can't translate natively? They run in-memory after fetching data. You don't need to think about it — write your LINQ, and the provider optimizes what it can.
+
+**Supported native operations:**
+
+| Operation | Supported Fields |
+|---|---|
+| `Contains()` | GivenName, FamilyName, MiddleName, DisplayName, Nickname, Note, NamePrefix, NameSuffix |
+| `StartsWith()` | Same as above |
+| `EndsWith()` | Same as above |
+| `Equals()` | Same as above |
+| `Any()` on Phones | Phone Number |
+| `Any()` on Emails | Email Address |
+| `Skip()` / `Take()` | Paging |
+| `OrderBy()` / `ThenBy()` | All properties |
+
+---
+
+## The Contact Model
+
+The `Contact` class covers everything both platforms support — no lowest-common-denominator compromises.
+
+```csharp
+var contact = new Contact
+{
+    // Name
+    NamePrefix = "Dr.",
+    GivenName = "Jane",
+    MiddleName = "Marie",
+    FamilyName = "Doe",
+    NameSuffix = "PhD",
+    Nickname = "JD",
+
+    // Organization
+    Organization = new ContactOrganization
+    {
+        Company = "Acme Inc",
+        Title = "Senior Engineer",
+        Department = "Platform"
+    },
+
+    // Note (iOS requires entitlement for this — see below)
+    Note = "Met at Build 2026",
+
+    // Collections — add as many as you need
+    Phones =
+    {
+        new ContactPhone { Number = "555-0100", Type = PhoneType.Mobile },
+        new ContactPhone { Number = "555-0200", Type = PhoneType.Work }
+    },
+    Emails =
+    {
+        new ContactEmail { Address = "jane@example.com", Type = EmailType.Home },
+        new ContactEmail { Address = "jane@acme.com", Type = EmailType.Work }
+    },
+    Addresses =
+    {
+        new ContactAddress
+        {
+            Street = "123 Main St",
+            City = "Springfield",
+            State = "IL",
+            PostalCode = "62701",
+            Country = "US",
+            Type = AddressType.Home
+        }
+    },
+    Dates =
+    {
+        new ContactDate { Date = new DateOnly(1990, 6, 15), Type = ContactDateType.Birthday }
+    },
+    Websites =
+    {
+        new ContactWebsite { Url = "https://janedoe.dev" }
+    },
+    Relationships =
+    {
+        new ContactRelationship { Name = "John Doe", Type = RelationshipType.Spouse }
+    }
+};
+```
+
+Photos and thumbnails are supported too — `byte[]` properties for both full-size and thumbnail images.
+
+---
+
+## Permissions: Built In
+
+Shiny.Maui.ContactStore ships with proper MAUI permission classes. No manual platform checks.
+
+```csharp
+// Check permission status
+var status = await contactStore.CheckPermissionStatusAsync();
+
+// Request permissions
+var granted = await contactStore.RequestPermissionsAsync();
+```
+
+Under the hood, this handles `READ_CONTACTS` and `WRITE_CONTACTS` on Android, and `CNContactStore` authorization on iOS — including the proper runtime prompts.
+
+---
+
+## Setup
+
+Install the package:
+
+```bash
+dotnet add package Shiny.Maui.ContactStore
+```
+
+Register in your `MauiProgram.cs`:
+
+```csharp
+var builder = MauiApp.CreateBuilder()
+    .UseMauiApp<App>();
+
+builder.AddContactStore();
+```
+
+That's it. `IContactStore` is now available through DI everywhere in your app.
+
+### Platform Configuration
+
+**Android** — add to `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.READ_CONTACTS" />
+<uses-permission android:name="android.permission.WRITE_CONTACTS" />
+```
+
+**iOS** — add to `Info.plist`:
+
+```xml
+<key>NSContactsUsageDescription</key>
+<string>This app needs access to your contacts.</string>
+```
+
+---
+
+## iOS Entitlement: Notes and Relationships
+
+iOS has a special restriction: accessing a contact's `Note` field and `Relationships` requires the `com.apple.developer.contacts.notes` entitlement. This entitlement requires Apple's approval for production distribution.
+
+Shiny.Maui.ContactStore handles this gracefully:
+
+- If the entitlement **is present**, `Note` and `Relationships` work normally.
+- If the entitlement **is missing**, `Note` returns `null` and `Relationships` returns an empty list. No crash. No exception. No runtime error.
+
+The library detects the entitlement at runtime, so you don't need conditional compilation for this.
+
+---
+
+## Real-World Example: Contact Search
+
+Here's a practical ViewModel for a searchable contact list:
+
+```csharp
+public partial class ContactListViewModel(IContactStore contactStore) : ObservableObject
+{
+    [ObservableProperty]
+    string searchText;
+
+    [ObservableProperty]
+    ObservableCollection<Contact> contacts = new();
+
+    partial void OnSearchTextChanged(string value)
+    {
+        _ = SearchAsync(value);
+    }
+
+    async Task SearchAsync(string query)
+    {
+        var results = string.IsNullOrWhiteSpace(query)
+            ? await contactStore.GetAll()
+            : contactStore.Query()
+                .Where(c =>
+                    c.GivenName.Contains(query) ||
+                    c.FamilyName.Contains(query) ||
+                    c.Phones.Any(p => p.Number.Contains(query)) ||
+                    c.Emails.Any(e => e.Address.Contains(query)))
+                .OrderBy(c => c.FamilyName)
+                .ThenBy(c => c.GivenName)
+                .ToList();
+
+        Contacts = new ObservableCollection<Contact>(results);
+    }
+}
+```
+
+Name queries, phone number lookups, email searches — all in one LINQ expression. The provider translates what it can natively and handles the rest in-memory.
+
+---
+
+## How It Compares
+
+Each approach has its place. Here's where Shiny.Maui.ContactStore fills in the gaps:
+
+| Capability | Platform APIs | MAUI Essentials | Shiny.Maui.ContactStore |
+|---|---|---|---|
+| Pick a contact | Per-platform | Native picker | Via query |
+| Read contacts | Per-platform | Via picker | Unified API |
+| Create contacts | Per-platform | Not in scope | Unified API |
+| Update contacts | Per-platform | Not in scope | Unified API |
+| Delete contacts | Per-platform | Not in scope | Unified API |
+| Search / filter | Raw queries | Not in scope | LINQ with native translation |
+| Paging | Manual | Not in scope | `Skip()` / `Take()` |
+| Ordering | Manual | Not in scope | `OrderBy()` / `ThenBy()` |
+| Cross-platform API | No | Yes | Yes |
+| DI-friendly | No | Yes | Yes |
+| AOT compatible | Depends | Yes | Yes |
+| Permissions | Manual | Manual | Built-in helpers |
+| Photos | Per-platform | No | `byte[]` properties |
+| Contact model depth | Full (per-platform) | Minimal | Comprehensive |
+
+---
+
+## Supported Platforms
+
+| Platform | Minimum Version |
+|---|---|
+| Android | API 24 |
+| iOS | 15.0 |
+
+The library targets .NET 10 and is fully AOT-compatible with trim analysis enabled.
+
+---
+
+## Getting Started
+
+```bash
+dotnet add package Shiny.Maui.ContactStore
+```
+
+```csharp
+// MauiProgram.cs
+builder.AddContactStore();
+```
+
+Inject `IContactStore`, request permissions, and start working with contacts the way you'd expect — clean C# with LINQ, DI, and no platform ceremony.
+
+Check it out on [GitHub](https://github.com/shinyorg/contactstore).

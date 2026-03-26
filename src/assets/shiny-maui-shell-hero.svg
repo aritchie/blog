@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0f0c29"/>
-      <stop offset="50%" stop-color="#302b63"/>
-      <stop offset="100%" stop-color="#24243e"/>
+      <stop offset="0%" stop-color="#0a0520"/>
+      <stop offset="40%" stop-color="#1a1045"/>
+      <stop offset="100%" stop-color="#0d0d2b"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#667eea"/>
@@ -13,66 +13,114 @@
       <stop offset="0%" stop-color="#f093fb"/>
       <stop offset="100%" stop-color="#f5576c"/>
     </linearGradient>
+    <linearGradient id="fire" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f5576c"/>
+      <stop offset="50%" stop-color="#ff9a56"/>
+      <stop offset="100%" stop-color="#ffd452"/>
+    </linearGradient>
+    <linearGradient id="route" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="50%" stop-color="#f093fb"/>
+      <stop offset="100%" stop-color="#f5576c"/>
+    </linearGradient>
+    <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="25"/>
+    </filter>
+    <filter id="iconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
 
-  <!-- Grid pattern -->
-  <g opacity="0.06" stroke="#fff" stroke-width="1">
-    <line x1="0" y1="0" x2="0" y2="630"/><line x1="60" y1="0" x2="60" y2="630"/>
-    <line x1="120" y1="0" x2="120" y2="630"/><line x1="180" y1="0" x2="180" y2="630"/>
-    <line x1="240" y1="0" x2="240" y2="630"/><line x1="300" y1="0" x2="300" y2="630"/>
-    <line x1="360" y1="0" x2="360" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/>
-    <line x1="480" y1="0" x2="480" y2="630"/><line x1="540" y1="0" x2="540" y2="630"/>
-    <line x1="600" y1="0" x2="600" y2="630"/><line x1="660" y1="0" x2="660" y2="630"/>
-    <line x1="720" y1="0" x2="720" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/>
-    <line x1="840" y1="0" x2="840" y2="630"/><line x1="900" y1="0" x2="900" y2="630"/>
-    <line x1="960" y1="0" x2="960" y2="630"/><line x1="1020" y1="0" x2="1020" y2="630"/>
-    <line x1="1080" y1="0" x2="1080" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/>
-    <line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/>
-    <line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/>
-    <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/>
-    <line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/>
-    <line x1="0" y1="540" x2="1200" y2="540"/>
+  <!-- Ambient glow orbs -->
+  <circle cx="200" cy="200" r="300" fill="#764ba2" opacity="0.07" filter="url(#softGlow)"/>
+  <circle cx="1000" cy="450" r="280" fill="#f093fb" opacity="0.06" filter="url(#softGlow)"/>
+  <circle cx="600" cy="100" r="200" fill="#667eea" opacity="0.05" filter="url(#softGlow)"/>
+
+  <!-- Animated-style route paths connecting nodes -->
+  <g opacity="0.25" stroke="url(#route)" stroke-width="2" fill="none" stroke-dasharray="8 6">
+    <path d="M100,500 Q250,350 400,400 T700,300 T1000,350 T1150,200"/>
+    <path d="M50,200 Q200,300 350,250 T650,350 T950,280 T1180,400"/>
+    <path d="M150,580 Q400,450 600,500 T900,420 T1100,500"/>
   </g>
 
-  <!-- Decorative circles -->
-  <circle cx="180" cy="315" r="200" fill="url(#accent)" opacity="0.08"/>
-  <circle cx="1020" cy="315" r="250" fill="url(#glow)" opacity="0.06"/>
+  <!-- Route node dots along paths -->
+  <g filter="url(#iconGlow)">
+    <circle cx="100" cy="500" r="5" fill="#667eea" opacity="0.8"/>
+    <circle cx="400" cy="400" r="4" fill="#9b7ef0" opacity="0.7"/>
+    <circle cx="700" cy="300" r="6" fill="#f093fb" opacity="0.8"/>
+    <circle cx="1000" cy="350" r="4" fill="#f5576c" opacity="0.7"/>
+    <circle cx="350" cy="250" r="4" fill="#667eea" opacity="0.6"/>
+    <circle cx="650" cy="350" r="5" fill="#c97ef0" opacity="0.7"/>
+    <circle cx="950" cy="280" r="4" fill="#f093fb" opacity="0.6"/>
+  </g>
 
-  <!-- Navigation arrow icon -->
-  <g transform="translate(520, 120)">
-    <rect x="0" y="0" width="160" height="160" rx="30" fill="url(#accent)" opacity="0.9"/>
-    <path d="M50 80 L80 50 L110 80 M80 50 L80 120" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Central icon: rocket/level-up -->
+  <g transform="translate(600, 165)" filter="url(#glowFilter)">
+    <!-- Rocket body -->
+    <g transform="translate(-45, -75)">
+      <path d="M45 0 C45 0 20 30 20 70 L30 85 L30 65 Q45 50 60 65 L60 85 L70 70 C70 30 45 0 45 0Z" fill="url(#accent)" opacity="0.95"/>
+      <!-- Rocket window -->
+      <circle cx="45" cy="40" r="10" fill="#1a1045" stroke="#c4b5fd" stroke-width="2" opacity="0.9"/>
+      <circle cx="45" cy="40" r="5" fill="#667eea" opacity="0.5"/>
+      <!-- Flame -->
+      <path d="M32 82 Q37 105 45 115 Q53 105 58 82 Q50 95 45 95 Q40 95 32 82Z" fill="url(#fire)" opacity="0.9"/>
+      <path d="M38 85 Q42 100 45 108 Q48 100 52 85 Q48 95 45 95 Q42 95 38 85Z" fill="#ffd452" opacity="0.8"/>
+    </g>
+    <!-- Speed lines -->
+    <line x1="-30" y1="30" x2="-30" y2="55" stroke="#f5576c" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+    <line x1="0" y1="35" x2="0" y2="65" stroke="#ff9a56" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+    <line x1="30" y1="30" x2="30" y2="55" stroke="#f5576c" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Sparkle particles -->
+  <g opacity="0.6">
+    <circle cx="480" cy="130" r="2" fill="#ffd452"/>
+    <circle cx="720" cy="110" r="1.5" fill="#f093fb"/>
+    <circle cx="530" cy="90" r="1" fill="#fff"/>
+    <circle cx="680" cy="80" r="2" fill="#667eea"/>
+    <circle cx="560" cy="150" r="1.5" fill="#ffd452"/>
+    <circle cx="640" cy="170" r="1" fill="#fff"/>
+    <circle cx="750" cy="160" r="1.5" fill="#c4b5fd"/>
+    <circle cx="450" cy="170" r="1" fill="#f5576c"/>
   </g>
 
   <!-- Title -->
-  <text x="600" y="350" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="#ffffff" letter-spacing="-1">
+  <text x="600" y="330" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="60" font-weight="800" fill="#ffffff" letter-spacing="-1.5">
     Shiny MAUI Shell
   </text>
 
-  <!-- Subtitle -->
-  <text x="600" y="405" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="#a0aec0">
-    Navigation That Actually Works
+  <!-- Subtitle with gradient feel -->
+  <text x="600" y="390" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="500" fill="#c4b5fd" letter-spacing="0.5">
+    Taking Shell to the Next Level
   </text>
 
   <!-- Tags -->
-  <g transform="translate(600, 460)" text-anchor="middle">
-    <rect x="-240" y="-18" width="120" height="36" rx="18" fill="url(#accent)" opacity="0.3"/>
-    <text x="-180" y="6" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">Type-Safe</text>
+  <g transform="translate(600, 455)" text-anchor="middle">
+    <rect x="-260" y="-20" width="130" height="40" rx="20" fill="#667eea" opacity="0.2" stroke="#667eea" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="-195" y="7" font-family="system-ui, sans-serif" font-size="15" font-weight="600" fill="#c4b5fd">Type-Safe</text>
 
-    <rect x="-80" y="-18" width="160" height="36" rx="18" fill="url(#accent)" opacity="0.3"/>
-    <text x="0" y="6" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">Source Generated</text>
+    <rect x="-90" y="-20" width="180" height="40" rx="20" fill="#764ba2" opacity="0.2" stroke="#764ba2" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="0" y="7" font-family="system-ui, sans-serif" font-size="15" font-weight="600" fill="#d8b4fe">Source Generated</text>
 
-    <rect x="120" y="-18" width="110" height="36" rx="18" fill="url(#accent)" opacity="0.3"/>
-    <text x="175" y="6" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">Testable</text>
+    <rect x="130" y="-20" width="120" height="40" rx="20" fill="#f093fb" opacity="0.15" stroke="#f093fb" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="190" y="7" font-family="system-ui, sans-serif" font-size="15" font-weight="600" fill="#f0abfc">Testable</text>
   </g>
 
-  <!-- Code snippet decoration -->
-  <g transform="translate(100, 500)" opacity="0.15">
-    <text font-family="monospace" font-size="14" fill="#667eea">await navigator.NavigateToDetail(itemId);</text>
+  <!-- Code snippet decorations -->
+  <g transform="translate(80, 530)" opacity="0.2">
+    <text font-family="monospace" font-size="14" fill="#667eea">await navigator.Navigate&lt;DetailPage&gt;(args);</text>
   </g>
-  <g transform="translate(750, 530)" opacity="0.12">
-    <text font-family="monospace" font-size="14" fill="#f093fb">[ShellMap&lt;DetailPage&gt;("Detail")]</text>
+  <g transform="translate(700, 555)" opacity="0.15">
+    <text font-family="monospace" font-size="14" fill="#f093fb">[ShellRoute(typeof(DetailPage), "detail/{id}")]</text>
+  </g>
+  <g transform="translate(300, 565)" opacity="0.12">
+    <text font-family="monospace" font-size="13" fill="#c4b5fd">// zero magic strings</text>
   </g>
 </svg>
