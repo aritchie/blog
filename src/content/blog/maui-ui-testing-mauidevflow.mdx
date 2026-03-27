@@ -1,0 +1,411 @@
+---
+title: 'UI Automated Testing for .NET MAUI with MauiDevFlow — And How AI Wrote the Tests'
+description: 'How I used MauiDevFlow and Claude Code to go from zero UI tests to full screen coverage in minutes — inspecting live apps, adding AutomationIds, and generating real automated tests from actual app screens.'
+pubDate: 'Mar 27 2026'
+heroImage: '../../assets/maui-ui-testing-hero.svg'
+---
+
+UI testing in .NET MAUI has historically been painful. Appium requires a Java server, platform-specific drivers, and a setup process that makes you question your life choices. Most teams skip it entirely and rely on manual testing or unit tests alone. Which means your ViewModels are well-tested but nobody's verifying that the actual screens render, the buttons are tappable, or the navigation works.
+
+[MauiDevFlow](https://github.com/Redth/MauiDevFlow) changes this completely. It embeds a lightweight agent directly in your MAUI app that exposes a CLI and REST API for inspecting and interacting with the live UI. No Appium. No WebDriver. No external test server. Just a NuGet package, one line of setup, and a CLI that lets you tap buttons, read properties, take screenshots, and assert element state from the terminal.
+
+And here's the kicker — I used Claude Code to analyze every screen in my app, add AutomationIds to every interactive element, and generate a full suite of 48 UI tests. In one session. Let me walk you through it.
+
+---
+
+## The Setup
+
+### 1. Add the NuGet Package
+
+MauiDevFlow ships as a NuGet package that you add to your MAUI project. Keep it Debug-only so it never ships to production:
+
+```xml
+<PackageReference Include="Redth.MauiDevFlow.Agent" Condition="'$(Configuration)' == 'Debug'" />
+```
+
+### 2. Register the Agent
+
+One line in `MauiProgram.cs`:
+
+```csharp
+#if DEBUG
+builder.AddMauiDevFlowAgent();
+#endif
+```
+
+That's it. When your app launches in Debug mode, the agent starts listening and registers with a local broker. The CLI auto-discovers it.
+
+### 3. Install the CLI
+
+```bash
+dotnet tool install --global Redth.MauiDevFlow.CLI
+```
+
+Now you can inspect and interact with your running app from the terminal.
+
+---
+
+## What Can MauiDevFlow Do?
+
+Once your app is running with the agent, the CLI gives you superpowers:
+
+```bash
+# See the full visual tree
+maui-devflow MAUI tree --depth 15 --fields "id,type,text,automationId"
+
+# Find a specific element
+maui-devflow MAUI query --automationId "LoginButton"
+
+# Tap a button
+maui-devflow MAUI tap --automationId "LoginButton"
+
+# Fill a text field
+maui-devflow MAUI fill --automationId "UsernameField" "admin"
+
+# Assert a property value (exits 0 on match, 1 on mismatch)
+maui-devflow MAUI assert --automationId "CounterLabel" Text "5"
+
+# Take a screenshot
+maui-devflow MAUI screenshot --output screen.png
+
+# Navigate Shell routes
+maui-devflow MAUI navigate "//main/settings"
+
+# Wait for an element to appear
+maui-devflow MAUI query --automationId "ResultsList" --wait-until exists --timeout 10
+```
+
+You can also read app logs, monitor HTTP requests, inspect preferences and secure storage, stream sensor data, and do live property editing — all without rebuilding. It's a full debugging and automation toolkit.
+
+---
+
+## The Real App: ShinyWonderland
+
+My test subject is [ShinyWonderland](https://github.com/shinyorg/wonderland) — a .NET MAUI app that shows ride wait times for Canada's Wonderland. It has 8 screens:
+
+- **StartupPage** — Splash screen with loading indicator
+- **RideTimesPage** — List of rides with wait times, pull-to-refresh, history toolbar button
+- **MapRideTimesPage** — Map view with ride pins
+- **SettingsPage** — Sort options (radio buttons), notification toggles, display filters
+- **ParkingPage** — Map with set/remove parking button
+- **MealTimePage** — Drink and food pass buttons
+- **HoursPage** — Park schedule
+- **RideHistoryPage** — History of rides taken (navigated from toolbar)
+
+No UI tests existed. Zero AutomationIds. Just unit tests on the ViewModels.
+
+---
+
+## Step 1: Add AutomationIds Everywhere
+
+MauiDevFlow can target elements by type, text, or tree position — but `AutomationId` is the stable, reliable approach. It survives rebuilds, doesn't change when text is localized, and makes your tests readable.
+
+I added AutomationIds to every interactive element across all pages. For example, the Settings page went from this:
+
+```xml
+<tv:SwitchCell Title="Ride Time Notifications"
+               On="{Binding EnableTimeRideNotifications, Mode=TwoWay}" />
+```
+
+To this:
+
+```xml
+<tv:SwitchCell AutomationId="RideTimeNotifications"
+               Title="Ride Time Notifications"
+               On="{Binding EnableTimeRideNotifications, Mode=TwoWay}" />
+```
+
+And Shell tabs got IDs too:
+
+```xml
+<Tab Icon="settings" Route="settings" AutomationId="SettingsTab">
+    <ShellContent Title="{Binding Localize.Settings}"
+                  ContentTemplate="{DataTemplate local:SettingsPage}"/>
+</Tab>
+```
+
+In total, I added AutomationIds to 35+ elements across 9 XAML files — every page, every button, every collection view, every toggle, every toolbar item.
+
+---
+
+## Step 2: Build a Driver
+
+MauiDevFlow is a CLI tool, not a test framework. You still need something to run the commands and make assertions. I wrote a thin `MauiDevFlowDriver` class that wraps the CLI with `Process.Start` and parses the JSON output:
+
+```csharp
+public class MauiDevFlowDriver : IAsyncDisposable
+{
+    readonly string screenshotDir;
+
+    public async Task<string> RunCommand(string args, int timeoutMs = 30_000)
+    {
+        using var process = new Process();
+        process.StartInfo = new ProcessStartInfo
+        {
+            FileName = "maui-devflow",
+            Arguments = args,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        process.Start();
+
+        using var cts = new CancellationTokenSource(timeoutMs);
+        var output = await process.StandardOutput.ReadToEndAsync(cts.Token);
+        var error = await process.StandardError.ReadToEndAsync(cts.Token);
+        await process.WaitForExitAsync(cts.Token);
+
+        if (process.ExitCode != 0)
+            throw new MauiDevFlowException(process.ExitCode, error, output);
+
+        return output.Trim();
+    }
+
+    public Task Navigate(string route)
+        => RunCommand($"MAUI navigate \"{route}\"");
+
+    public Task Tap(string? automationId = null)
+        => RunCommand($"MAUI tap --automationId \"{automationId}\"");
+
+    public Task<JsonNode?> WaitUntilExists(string automationId, int timeoutSeconds = 30)
+        => RunJsonCommand(
+            $"MAUI query --automationId \"{automationId}\" --wait-until exists --timeout {timeoutSeconds}",
+            (timeoutSeconds + 5) * 1000);
+
+    public async Task<bool> IsElementVisible(string automationId)
+    {
+        try
+        {
+            var result = await Query(automationId: automationId);
+            return result != null;
+        }
+        catch (MauiDevFlowException)
+        {
+            return false;
+        }
+    }
+
+    // ... plus Screenshot, Fill, Clear, AssertProperty, Scroll, etc.
+}
+```
+
+The driver gets shared across all tests via an xUnit collection fixture that waits for the agent on startup:
+
+```csharp
+public class AppFixture : IAsyncLifetime
+{
+    public MauiDevFlowDriver Driver { get; } = new();
+
+    public async Task InitializeAsync()
+    {
+        await Driver.WaitForAgent(timeoutSeconds: 30);
+        await Driver.WaitUntilExists("RideTimesPage", timeoutSeconds: 30);
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
+}
+
+[CollectionDefinition("App")]
+public class AppCollection : ICollectionFixture<AppFixture>;
+```
+
+---
+
+## Step 3: Write the Tests
+
+With the driver and AutomationIds in place, the tests practically write themselves. Here's what testing navigation looks like:
+
+```csharp
+[Collection("App")]
+public class NavigationTests
+{
+    readonly MauiDevFlowDriver driver;
+
+    public NavigationTests(AppFixture fixture)
+    {
+        driver = fixture.Driver;
+    }
+
+    [Fact]
+    public async Task Navigate_ToSettingsTab()
+    {
+        await driver.Navigate("//main/settings");
+        await driver.WaitUntilExists("SettingsPage");
+
+        var isVisible = await driver.IsElementVisible("SettingsPage");
+        isVisible.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Navigate_AllTabs_Sequentially()
+    {
+        var tabs = new[]
+        {
+            ("//main/ridetimes", "RideTimesPage"),
+            ("//main/settings", "SettingsPage"),
+            ("//main/parking", "ParkingPage"),
+            ("//main/mealtimes", "MealTimePage"),
+            ("//main/hours", "HoursPage"),
+            ("//main/ridetimesmap", "MapRideTimesPage"),
+            ("//main/ridetimes", "RideTimesPage")
+        };
+
+        foreach (var (route, pageId) in tabs)
+        {
+            await driver.Navigate(route);
+            await driver.WaitUntilExists(pageId);
+
+            var isVisible = await driver.IsElementVisible(pageId);
+            isVisible.ShouldBeTrue($"Page {pageId} should be visible after navigating to {route}");
+        }
+    }
+}
+```
+
+And testing the Settings page interactions:
+
+```csharp
+[Collection("App")]
+public class SettingsPageTests
+{
+    readonly MauiDevFlowDriver driver;
+
+    public SettingsPageTests(AppFixture fixture)
+    {
+        driver = fixture.Driver;
+    }
+
+    [Fact]
+    public async Task Settings_TapSortByWaitTime()
+    {
+        await driver.Navigate("//main/settings");
+        await driver.WaitUntilExists("SettingsPage");
+
+        await driver.Tap(automationId: "SortByWaitTime");
+        await driver.Screenshot("settings-sort-wait-time.png");
+    }
+
+    [Fact]
+    public async Task Settings_ToggleRideTimeNotifications()
+    {
+        await driver.Navigate("//main/settings");
+        await driver.WaitUntilExists("SettingsPage");
+
+        await driver.Tap(automationId: "RideTimeNotifications");
+        await driver.Screenshot("settings-ride-notification-toggled.png");
+    }
+
+    [Fact]
+    public async Task Settings_NotificationSwitchesExist()
+    {
+        await driver.Navigate("//main/settings");
+        await driver.WaitUntilExists("SettingsPage");
+
+        var rideTime = await driver.IsElementVisible("RideTimeNotifications");
+        rideTime.ShouldBeTrue("Ride Time Notifications switch should exist");
+
+        var geofence = await driver.IsElementVisible("GeofenceNotifications");
+        geofence.ShouldBeTrue("Geofence Notifications switch should exist");
+
+        var drink = await driver.IsElementVisible("DrinkNotifications");
+        drink.ShouldBeTrue("Drink Notifications switch should exist");
+
+        var meal = await driver.IsElementVisible("MealNotifications");
+        meal.ShouldBeTrue("Meal Notifications switch should exist");
+    }
+}
+```
+
+Testing cross-page navigation flows like the ride history toolbar button:
+
+```csharp
+[Fact]
+public async Task RideTimes_HistoryButton_NavigatesToHistory()
+{
+    await driver.Navigate("//main/ridetimes");
+    await driver.WaitUntilExists("RideTimesPage");
+
+    await driver.Tap(automationId: "HistoryToolbarButton");
+    await driver.WaitUntilExists("RideHistoryPage", timeoutSeconds: 10);
+
+    var isVisible = await driver.IsElementVisible("RideHistoryPage");
+    isVisible.ShouldBeTrue("Should navigate to ride history page");
+
+    // Navigate back
+    await driver.Navigate("//main/ridetimes");
+    await driver.WaitUntilExists("RideTimesPage");
+}
+```
+
+---
+
+## The Full Test Suite
+
+In one session, I ended up with **48 tests** across 8 test classes:
+
+| Test Class | Tests | What It Covers |
+|-----------|-------|----------------|
+| StartupPageTests | 2 | App navigates from splash, startup page disappears |
+| NavigationTests | 7 | Each tab individually + all tabs sequentially |
+| RideTimesPageTests | 7 | Timestamp, collection view, refresh, history navigation |
+| MapRideTimesPageTests | 3 | Page loads, map present |
+| SettingsPageTests | 13 | Sort radios, notification switches, display toggles, version label |
+| ParkingPageTests | 5 | Map, toggle parking button |
+| MealTimePageTests | 5 | Drink/food buttons, collection view |
+| HoursPageTests | 3 | Schedule collection view |
+| RideHistoryPageTests | 3 | Navigation via toolbar, collection view |
+
+Every test takes a screenshot for visual verification. The screenshots land in a `screenshots/` directory alongside the test output.
+
+---
+
+## Running It
+
+The workflow is:
+
+```bash
+# 1. Boot a simulator
+xcrun simctl boot <UDID>
+
+# 2. Build and deploy (keep running — this IS the app process)
+dotnet build -f net10.0-ios -t:Run -p:_DeviceName=:v2:udid=<UDID>
+
+# 3. Wait for the agent
+maui-devflow wait
+
+# 4. Run the tests
+dotnet test tests/ShinyWonderland.UITests/
+```
+
+The `AppFixture` handles waiting for the agent and the startup navigation, so the tests themselves are fast and focused.
+
+---
+
+## How AI Generated These Tests
+
+Here's the part that surprised me. I pointed Claude Code at my MAUI project and asked it to analyze the screens and write UI tests using MauiDevFlow. Here's what happened:
+
+1. **It read every XAML file and ViewModel** — understood the page structure, identified all interactive elements, mapped the navigation routes from `AppShell.xaml`.
+
+2. **It added AutomationIds** — went through all 9 XAML files and added meaningful, consistent IDs to every button, label, collection view, switch, radio cell, toolbar item, and tab.
+
+3. **It created the test infrastructure** — built the `MauiDevFlowDriver` wrapper, the `AppFixture` with proper xUnit collection semantics, and the project file with the right package references.
+
+4. **It wrote tests that match the actual UI** — not generic "page exists" tests, but tests that verify the specific elements on each screen. The Settings tests check for all four sort radio buttons by name. The Ride Times tests verify the offline banner, timestamp label, and history toolbar button. The tests navigate Shell routes that actually exist in `AppShell.xaml`.
+
+5. **It followed the project's editorconfig** — camelCase private fields, no underscore prefix, consistent with the existing unit test style.
+
+The AI didn't guess at the UI. It read the XAML, understood what controls were on each page, and wrote tests that verify those specific controls are present and interactive. That's the difference between template-generated tests and tests that actually know your app.
+
+---
+
+## Why This Matters
+
+UI testing in MAUI has been a gap in the ecosystem. Unit tests cover your logic. Integration tests cover your services. But nothing verifies that the screens render, the buttons tap, the navigation works, and the data binds correctly — until you do it manually on a device.
+
+MauiDevFlow fills that gap with minimal setup. No Appium server. No Selenium grid. No WebDriver protocol translation layer. Just an in-process agent that speaks HTTP and a CLI that wraps it.
+
+And when you combine it with AI that can read your XAML and generate tests that match your actual screens, you go from zero UI coverage to meaningful automation in a single session.
+
+The code is all open source. Check out [MauiDevFlow on GitHub](https://github.com/Redth/MauiDevFlow) and give [ShinyWonderland](https://github.com/shinyorg/wonderland) a look to see the full test suite in action.
