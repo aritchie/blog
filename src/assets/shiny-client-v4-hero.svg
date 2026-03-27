@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#512BD4"/>
+      <stop offset="100%" style="stop-color:#7b4ff5"/>
+    </linearGradient>
+    <linearGradient id="winGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4"/>
+      <stop offset="100%" style="stop-color:#005a9e"/>
+    </linearGradient>
+    <linearGradient id="appleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#555555"/>
+      <stop offset="100%" style="stop-color:#333333"/>
+    </linearGradient>
+    <linearGradient id="androidGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3DDC84"/>
+      <stop offset="100%" style="stop-color:#2ab760"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#161b22"/>
+      <stop offset="100%" style="stop-color:#0d1117"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#512BD4" stop-opacity="0.2"/>
+      <stop offset="100%" style="stop-color:#512BD4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="winGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#0078D4" stop-opacity="0.3"/>
+      <stop offset="100%" style="stop-color:#0078D4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid -->
+  <line x1="200" y1="0" x2="200" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="1000" y1="0" x2="1000" y2="630" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="130" x2="1200" y2="130" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="260" x2="1200" y2="260" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="390" x2="1200" y2="390" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+  <line x1="0" y1="520" x2="1200" y2="520" stroke="#512BD4" stroke-width="0.3" opacity="0.08"/>
+
+  <!-- Central glow -->
+  <circle cx="600" cy="260" r="220" fill="url(#glow)"/>
+
+  <!-- ===== PLATFORM ICONS (top row) ===== -->
+
+  <!-- Windows - NEW badge with glow -->
+  <circle cx="340" cy="120" r="70" fill="url(#winGlow)"/>
+  <rect x="295" y="80" width="90" height="80" rx="14" fill="url(#cardGrad)" stroke="#0078D4" stroke-width="2"/>
+  <g transform="translate(316, 98)">
+    <!-- Windows logo -->
+    <rect x="0" y="0" width="20" height="20" fill="#0078D4" rx="2"/>
+    <rect x="24" y="0" width="24" height="20" fill="#0078D4" rx="2"/>
+    <rect x="0" y="24" width="20" height="16" fill="#0078D4" rx="2"/>
+    <rect x="24" y="24" width="24" height="16" fill="#0078D4" rx="2"/>
+  </g>
+  <text x="340" y="150" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="11" font-weight="bold">Windows</text>
+
+  <!-- NEW badge on Windows -->
+  <rect x="360" y="72" width="42" height="20" rx="10" fill="#0078D4"/>
+  <text x="381" y="86" text-anchor="middle" fill="#fff" font-family="system-ui" font-size="10" font-weight="bold">NEW</text>
+
+  <!-- iOS -->
+  <rect x="495" y="80" width="90" height="80" rx="14" fill="url(#cardGrad)" stroke="#555" stroke-width="1.5"/>
+  <g transform="translate(528, 96)">
+    <!-- Apple logo simplified -->
+    <path d="M12 0C12 0 14-4 18-4C18-4 18.5 0 14.5 2C14.5 2 18 3 18 8C18 13 14 16 12 18C10 16 6 13 6 8C6 3 9.5 2 9.5 2C5.5 0 6-4 6-4C10-4 12 0 12 0Z" fill="#999"/>
+  </g>
+  <text x="540" y="150" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="11" font-weight="bold">iOS</text>
+
+  <!-- Android -->
+  <rect x="695" y="80" width="90" height="80" rx="14" fill="url(#cardGrad)" stroke="#3DDC84" stroke-width="1.5"/>
+  <g transform="translate(724, 96)">
+    <!-- Android robot head -->
+    <rect x="3" y="10" width="30" height="20" rx="4" fill="#3DDC84"/>
+    <circle cx="12" cy="18" r="2.5" fill="#161b22"/>
+    <circle cx="24" cy="18" r="2.5" fill="#161b22"/>
+    <line x1="10" y1="2" x2="6" y2="9" stroke="#3DDC84" stroke-width="2" stroke-linecap="round"/>
+    <line x1="26" y1="2" x2="30" y2="9" stroke="#3DDC84" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <text x="740" y="150" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="11" font-weight="bold">Android</text>
+
+  <!-- macOS -->
+  <rect x="895" y="80" width="90" height="80" rx="14" fill="url(#cardGrad)" stroke="#555" stroke-width="1.5"/>
+  <g transform="translate(924, 94)">
+    <!-- Mac display -->
+    <rect x="2" y="0" width="32" height="22" rx="2" fill="none" stroke="#999" stroke-width="2"/>
+    <line x1="18" y1="22" x2="18" y2="28" stroke="#999" stroke-width="2"/>
+    <line x1="10" y1="28" x2="26" y2="28" stroke="#999" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <text x="940" y="150" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="11" font-weight="bold">macOS</text>
+
+  <!-- ===== CENTRAL SHINY HUB ===== -->
+  <rect x="480" y="205" width="240" height="110" rx="18" fill="#161b22" stroke="url(#accent)" stroke-width="2.5"/>
+  <text x="600" y="250" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="26" font-weight="bold">Shiny</text>
+  <text x="600" y="275" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="14">Client Libraries</text>
+  <text x="600" y="300" text-anchor="middle" fill="#512BD4" font-family="monospace" font-size="12">net10.0 | .NET MAUI</text>
+
+  <!-- Connection lines from platforms to hub -->
+  <path d="M385,140 C420,180 460,210 490,230" stroke="#0078D4" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <path d="M540,160 L560,205" stroke="#555" stroke-width="1.5" fill="none" opacity="0.3"/>
+  <path d="M740,160 L640,205" stroke="#3DDC84" stroke-width="1.5" fill="none" opacity="0.3"/>
+  <path d="M895,140 C860,180 740,210 710,230" stroke="#555" stroke-width="1.5" fill="none" opacity="0.3"/>
+
+  <!-- ===== MODULE CARDS (bottom row) ===== -->
+
+  <!-- BluetoothLE -->
+  <rect x="60" y="380" width="160" height="75" rx="12" fill="url(#cardGrad)" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="140" y="410" text-anchor="middle" fill="#7b4ff5" font-family="monospace" font-size="13" font-weight="bold">BluetoothLE</text>
+  <text x="140" y="430" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">ManagedScan + Hosting</text>
+  <text x="140" y="445" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Thread-safe + Windows</text>
+
+  <!-- HTTP Transfers -->
+  <rect x="250" y="380" width="160" height="75" rx="12" fill="url(#cardGrad)" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="330" y="410" text-anchor="middle" fill="#7b4ff5" font-family="monospace" font-size="13" font-weight="bold">HTTP Transfers</text>
+  <text x="330" y="430" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Upload + Download</text>
+  <text x="330" y="445" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Azure Blob + Raw Body</text>
+
+  <!-- Locations -->
+  <rect x="440" y="380" width="160" height="75" rx="12" fill="url(#cardGrad)" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="520" y="410" text-anchor="middle" fill="#7b4ff5" font-family="monospace" font-size="13" font-weight="bold">Locations</text>
+  <text x="520" y="430" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">CLMonitor (iOS 18+)</text>
+  <text x="520" y="445" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">GPS + Geofencing</text>
+
+  <!-- Push -->
+  <rect x="630" y="380" width="160" height="75" rx="12" fill="url(#cardGrad)" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="710" y="410" text-anchor="middle" fill="#7b4ff5" font-family="monospace" font-size="13" font-weight="bold">Push</text>
+  <text x="710" y="430" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Raw iOS Payloads</text>
+  <text x="710" y="445" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Azure NH Templates</text>
+
+  <!-- Configuration -->
+  <rect x="820" y="380" width="160" height="75" rx="12" fill="url(#cardGrad)" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="900" y="410" text-anchor="middle" fill="#7b4ff5" font-family="monospace" font-size="13" font-weight="bold">Configuration</text>
+  <text x="900" y="430" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Remote Config Built-In</text>
+  <text x="900" y="445" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">HTTP + Extensions</text>
+
+  <!-- Jobs (smaller, tucked right) -->
+  <rect x="1010" y="380" width="130" height="75" rx="12" fill="url(#cardGrad)" stroke="#30363d" stroke-width="1.5"/>
+  <text x="1075" y="410" text-anchor="middle" fill="#7b4ff5" font-family="monospace" font-size="13" font-weight="bold">Jobs</text>
+  <text x="1075" y="430" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="10">Android Lifecycle Fix</text>
+
+  <!-- Connection lines from hub to modules -->
+  <path d="M520,315 C500,340 300,360 140,380" stroke="#512BD4" stroke-width="1.2" fill="none" opacity="0.3"/>
+  <path d="M540,315 C530,340 400,360 330,380" stroke="#512BD4" stroke-width="1.2" fill="none" opacity="0.3"/>
+  <path d="M580,315 L520,380" stroke="#512BD4" stroke-width="1.2" fill="none" opacity="0.3"/>
+  <path d="M620,315 L710,380" stroke="#512BD4" stroke-width="1.2" fill="none" opacity="0.3"/>
+  <path d="M660,315 C680,340 800,360 900,380" stroke="#512BD4" stroke-width="1.2" fill="none" opacity="0.3"/>
+  <path d="M680,315 C720,340 900,360 1075,380" stroke="#512BD4" stroke-width="1.2" fill="none" opacity="0.3"/>
+
+  <!-- ===== TITLE ===== -->
+  <text x="600" y="535" text-anchor="middle" fill="#e6edf3" font-family="system-ui" font-size="38" font-weight="bold">Shiny Client</text>
+  <text x="600" y="575" text-anchor="middle" fill="#8b949e" font-family="system-ui" font-size="18">Windows Support - .NET 10 - Major Improvements</text>
+
+  <!-- v4 badge -->
+  <rect x="1080" y="80" width="60" height="30" rx="15" fill="#512BD4" fill-opacity="0.2" stroke="#512BD4" stroke-width="1.5"/>
+  <text x="1110" y="100" text-anchor="middle" fill="#7b4ff5" font-family="system-ui" font-size="14" font-weight="bold">v4</text>
+
+  <!-- Decorative dots -->
+  <circle cx="50" cy="80" r="3" fill="#512BD4" opacity="0.4"/>
+  <circle cx="75" cy="60" r="2" fill="#0078D4" opacity="0.3"/>
+  <circle cx="40" cy="550" r="2" fill="#533483" opacity="0.3"/>
+  <circle cx="1160" cy="550" r="2" fill="#512BD4" opacity="0.3"/>
+  <circle cx="1150" cy="60" r="2" fill="#7b4ff5" opacity="0.3"/>
+</svg>
