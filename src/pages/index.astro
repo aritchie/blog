@@ -5,6 +5,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import TagCloud from '../components/TagCloud.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import me from '../assets/me.jpg';
 import mvp from '../assets/msft_mvp.png';
@@ -13,6 +14,13 @@ const posts = (await getCollection('blog'))
 	.filter((post) => (import.meta.env.DEV || post.data.draft !== true) && post.data.pubDate <= new Date())
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+const tagCounts = new Map<string, number>();
+for (const post of posts) {
+	for (const tag of post.data.tags ?? []) {
+		tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+	}
+}
 ---
 
 <!doctype html>
@@ -74,6 +82,13 @@ const posts = (await getCollection('blog'))
 			}
 			.contact-btn:hover {
 				opacity: 0.85;
+			}
+			.sidebar-heading {
+				margin: 1.5rem 0 0.25rem;
+				font-size: 0.95rem;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: rgb(var(--gray));
 			}
 			.email-btn {
 				background: rgb(var(--gray-dark));
@@ -199,6 +214,8 @@ const posts = (await getCollection('blog'))
 							<span>LinkedIn</span>
 						</a>
 					</div>
+					<h3 class="sidebar-heading">Tags</h3>
+					<TagCloud tags={tagCounts} />
 				</aside>
 				<section class="posts">
 					<ul>

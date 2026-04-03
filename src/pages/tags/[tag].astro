@@ -1,0 +1,126 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const posts = (await getCollection('blog'))
+		.filter((post) => (import.meta.env.DEV || post.data.draft !== true) && post.data.pubDate <= new Date());
+
+	const tags = new Set<string>();
+	for (const post of posts) {
+		for (const tag of post.data.tags ?? []) {
+			tags.add(tag);
+		}
+	}
+
+	return [...tags].map((tag) => ({
+		params: { tag },
+		props: {
+			tag,
+			posts: posts
+				.filter((p) => p.data.tags?.includes(tag))
+				.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+		},
+	}));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${tag} — ${SITE_TITLE}`} description={`Posts tagged "${tag}"`} />
+		<style>
+			main {
+				width: 960px;
+				max-width: calc(100% - 2rem);
+				margin: auto;
+				padding: 1rem;
+			}
+			.tag-header {
+				text-align: center;
+				margin-bottom: 2rem;
+			}
+			.tag-header h1 {
+				margin: 0 0 0.25rem;
+			}
+			.tag-header p {
+				color: rgb(var(--gray));
+				margin: 0;
+			}
+			ul {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2rem;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			ul li {
+				width: calc(50% - 1rem);
+			}
+			ul li img {
+				margin-bottom: 0.5rem;
+				border-radius: 12px;
+			}
+			ul li a {
+				display: block;
+				text-decoration: none;
+				transition: 0.2s ease;
+			}
+			.title {
+				margin: 0;
+				color: rgb(var(--black));
+				line-height: 1;
+			}
+			.date {
+				margin: 0;
+				color: rgb(var(--gray));
+			}
+			ul li a:hover h4,
+			ul li a:hover .date {
+				color: rgb(var(--accent));
+			}
+			ul li a:hover img {
+				box-shadow: var(--box-shadow);
+			}
+			@media (max-width: 720px) {
+				ul li {
+					width: 100%;
+					text-align: center;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="tag-header">
+				<h1>{tag}</h1>
+				<p>{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
+			</div>
+			<ul>
+				{posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`}>
+							{post.data.heroImage && (
+								<Image width={720} height={360} src={post.data.heroImage} alt="" />
+							)}
+							<h4 class="title">{post.data.title}</h4>
+							<p class="date">
+								<FormattedDate date={post.data.pubDate} />
+							</p>
+						</a>
+					</li>
+				))}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
