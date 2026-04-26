@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#0d1a2d"/>
+    </linearGradient>
+    <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#512bd4" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#512bd4" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00ccff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#00ff88" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#512bd4"/>
+      <stop offset="100%" stop-color="#00ccff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Background glows -->
+  <ellipse cx="300" cy="315" rx="280" ry="220" fill="url(#glowLeft)"/>
+  <ellipse cx="900" cy="315" rx="280" ry="220" fill="url(#glowRight)"/>
+
+  <!-- Chat bubble (left side) -->
+  <g transform="translate(180, 200)" opacity="0.2">
+    <rect x="0" y="0" width="220" height="60" rx="12" fill="#512bd4"/>
+    <rect x="30" y="80" width="180" height="50" rx="12" fill="#512bd4"/>
+    <rect x="0" y="150" width="200" height="55" rx="12" fill="#512bd4"/>
+  </g>
+
+  <!-- Chat bubble lines (user messages) -->
+  <g transform="translate(195, 215)" opacity="0.4">
+    <rect x="0" y="0" width="140" height="6" rx="3" fill="#ffffff"/>
+    <rect x="0" y="14" width="100" height="6" rx="3" fill="#ffffff"/>
+    <rect x="45" y="80" width="120" height="6" rx="3" fill="#ffffff"/>
+    <rect x="15" y="150" width="130" height="6" rx="3" fill="#ffffff"/>
+    <rect x="15" y="164" width="80" height="6" rx="3" fill="#ffffff"/>
+  </g>
+
+  <!-- Flow arrow -->
+  <g opacity="0.5">
+    <line x1="430" y1="315" x2="560" y2="315" stroke="url(#arrow)" stroke-width="2" stroke-dasharray="8,4"/>
+    <polygon points="560,308 575,315 560,322" fill="#00ccff" opacity="0.7"/>
+  </g>
+
+  <!-- AI brain icon (center) -->
+  <g transform="translate(600, 260)" opacity="0.15">
+    <circle cx="0" cy="0" r="50" fill="none" stroke="#00ccff" stroke-width="2"/>
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#00ccff" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="12" fill="#00ccff" opacity="0.3"/>
+    <line x1="-50" y1="0" x2="50" y2="0" stroke="#00ccff" stroke-width="1"/>
+    <line x1="0" y1="-50" x2="0" y2="50" stroke="#00ccff" stroke-width="1"/>
+    <line x1="-35" y1="-35" x2="35" y2="35" stroke="#00ccff" stroke-width="0.8"/>
+    <line x1="35" y1="-35" x2="-35" y2="35" stroke="#00ccff" stroke-width="0.8"/>
+  </g>
+
+  <!-- Flow arrow (right) -->
+  <g opacity="0.5">
+    <line x1="640" y1="315" x2="770" y2="315" stroke="url(#arrow)" stroke-width="2" stroke-dasharray="8,4"/>
+    <polygon points="770,308 785,315 770,322" fill="#00ccff" opacity="0.7"/>
+  </g>
+
+  <!-- Form (right side) -->
+  <g transform="translate(820, 190)" opacity="0.2">
+    <rect x="0" y="0" width="220" height="250" rx="8" fill="none" stroke="#00ff88" stroke-width="1.5"/>
+    <!-- Form header -->
+    <rect x="15" y="15" width="100" height="8" rx="4" fill="#00ff88"/>
+    <!-- Form fields -->
+    <rect x="15" y="45" width="190" height="30" rx="4" fill="#00ff88" opacity="0.3"/>
+    <rect x="15" y="90" width="190" height="30" rx="4" fill="#00ff88" opacity="0.3"/>
+    <rect x="15" y="135" width="190" height="30" rx="4" fill="#00ff88" opacity="0.3"/>
+    <!-- Form field labels -->
+    <rect x="22" y="52" width="60" height="5" rx="2" fill="#ffffff" opacity="0.5"/>
+    <rect x="22" y="97" width="45" height="5" rx="2" fill="#ffffff" opacity="0.5"/>
+    <rect x="22" y="142" width="70" height="5" rx="2" fill="#ffffff" opacity="0.5"/>
+    <!-- Form field values (filled by AI) -->
+    <rect x="22" y="62" width="120" height="5" rx="2" fill="#00ff88" opacity="0.6"/>
+    <rect x="22" y="107" width="80" height="5" rx="2" fill="#00ff88" opacity="0.6"/>
+    <rect x="22" y="152" width="100" height="5" rx="2" fill="#00ff88" opacity="0.6"/>
+    <!-- Submit button -->
+    <rect x="15" y="195" width="80" height="28" rx="6" fill="#00ff88" opacity="0.4"/>
+    <rect x="28" y="206" width="50" height="5" rx="2" fill="#ffffff" opacity="0.5"/>
+  </g>
+
+  <!-- Title text -->
+  <text x="600" y="120" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="300" font-size="18" fill="#ffffff" opacity="0.5" letter-spacing="6">SHINY MAUI SHELL</text>
+
+  <text x="600" y="510" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="52" fill="#ffffff">AI-Powered Navigation</text>
+  <text x="600" y="560" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="300" font-size="24" fill="#00ccff" opacity="0.7">Chat to Navigate. Intent to Form.</text>
+
+  <!-- Bottom pills -->
+  <g font-family="system-ui,-apple-system,sans-serif" font-size="11" text-anchor="middle">
+    <rect x="280" y="585" width="130" height="26" rx="13" fill="none" stroke="#512bd4" stroke-width="1" opacity="0.5"/>
+    <text x="345" y="602" fill="#512bd4" opacity="0.8">Source Generated</text>
+
+    <rect x="430" y="585" width="110" height="26" rx="13" fill="none" stroke="#00ccff" stroke-width="1" opacity="0.5"/>
+    <text x="485" y="602" fill="#00ccff" opacity="0.8">M.E.AI Tools</text>
+
+    <rect x="560" y="585" width="120" height="26" rx="13" fill="none" stroke="#00ff88" stroke-width="1" opacity="0.5"/>
+    <text x="620" y="602" fill="#00ff88" opacity="0.8">Intent Matching</text>
+
+    <rect x="700" y="585" width="120" height="26" rx="13" fill="none" stroke="#9966ff" stroke-width="1" opacity="0.5"/>
+    <text x="760" y="602" fill="#9966ff" opacity="0.8">Two-Tool Pattern</text>
+  </g>
+</svg>

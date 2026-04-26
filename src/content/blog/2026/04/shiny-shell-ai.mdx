@@ -1,0 +1,153 @@
+---
+title: 'AI-Powered Navigation in Shiny MAUI Shell — Chat to Navigate, Intent to Form'
+description: 'How Shiny MAUI Shell uses source generation and Microsoft.Extensions.AI to let an AI chat agent discover your app routes, match user intent, and navigate with pre-filled forms.'
+pubDate: 'Apr 26 2026'
+heroImage: '../../../../assets/shiny-shell-ai-hero.svg'
+tags: ['Shiny', '.NET MAUI', 'AI', 'Source Generators', 'Microsoft.Extensions.AI']
+---
+
+What if a user could type *"My furnace is broken — it's urgent!"* into a chat and your app would automatically open the work order form with the description filled in and the priority set to Urgent?
+
+That's the new AI integration in [Shiny MAUI Shell](https://github.com/shinyorg/mauishell).
+
+---
+
+## The Problem
+
+Mobile apps are full of forms behind menus behind tabs. Users have to know the app's structure to get anything done. They tap through navigation hierarchies, find the right page, and manually key in every field.
+
+Meanwhile, AI chat is everywhere. Users already talk to assistants in natural language. But wiring up an AI to *navigate your app* has always meant building one-off tool functions for each page — code that doesn't scale and breaks every time you add a route.
+
+## The Insight: Your Source Generator Already Knows Everything
+
+Shiny Shell's `[ShellMap]` and `[ShellProperty]` attributes already describe every route and parameter in your app. The source generator uses them to produce type-safe navigation methods and route constants.
+
+The new AI integration simply **extends that same metadata** with two additional pieces of information:
+
+1. A `description` on `[ShellMap]` that tells the AI **when** this page is relevant (user intent signals)
+2. A `description` on `[ShellProperty]` that tells the AI **how to infer** the value from natural language
+
+```csharp
+public enum WorkOrderPriority { Low, Medium, High, Urgent }
+
+[ShellMap<WorkOrderPage>(description: 
+    "Use when the user reports something broken, malfunctioning, needing repair, maintenance, or service")]
+public partial class WorkOrderViewModel : ObservableObject
+{
+    [ShellProperty("Summarize what is broken based on what the user said", required: true)]
+    public string Description { get; set; } = string.Empty;
+
+    [ShellProperty("Infer urgency from the user's tone. Must be: Low, Medium, High, or Urgent", required: true)]
+    public WorkOrderPriority Priority { get; set; } = WorkOrderPriority.Medium;
+
+    [ShellProperty("The physical location if the user mentioned one, otherwise leave empty", required: false)]
+    public string Location { get; set; } = string.Empty;
+}
+```
+
+## Two Tools, Any Number of Pages
+
+Instead of generating a separate AI tool function per page (which pollutes the tool list and doesn't scale), the source generator produces exactly **two** tools:
+
+### 1. Discover Routes
+
+```csharp
+[Description("This provides a list of AI tool applicable routes")]
+public static GeneratedRouteInfo[] GetAiToolApplicableGeneratedRoutes(this INavigator navigator);
+```
+
+Returns only routes that have a `description` on `[ShellMap]` **and** at least one `[ShellProperty]`. The AI calls this to see what pages exist, what they do, and what parameters they accept.
+
+### 2. Navigate
+
+```csharp
+[Description("Navigate to a route in the application, passing parameters as key-value pairs")]
+public static Task NavigateToRoute(
+    this INavigator navigator,
+    [Description("The route name to navigate to")] string route,
+    [Description("Route parameters as key-value pairs")] Dictionary<string, string>? args = null,
+    [Description("Navigate from the current page if true")] bool relativeNavigation = true);
+```
+
+Takes a `Dictionary<string, string>` instead of value tuples — because AI models handle dictionaries natively in tool calling schemas.
+
+Note that AI-compatible ViewModels do **not** need to implement `IQueryAttributable`. The generated `NavigateToRoute` sets `[ShellProperty]` properties directly on the ViewModel instance — no query attribute plumbing required.
+
+Properties can use real types — enums, ints, bools, doubles, DateTimes, Guids — and the generator handles conversion automatically. The AI sends `"Urgent"` as a string, and the generated `NavigateToRoute` converts it to `WorkOrderPriority.Urgent` via case-insensitive `Enum.Parse`.
+
+### The Flow
+
+1. AI calls `GetAiToolApplicableGeneratedRoutes()` → sees all available pages with intent descriptions and parameter schemas
+2. AI matches user's message to the right route based on descriptions
+3. AI extracts parameter values from natural language using inference hints
+4. AI calls `NavigateToRoute("WorkOrder", {"Description": "Furnace is not working", "Priority": "Urgent"})`
+5. App navigates to the work order page with fields pre-filled
+
+Add a new page? Just add `[ShellMap]` and `[ShellProperty]` descriptions. The AI discovers it automatically on the next chat message. Zero tool registration changes.
+
+## Rich Parameter Metadata
+
+The generated `GeneratedRouteParameter` now includes type information and requirement flags:
+
+```csharp
+public record GeneratedRouteParameter(
+    string ParameterName,    // Property name — used as key in NavigateToRoute args
+    string Description,      // Inference hint for the AI
+    string TypeName,         // "string", "int", "bool", etc.
+    bool IsRequired          // Whether the AI must provide this value
+);
+```
+
+This gives the AI everything it needs: what to call the parameter, how to infer it, what type it expects, and whether it's optional.
+
+## Wiring It Up with Microsoft.Extensions.AI
+
+First, enable AI extensions in your `.csproj`:
+
+```xml
+<PropertyGroup>
+    <ShinyMauiShell_GenerateAiExtensions>true</ShinyMauiShell_GenerateAiExtensions>
+</PropertyGroup>
+```
+
+Then use the generated `GetAiTools()` method — one line to get ready-to-use `AITool` instances:
+
+```csharp
+var tools = navigator.GetAiTools();
+var options = new ChatOptions { Tools = [.. tools] };
+```
+
+You can also seed route info into the system prompt upfront via the generated `navigator.AiRoutePrompt()` extension method, so the model knows what's available without a discovery call.
+
+## The Sample App
+
+The sample includes a full working demo with:
+
+- **GitHub Copilot authentication** via the OAuth device flow — users authenticate with their own GitHub account
+- **ChatView** from Shiny.Maui.Controls for the chat UI
+- **Two sample forms**: Work Order and Contact — each with intent-driven descriptions
+
+Try these prompts:
+
+- *"My furnace is not working! URGENT"* → opens the work order form with description and priority filled in
+- *"I'd like to discuss a partnership. My name is Allan, email allan@test.com, phone 555-1234"* → opens the contact form with fields populated
+- *"The sink in the kitchen is leaking"* → work order with "Kitchen" as location and inferred description
+
+## Describe Intent, Not Pages
+
+The quality of AI navigation depends entirely on how you write descriptions:
+
+| Do | Don't |
+|:---|:------|
+| Describe **user intent signals** | Name the page |
+| *"Use when the user reports something broken"* | *"Work order form"* |
+| Tell AI to **infer** from context | Expect exact field values |
+| *"Infer urgency from tone"* | *"The priority level"* |
+| Make optional fields truly optional | Require everything |
+| *"Leave empty if not mentioned"* | Require the user to state everything |
+
+## What's Next
+
+This is the first step toward making Shiny MAUI Shell apps genuinely AI-native. The two-tool pattern scales to any number of routes and works with any `IChatClient` — OpenAI, Anthropic, local models, or GitHub Copilot.
+
+Check out the [full documentation](https://shinylib.net/mauishell/ai/) and the [source on GitHub](https://github.com/shinyorg/mauishell).
