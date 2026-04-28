@@ -51,25 +51,13 @@ Instead of generating a separate AI tool function per page (which pollutes the t
 
 ### 1. Discover Routes
 
-```csharp
-[Description("This provides a list of AI tool applicable routes")]
-public static GeneratedRouteInfo[] GetAiToolApplicableGeneratedRoutes(this INavigator navigator);
-```
-
-Returns only routes that have a `description` on `[ShellMap]` **and** at least one `[ShellProperty]`. The AI calls this to see what pages exist, what they do, and what parameters they accept.
+The AI calls `GetAiToolApplicableGeneratedRoutes()` to see what pages exist, what they do, and what parameters they accept. This returns only routes that have a `description` on `[ShellMap]` **and** at least one `[ShellProperty]`.
 
 ### 2. Navigate
 
-```csharp
-[Description("Navigate to a route in the application, passing parameters as key-value pairs")]
-public static Task NavigateToRoute(
-    this INavigator navigator,
-    [Description("The route name to navigate to")] string route,
-    [Description("Route parameters as key-value pairs")] Dictionary<string, string>? args = null,
-    [Description("Navigate from the current page if true")] bool relativeNavigation = true);
-```
+The AI calls `NavigateToRoute(route, args)` with a `Dictionary<string, string>` of parameters — because AI models handle dictionaries natively in tool calling schemas.
 
-Takes a `Dictionary<string, string>` instead of value tuples — because AI models handle dictionaries natively in tool calling schemas.
+Both of these live on the generated `AiMauiShellTools` class, which is injected via DI. The class also provides a `Prompt` property (pre-formatted route descriptions for system messages) and a `Tools` property (ready-to-use `AITool[]`).
 
 Note that AI-compatible ViewModels do **not** need to implement `IQueryAttributable`. The generated `NavigateToRoute` sets `[ShellProperty]` properties directly on the ViewModel instance — no query attribute plumbing required.
 
@@ -102,22 +90,30 @@ This gives the AI everything it needs: what to call the parameter, how to infer 
 
 ## Wiring It Up with Microsoft.Extensions.AI
 
-First, enable AI extensions in your `.csproj`:
-
-```xml
-<PropertyGroup>
-    <ShinyMauiShell_GenerateAiExtensions>true</ShinyMauiShell_GenerateAiExtensions>
-</PropertyGroup>
-```
-
-Then use the generated `GetAiTools()` method — one line to get ready-to-use `AITool` instances:
+AI extensions are now **enabled by default** — just install `Microsoft.Extensions.AI` and register the generated class:
 
 ```csharp
-var tools = navigator.GetAiTools();
-var options = new ChatOptions { Tools = [.. tools] };
+// MauiProgram.cs
+builder.UseShinyShell(x => x
+    .AddGeneratedMaps()
+    .AddAiTools()          // registers AiMauiShellTools as singleton
+);
 ```
 
-You can also seed route info into the system prompt upfront via the generated `navigator.AiRoutePrompt()` extension method, so the model knows what's available without a discovery call.
+Then inject `AiMauiShellTools` and use the `Prompt` and `Tools` properties:
+
+```csharp
+public class ChatViewModel(AiMauiShellTools aiTools)
+{
+    // Seed the system prompt with route info
+    history.Add(new ChatMessage(ChatRole.System, aiTools.Prompt));
+
+    // Use ready-to-use AITool instances
+    var options = new ChatOptions { Tools = [.. aiTools.Tools] };
+}
+```
+
+The class name is customizable via the `ShinyMauiShell_AiToolsClassName` MSBuild property if `AiMauiShellTools` doesn't fit your naming conventions.
 
 ## The Sample App
 
