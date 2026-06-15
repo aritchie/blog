@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accentCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="accentViolet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="accentGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <radialGradient id="lensGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.45"/>
+      <stop offset="55%" stop-color="#8b5cf6" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="aperture" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#lensGlow)"/>
+
+  <!-- camera lens / aperture, right side -->
+  <g transform="translate(880 315)" filter="url(#glow)">
+    <circle r="190" fill="none" stroke="#334155" stroke-width="2" opacity="0.5"/>
+    <circle r="158" fill="none" stroke="url(#aperture)" stroke-width="6" opacity="0.9"/>
+    <circle r="120" fill="#0b1220" stroke="#1e293b" stroke-width="3"/>
+    <!-- aperture blades -->
+    <g stroke="url(#aperture)" stroke-width="4" fill="none" opacity="0.85">
+      <path d="M0 -120 L104 -60"/>
+      <path d="M104 -60 L104 60"/>
+      <path d="M104 60 L0 120"/>
+      <path d="M0 120 L-104 60"/>
+      <path d="M-104 60 L-104 -60"/>
+      <path d="M-104 -60 L0 -120"/>
+    </g>
+    <circle r="46" fill="url(#aperture)" opacity="0.95"/>
+    <circle r="20" fill="#0b1220"/>
+  </g>
+
+  <!-- detection bounding boxes, scattered -->
+  <g stroke-width="3" fill="none" opacity="0.9">
+    <rect x="120" y="120" width="150" height="100" rx="8" stroke="url(#accentCyan)"/>
+    <rect x="300" y="430" width="170" height="90" rx="8" stroke="url(#accentGreen)"/>
+    <rect x="540" y="150" width="120" height="120" rx="8" stroke="url(#accentViolet)"/>
+  </g>
+  <g font-family="ui-monospace, monospace" font-size="18" fill="#94a3b8">
+    <text x="120" y="110">barcode</text>
+    <text x="300" y="420">document</text>
+    <text x="540" y="140">face</text>
+  </g>
+
+  <!-- headline -->
+  <text x="100" y="300" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="92" font-weight="800" fill="#f8fafc">CameraView</text>
+  <text x="104" y="356" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="30" font-weight="600" fill="url(#accentCyan)">The camera control to end them all</text>
+  <text x="104" y="396" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22" font-weight="500" fill="#cbd5e1">iOS · Android · Windows · macOS AppKit · Blazor</text>
+
+  <!-- shiny mark -->
+  <text x="100" y="560" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="24" font-weight="700" fill="#64748b">Shiny.Maui.Controls</text>
+</svg>
