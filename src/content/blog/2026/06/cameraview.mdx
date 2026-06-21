@@ -33,7 +33,7 @@ this.Camera.CameraError += (_, e) => status = e.Message;   // "Camera permission
 
 CameraPhoto photo = await this.Camera.CapturePhotoAsync();                 // filtered JPEG bytes
 await this.Camera.StartVideoRecordingAsync(new() { IncludeAudio = true });
-CameraVideo video = await this.Camera.StopVideoRecordingAsync();
+CameraVideo video = await this.Camera.StopVideoRecordingAsync();           // a file path you can stream
 ```
 
 ## One control, five hosts
@@ -64,47 +64,54 @@ Eleven of them ship — `Mono`, `Noir`, `Sepia`, `Invert`, `Vivid`, `Cool`, `War
 
 ## The part that makes it interesting: frame analysis
 
-A camera that only takes pictures is boring. The thing I really wanted was a pipeline I could *plug things into*. So `Camera.Analyzers` takes any number of `IFrameAnalyzer`s, and the pipeline streams frames **off the UI thread** with **drop-on-busy back-pressure** per analyzer — one frame in flight at a time, so a slow analyzer never backs up the feed.
+A camera that only takes pictures is boring. The thing I really wanted was a pipeline I could *plug things into*. So `CameraView` takes a single `Analyzer` — barcode, face, motion, OCR, a document scanner — and streams frames to it **off the UI thread** with **drop-on-busy back-pressure**: one frame in flight at a time, so a slow analyzer never backs up the feed. You set it once and **swap it freely while the camera is running**.
 
-Each analyzer talks back on two channels: a **strongly-typed event** for the result, and a set of **bounding boxes** to draw. Add ZXing barcode scanning, native face detection, and pure-managed motion detection in a few lines:
+Each analyzer talks back on two channels: a **strongly-typed event** for the result, and a set of **bounding boxes** to draw. The boxes draw the whole time the analyzer is running — but the result is *gated on a scan*. The analyzer stays quiet until you arm it with `Camera.Scan()` (or bind a shutter button to `Camera.ScanCommand`), then it hands you its next confirmed detection exactly once. That single-shot default is what you actually want most of the time — point, tap, get the code. Want it to keep going? Give the analyzer an `OnDetected` handler and return `true`:
 
 ```csharp
-var barcode = new BarcodeAnalyzer();                 // ZXing — every platform, even Blazor
-barcode.BarcodeDetected += (_, e) => status = $"{e.Format}: {e.Value}";
+var barcode = new BarcodeAnalyzer();                 // native — Apple Vision (iOS/macOS) / Android MLKit
+barcode.BarcodesDetected += (_, e) =>
+    status = $"{e.First.Format}: {e.First.Value}";    // e.Barcodes has every code in the frame
+Camera.Analyzer = barcode;
 
-var faces = new FaceAnalyzer();                       // Apple Vision / Android MLKit / Windows
-faces.FacesDetected += (_, e) => status = $"{e.Faces.Count} face(s)";
-
-var motion = new MotionAnalyzer();                    // managed frame differencing
-motion.MotionChanged += (_, e) =>
-    status = e.InMotion ? $"Motion in {e.Regions.Count} area(s)" : "Still";
-
-Camera.Analyzers.Add(barcode);
-Camera.Analyzers.Add(faces);
-Camera.Analyzers.Add(motion);
+Camera.Scan();                                        // arm — deliver the next decode, once
+barcode.OnDetected = async e => { await Save(e.First.Value); return true; };   // …or keep scanning
 ```
 
-Events come back marshalled to the UI thread, so you can touch the UI directly. The collection is observable — add and remove analyzers while the camera is running and the pipeline picks it up live. To pause one without losing its bindings, set `IsEnabled = false`; it resumes instantly. `MotionAnalyzer` even clusters movement into *separate* regions, so two people moving in two corners give you two boxes, not one giant box — exactly what you want for a security-cam view.
+Swapping analyzers is just an assignment — the running session picks it up live:
 
-If you live in MVVM, you don't touch events at all. Analyzers are `BindableObject`s and the camera's content property is `Analyzers`, so declare them in XAML and bind commands:
+```csharp
+Camera.Analyzer = new FaceAnalyzer();                // Apple Vision / Android MLKit / Windows
+Camera.Analyzer = new MotionAnalyzer();              // managed frame differencing — every platform
+```
+
+Events come back marshalled to the UI thread, so you can touch the UI directly. Need to pause the analyzer without losing its bindings? Set `IsEnabled = false`; it resumes instantly, and while it's off the camera acts like it has no analyzer (which, on Android, is how you free it up to record video). `MotionAnalyzer` even clusters movement into *separate* regions, so two people moving in two corners give you two boxes, not one giant box — exactly what you want for a security-cam view.
+
+If you live in MVVM, you don't touch events at all. The analyzer is a `BindableObject` and the camera's content property is `Analyzer`, so declare it in XAML, bind its command, and wire a button to the camera's `ScanCommand`:
 
 ```xml
-<cam:CameraView Facing="Back" Filter="Chrome">
-    <cam:BarcodeAnalyzer BarcodeDetectedCommand="{Binding ScanCommand}" />
-    <cam:InvoiceAnalyzer DocumentDetectedCommand="{Binding InvoiceCommand}" />
-</cam:CameraView>
+<Grid>
+    <cam:CameraView x:Name="Camera" Facing="Back" Filter="Chrome">
+        <cam:BarcodeAnalyzer BarcodesDetectedCommand="{Binding ScanResultCommand}" />
+    </cam:CameraView>
+    <Button Text="Scan"
+            Command="{Binding Source={x:Reference Camera}, Path=ScanCommand}"
+            VerticalOptions="End" />
+</Grid>
 ```
 
-Boxes are free: drop a `CameraOverlayView` over the camera in the same grid cell and it auto-subscribes. Coordinates are normalized, upright, and mirror-corrected, so you never wrestle with raw pixels — and an `OverlayProvider` lets you restyle or suppress boxes per detection.
+Boxes are free: drop a `CameraOverlayView` over the camera in the same grid cell and it auto-subscribes. Coordinates are normalized, upright, and mirror-corrected, so you never wrestle with raw pixels — set an analyzer's `ScanWindow` to a band and the overlay dims everything outside it and frames a viewfinder, and an `OverlayProvider` lets you restyle or suppress boxes per detection.
 
 ## Documents: structured records, not strings
 
-This is the part people don't expect a camera library to do. The `Shiny.Maui.Controls.Camera.Documents` package hands you **typed records** — not a blob of OCR text. Each document type is its own analyzer with its own event, and every field is nullable so you only get what was actually found.
+This is the part people don't expect a camera library to do. The `Shiny.Maui.Controls.Camera.Documents` package hands you **typed records** — not a blob of OCR text. Each document type is its own analyzer with its own event, and every field is nullable so you only get what was actually found. Same arm-to-scan deal — `Camera.Scan()` captures the next read:
 
 ```csharp
 var invoice = new InvoiceAnalyzer();
 invoice.DocumentDetected += (_, e) =>
     status = $"Invoice {e.Document.Number} — {e.Document.Total}, {e.Document.Lines.Count} lines";
+Camera.Analyzer = invoice;
+Camera.Scan();
 
 var license = new DriversLicenseAnalyzer();           // PDF417 + AAMVA, fully deterministic
 license.DocumentDetected += (_, e) =>
@@ -133,7 +140,8 @@ And if I don't ship the document you need — a business card, a shipping label,
 I'd rather you hear these from me than from a bug report:
 
 - **Permissions are yours to declare** — `NSCameraUsageDescription` on Apple (skip it and iOS crashes instantly), `CAMERA` on Android, `webcam` on Windows. Blazor needs HTTPS or `localhost`.
-- **Android won't record video while an analyzer is enabled** — CameraX caps concurrent use-cases, so it's analysis *or* video. Disable the analyzers to record; the call throws a clear error if you forget.
+- **Android won't record video while an analyzer is enabled** — CameraX caps concurrent use-cases, so it's analysis *or* video. Clear the `Analyzer` (or set `IsEnabled = false`) to record; the call throws a clear error if you forget.
+- **The native analyzers run on devices, not bare `net10.0`** — `MotionAnalyzer` is pure-managed and goes everywhere, but barcode/face/OCR/documents lean on Apple Vision, Android MLKit, and the Windows ML APIs, so they light up on the real platforms.
 - **Don't gate startup on `RequestPermissionAsync()`** in `OnAppearing` — it returns `false` before the handler is wired up and looks like a denial. Trust the auto-start and `CameraError`.
 
 That's `CameraView`: preview, capture, filters, and a real analysis pipeline — barcodes to passports — on every platform I ship to, from one control. Add `.UseShinyCamera()` and go build something. The full reference lives in the [Shiny docs](https://shinylib.net/controls/cameraview/).
