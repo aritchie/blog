@@ -1,0 +1,91 @@
+---
+// A screenshot slot that degrades to a labelled placeholder until the file exists.
+// Drop the real image at `public/<src>` (any format) and it renders automatically — no post edits.
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+	/** Public-root-relative path, e.g. "/images/recogiq/face-recognize.png" */
+	src: string;
+	alt: string;
+	caption?: string;
+	/** Phone screenshots render narrow and centered; set false for wide/landscape shots. */
+	phone?: boolean;
+}
+
+const { src, alt, caption, phone = true } = Astro.props;
+const exists = fs.existsSync(path.join(process.cwd(), 'public', src.replace(/^\//, '')));
+---
+
+<figure class:list={['shot', phone && 'phone']}>
+	{
+		exists ? (
+			<img src={src} alt={alt} loading="lazy" />
+		) : (
+			<div class="placeholder" role="img" aria-label={`Screenshot placeholder: ${alt}`}>
+				<span class="ph-label">{alt}</span>
+				<code class="ph-path">{src}</code>
+			</div>
+		)
+	}
+	{caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+	.shot {
+		margin: 2em auto;
+	}
+	.shot.phone {
+		max-width: 320px;
+	}
+	.shot img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 14px;
+		box-shadow: var(--box-shadow);
+	}
+	.placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5em;
+		padding: 1.5em;
+		text-align: center;
+		border: 2px dashed rgba(var(--gray), 55%);
+		border-radius: 14px;
+		background: repeating-linear-gradient(
+			45deg,
+			rgba(var(--gray-light), 45%),
+			rgba(var(--gray-light), 45%) 12px,
+			rgba(var(--gray-light), 20%) 12px,
+			rgba(var(--gray-light), 20%) 24px
+		);
+	}
+	.shot.phone .placeholder {
+		aspect-ratio: 9 / 19.5;
+	}
+	.shot:not(.phone) .placeholder {
+		aspect-ratio: 16 / 10;
+	}
+	.ph-label {
+		font-size: 0.85em;
+		font-weight: 700;
+		color: rgb(var(--gray));
+		line-height: 1.35;
+	}
+	.ph-path {
+		font-size: 0.7em;
+		color: rgb(var(--gray));
+		opacity: 0.8;
+		word-break: break-all;
+	}
+	figcaption {
+		margin-top: 0.6em;
+		font-size: 0.75em;
+		line-height: 1.5;
+		text-align: center;
+		color: rgb(var(--gray));
+	}
+</style>

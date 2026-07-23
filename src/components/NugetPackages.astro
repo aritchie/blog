@@ -1,0 +1,116 @@
+---
+// Renders a list of NuGet packages as badge rows.
+// Packages marked `published: false` render as a muted "not yet published" chip instead of a
+// link, so a post can reference packages that haven't shipped without linking to a 404.
+interface Pkg {
+	id: string;
+	desc?: string;
+	published?: boolean;
+}
+
+interface Props {
+	packages: Pkg[];
+	title?: string;
+}
+
+const { packages, title } = Astro.props;
+---
+
+<div class="nuget-list">
+	{title && <p class="nuget-list-title">{title}</p>}
+	{
+		packages.map((p) => (
+			<div class="nuget-row">
+				{p.published === false ? (
+					<span class="nuget-badge unpublished">
+						<img
+							src="https://www.nuget.org/Content/gallery/img/logo-header.svg"
+							alt="NuGet"
+							width="20"
+							height="20"
+						/>
+						<span>{p.id}</span>
+						<span class="soon">soon</span>
+					</span>
+				) : (
+					<a
+						class="nuget-badge"
+						href={`https://www.nuget.org/packages/${p.id}`}
+						target="_blank"
+						rel="noopener"
+					>
+						<img
+							src="https://www.nuget.org/Content/gallery/img/logo-header.svg"
+							alt="NuGet"
+							width="20"
+							height="20"
+						/>
+						<span>{p.id}</span>
+					</a>
+				)}
+				{p.desc && <span class="nuget-desc">{p.desc}</span>}
+			</div>
+		))
+	}
+</div>
+
+<style>
+	.nuget-list {
+		margin: 1.5em 0;
+	}
+	.nuget-list-title {
+		margin: 0 0 0.6em 0;
+		font-size: 0.8em;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: rgb(var(--gray));
+	}
+	.nuget-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.4rem 0.6rem;
+		margin-bottom: 0.5rem;
+	}
+	.nuget-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.2rem 0.55rem;
+		border-radius: 4px;
+		background: #004880;
+		color: #fff;
+		text-decoration: none;
+		font-size: 0.72rem;
+		line-height: 20px;
+		white-space: nowrap;
+	}
+	.nuget-badge img {
+		display: block;
+		margin: 0;
+		padding: 0;
+		border-radius: 0;
+		background: #fff;
+		border-radius: 3px;
+	}
+	.nuget-badge.unpublished {
+		background: rgba(var(--gray), 12%);
+		color: rgb(var(--gray-dark));
+		border: 1px dashed rgba(var(--gray), 55%);
+	}
+	.nuget-badge .soon {
+		padding: 0 0.3rem;
+		border-radius: 3px;
+		background: rgba(var(--gray), 25%);
+		font-size: 0.62rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+	.nuget-desc {
+		font-size: 0.78em;
+		line-height: 1.4;
+		color: rgb(var(--gray));
+	}
+</style>

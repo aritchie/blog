@@ -1,0 +1,706 @@
+---
+title: 'Giving your .NET MAUI a real set of AI Wings'
+description: 'A .NET MAUI app built straight on Microsoft.Extensions.AI — an IChatClient onto GitHub Copilot, ChatOptions.Tools, and UseFunctionInvocation running the loop. The chat UI is a control; the hands are Shiny — contacts, reminders, GPS, health, music, a local document DB, your own services, and the app''s own navigation. All opt-in, all switchable, all AOT-clean.'
+pubDate: 'Jul 23 2026'
+heroImage: '../../../../assets/maui-ai-wings-hero.svg'
+tags: ['Shiny', '.NET MAUI', 'AI']
+---
+
+*This post is part of [MAUI UI July 2026](https://goforgoldman.com/posts/mauiuijuly-26/). Thanks to Matt Goldman for running it again.*
+
+Every "add AI to your MAUI app" post I read ends at the same place: a chat bubble list, a text box, and a model that can talk beautifully about absolutely nothing on the device. It's the software equivalent of a very articulate houseplant.
+
+The chat UI is the easy half. I know, because I shipped a control for it and it took an afternoon to wire up. The hard half — the half nobody shows you — is the moment a tester says *"remind me to call the plumber at three"* out loud and the model cheerfully replies "Sure, I'll remind you!" and then does **absolutely nothing**. No hands. Just a mouth.
+
+So this is the other post. We're going to build a MAUI app for iOS and Android where the chat is a control you drop in, and the interesting work is deciding — deliberately, one line at a time — what the model is actually allowed to *do* on the phone.
+
+By the end it can write notes into a local database, look up your contacts, schedule real reminders, tell you where you are, read your step count, put music on, and **navigate your own app to the right screen with the form pre-filled**. And you can switch any of it off from the csproj.
+
+The whole sample is here: **[github.com/aritchie — MauiUi2026](https://github.com/aritchie)** (it's also the code every snippet below is lifted from).
+
+---
+
+## The shape of the thing
+
+Three tabs. That's the whole app.
+
+- **Assistant** — one `ChatView`, nothing else
+- **Notes** — a `CollectionView` over a local document store
+- **Settings** — sign in, grant permissions, see which modules got compiled in
+
+And under it, a single idea worth internalising:
+
+> `Microsoft.Extensions.AI` gave us a common currency — `AITool`. Every Shiny device library now mints them. Your job is to decide which ones go in the wallet.
+
+That's it. That's the architecture. Everything below is variations on `services.Add…AITools(…)`.
+
+---
+
+## Part 1: the UI, because it's July
+
+`Shiny.Maui.Controls` ships a `ChatView`. It is **provider-driven** — you don't bind a message collection, you don't write a send command, you don't manage a scroll position or a "load older" spinner. You hand it an `IChatSessionProvider` and a session id and it owns the rest.
+
+Here is the entire Assistant tab:
+
+```xml
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:shiny="http://shiny.net/maui/controls"
+             xmlns:local="clr-namespace:MauiUi2026.Features.Chat"
+             x:Class="MauiUi2026.Features.Chat.ChatPage"
+             x:DataType="local:ChatViewModel"
+             Title="Assistant">
+
+    <shiny:ChatView Provider="{Binding Provider}"
+                    SessionId="{Binding SessionId}"
+                    ChatBackgroundColor="{AppThemeBinding Light=#F6F5FB, Dark=#14131C}"
+                    MyBubbleColor="{StaticResource Primary}"
+                    MyTextColor="White"
+                    OtherBubbleColor="{AppThemeBinding Light=#EDEAFF, Dark=#2A2854}"
+                    OtherTextColor="{AppThemeBinding Light=#1A1A2E, Dark=#E8E5FF}"
+                    BubbleCornerRadius="18"
+                    PlaceholderText="Ask me to do something..."
+                    SendButtonText="Send" />
+</ContentPage>
+```
+
+And the ViewModel:
+
+```csharp
+[ShellMap<ChatPage>("chat", registerRoute: false)]
+public partial class ChatViewModel(IAssistant assistant) : ObservableObject
+{
+    public IChatSessionProvider Provider { get; } = new AiChatSessionProvider(assistant);
+    public string SessionId => AiChatSessionProvider.DefaultSessionId;
+}
+```
+
+Two properties. The control does bubbles, timestamps, markdown rendering on the AI side, the input bar, and cursor-based history paging — including "pull to load older", which it drives through your provider.
+
+The provider is the only real code, and it's mechanical: sends go to my own `IAssistant`, replies come back on an event, and history paging reads out of SQLite.
+
+```csharp
+public Task<ChatMessage> SendMessageAsync(OutgoingMessage message, CancellationToken ct = default)
+{
+    var sent = new ChatMessage(/* … your own bubble … */);
+
+    // fire the round trip in the background - the reply surfaces via IAssistant.Replied
+    _ = this.assistant.Send(message.Body ?? String.Empty);
+    return Task.FromResult(sent);
+}
+
+void OnReplied(object? sender, AssistantReply reply)
+    => this.RaiseAiMessage(reply.Text, reply.Usage);
+```
+
+I append the token usage to each AI bubble, because when you give a model eight tool packs it is *extremely* educational to watch the input token count climb.
+
+## Signing in with GitHub Copilot
+
+For a demo app, "where do I get a model from" is usually the most annoying paragraph. I went with GitHub Copilot, because most .NET developers reading this already pay for it.
+
+The Copilot API speaks OpenAI, so once you have a token this is just `Microsoft.Extensions.AI.OpenAI`:
+
+```csharp
+var options = new OpenAIClientOptions { Endpoint = new Uri("https://api.githubcopilot.com") };
+options.AddPolicy(new CopilotHeadersPolicy(), PipelinePosition.PerCall);
+
+return new OpenAIClient(new ApiKeyCredential(copilotToken), options)
+    .GetChatClient("gpt-4o")
+    .AsIChatClient();
+```
+
+Getting the token is the interesting bit, because a phone has no redirect URI. GitHub's **device code flow** solves it: ask GitHub for a short user code, show it, copy it to the clipboard, open the browser, then poll until the user authorises.
+
+```csharp
+var device = await this.StartDeviceFlow(cancelToken);
+
+await MainThread.InvokeOnMainThreadAsync(async () =>
+{
+    await Clipboard.Default.SetTextAsync(device.UserCode);
+    await page.DisplayAlertAsync(
+        "GitHub Sign In",
+        $"Your device code is:\n\n{device.UserCode}\n\nIt's on your clipboard. Press OK to open GitHub and paste it.",
+        "OK"
+    );
+    await Browser.Default.OpenAsync(device.VerificationUri, BrowserLaunchMode.SystemPreferred);
+});
+
+using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+cts.CancelAfter(TimeSpan.FromSeconds(device.ExpiresIn));
+
+while (!cts.IsCancellationRequested)
+{
+    await Task.Delay(TimeSpan.FromSeconds(device.Interval), cts.Token);
+    if (await this.PollForToken(device, cts.Token))
+        return;
+}
+```
+
+Two tokens are in play: the long-lived **GitHub OAuth token**, which goes in `SecureStorage`, and the short-lived **Copilot session token**, which is exchanged on demand and never persisted. A 401 on the exchange means the OAuth token was revoked — sign out and run the flow again.
+
+That's about 200 lines in `Ai/GitHubCopilotChatClientProvider.cs` and it's the *only* provider-specific code in the app. Swap it for `AzureOpenAIClient`, Ollama, or a local ONNX model and nothing else in this post changes. That is the entire point of `Microsoft.Extensions.AI`: everything downstream only knows `IChatClient`.
+
+---
+
+## Part 2: the engine, and it's smaller than you think
+
+Two small pieces of infrastructure, and then everything else in this post is just registration.
+
+### The tool pack
+
+Every Shiny "Extensions.AI" package hands you a small bundle object — `HealthAITools`, `ContactAITools`, `MusicAITools`, `NotificationAITools`, `LocationAITools`, `DocumentStoreAITools` — and each one has a `Tools` property that is just `IReadOnlyList<AITool>`. So a capability, from the app's point of view, is a list of tools plus a sentence or two telling the model when to use them:
+
+```csharp
+public interface IAiToolPack
+{
+    IReadOnlyList<AITool> Tools { get; }
+    string? SystemPrompt { get; }
+}
+
+public static IServiceCollection AddAiTools<TBundle>(
+    this IServiceCollection services,
+    Func<TBundle, IReadOnlyList<AITool>> tools,
+    string? systemPrompt = null
+) where TBundle : notnull
+    => services.AddSingleton<IAiToolPack>(sp => new AiToolPack(
+        tools(sp.GetRequiredService<TBundle>()),
+        systemPrompt
+    ));
+```
+
+Tool *descriptions* tell a model what a tool is; the framing prompt tells it what **your app** expects. That distinction matters more than it looks, and you'll see it earning its keep in every module below.
+
+### The conversation
+
+And here's the whole AI engine. Not an excerpt — this is the interesting half of `Ai/Assistant.cs`:
+
+```csharp
+async Task<IChatClient> GetClient(CancellationToken cancelToken)
+{
+    if (this.client is not null)
+        return this.client;
+
+    var inner = await copilot.GetChatClient(cancelToken);
+
+    this.client = inner
+        .AsBuilder()
+        .UseFunctionInvocation(loggerFactory)   // <- the entire tool-calling loop
+        .Build();
+
+    return this.client;
+}
+
+public async Task Send(string text, CancellationToken cancelToken = default)
+{
+    var chat = await this.GetClient(cancelToken);
+
+    // one flattened tool list from every module that registered a pack
+    this.options ??= new ChatOptions { Tools = [.. packs.SelectMany(x => x.Tools)] };
+
+    // slot 0 is always the system message; rebuilt each turn so "now" stays current
+    this.messages[0] = new ChatMessage(ChatRole.System, this.BuildSystemPrompt());
+    this.messages.Add(new ChatMessage(ChatRole.User, text));
+    await this.Persist(ChatRole.User.Value, text, null, cancelToken);
+
+    var response = await chat.GetResponseAsync(this.messages, this.options, cancelToken);
+    this.messages.AddRange(response.Messages);
+
+    await this.Persist(ChatRole.Assistant.Value, response.Text, response.Usage, cancelToken);
+    this.Replied?.Invoke(this, new AssistantReply(response.Text, response.Usage));
+}
+```
+
+`UseFunctionInvocation()` is the line that earns its keep. Without it you'd write the loop yourself: read the response, spot the `FunctionCallContent`, find the matching tool, invoke it, append a `FunctionResultContent`, call the model again, repeat until it stops asking. With it, all of that happens inside that single `GetResponseAsync` await. The app never sees a tool call — it sees a question go in and an answer come out, and somewhere in the middle your address book got read.
+
+`BuildSystemPrompt()` is equally boring: the base prompt, then every pack's `SystemPrompt` concatenated, then the current local time (models are hopeless at "tomorrow at 3" without it). Rebuilt every turn so a conversation left open overnight doesn't schedule reminders for yesterday.
+
+History is a plain `List<ChatMessage>` mirrored into SQLite — which is what makes "pull to load older" in the chat control work across relaunches.
+
+---
+
+## Part 3: hands
+
+Each capability lives in exactly one file under `Modules/`. Registration, allow-list, framing prompt. Nothing else in the app knows the module exists.
+
+### Navigating your own app (Shiny.Maui.Shell)
+
+This is my favourite one, and it's the most *MAUI* thing in the post, so it goes first.
+
+You already decorate your ViewModels for Shell routing. Add descriptions written as **user intent** instead of page names, and the source generator emits AI tooling for free:
+
+```csharp
+[ShellMap<NoteEditorPage>(
+    "note",
+    description: "Use when the user wants to write down, capture, draft, or edit a note, memo, thought or journal entry. Any intent to record something for later."
+)]
+public partial class NoteEditorViewModel(IDocumentStore store, INavigator navigator)
+    : ObservableObject, IQueryAttributable
+{
+    [ShellProperty("A short title summarising the note, inferred from what the user said", required: true)]
+    public string Title { get; set; } = String.Empty;
+
+    [ShellProperty("The full body of the note in the user's own words", required: false)]
+    public string Body { get; set; } = String.Empty;
+
+    [ShellProperty("A single lowercase tag to file the note under, e.g. work, home, ideas, health. Infer it; default to general.", required: false)]
+    public string Tag { get; set; } = "general";
+}
+```
+
+Flip `ShinyMauiShell_GenerateAiExtensions` on in the csproj, and out the other side comes a class called `AiMauiShellTools` containing a `GetRoutes` tool, a `NavigateToRoute` tool, and — the bit I like most — a pre-baked `Prompt` string. Here's the *actual* generated prompt from the sample app:
+
+```
+Available routes:
+- Route "note": Use when the user wants to write down, capture, draft, or edit a note, memo,
+  thought or journal entry. Any intent to record something for later.
+  Parameters:
+    - Title (string, required): A short title summarising the note, inferred from what the user said
+    - Body (string, optional): The full body of the note in the user's own words
+    - Tag (string, optional): A single lowercase tag to file the note under, e.g. work, home,
+      ideas, health. Infer it; default to general.
+- Route "notes": Use when the user wants to browse, list or review the notes they have saved
+  Parameters:
+    - Tag (string, optional): Filter the list to a single lowercase tag. Leave empty for all notes.
+```
+
+Nobody wrote that. It's your `[ShellMap]` attributes, compiled. Wire it up:
+
+```csharp
+// MauiProgram
+.UseShinyShell(shell => shell
+    .AddGeneratedMaps()
+    .AddAiTools()          // registers AiMauiShellTools
+)
+
+// ShellNavigationModule
+services.AddSingleton<IAiToolPack>(sp =>
+{
+    var shell = sp.GetRequiredService<AiMauiShellTools>();
+    return new AiToolPack(shell.Tools, $"""
+        You can move the user around the app by calling NavigateToRoute. Fill in as many route
+        parameters as you can infer from what the user said — the screen opens pre-populated.
+
+        {shell.Prompt}
+        """);
+});
+```
+
+Now say *"jot down that the boiler is leaking, tag it home"* and the app pushes the note editor with Title, Body and Tag already filled in. The user reviews and taps Save.
+
+That last sentence is the design, not a limitation. The model **navigates and pre-fills; the human commits.** Add a described `[ShellMap]` to any new ViewModel and it's reachable by voice on the next build — no tool code, no prompt maintenance.
+
+### The app's own data (Shiny.DocumentDb + SQLite)
+
+`Shiny.DocumentDb` turns SQLite into a schema-free JSON document store. Its AI layer turns a *registered document type* into query / count / aggregate / insert / update / delete tools — a typed, capability-gated database rather than "here, model, write some SQL".
+
+The document type is a plain class. The `[Description]` attributes aren't decoration — they're literally how the model learns what a note is, because they end up in the generated JSON schema:
+
+```csharp
+[Description("A note or journal entry the user has captured in this app")]
+public class Note
+{
+    public Guid Id { get; set; }
+
+    [Description("Short one-line title for the note")]
+    public string Title { get; set; } = String.Empty;
+
+    [Description("The body of the note, plain text")]
+    public string Body { get; set; } = String.Empty;
+
+    [Description("A single lowercase tag used to group notes, e.g. work, health, ideas, shopping")]
+    public string Tag { get; set; } = "general";
+
+    [Description("When the note was created (UTC)")]
+    public DateTimeOffset CreatedUtc { get; set; } = DateTimeOffset.UtcNow;
+}
+
+[JsonSerializable(typeof(Note))]
+[JsonSerializable(typeof(ChatEntry))]      // chat history lives in the same store
+public partial class AppJsonContext : JsonSerializerContext;
+```
+
+```csharp
+services.AddDocumentStore(opts =>
+{
+    opts.UseReflectionFallback = false;                          // AOT: fail loudly, don't reflect
+    opts.JsonSerializerOptions = AppJsonContext.Default.Options;
+    opts.DatabaseProvider = new SqliteDatabaseProvider("Data Source=" + dbPath);
+});
+
+// Types you don't register here simply do not exist as far as the model is concerned
+services.AddDocumentStoreAITools(tools => tools
+    .AddType(
+        AppJsonContext.Default.Note,
+        name: "note",
+        capabilities: DocumentAICapabilities.All,   // ReadOnly is the default
+        configure: b => b
+            .Description("Notes and journal entries the user has written in this app")
+            .MaxPageSize(25)
+    )
+);
+
+services.AddAiTools<DocumentStoreAITools>(x => x.Tools, "…framing prompt…");
+```
+
+The Notes tab is an ordinary `CollectionView` over **the same `IDocumentStore`**. No sync layer, no separate "AI data". The model writes; the list reloads on `OnAppearing` and there it is. That symmetry is worth more than it sounds — it means the AI is a peer of your UI, not a bolt-on.
+
+The per-type builder is the interesting bit for real apps: `AllowProperties`, `IgnoreProperties` (secrets, big blobs), `MaxPageSize`, per-property descriptions. Capabilities are flags — `ReadOnly`, `All`, or hand-picked `Query | Count`.
+
+### Contacts
+
+```csharp
+services.AddContactStore();
+services.AddContactsAITools(tools => tools
+    .AddContacts(ContactAICapabilities.ReadWrite)   // Read is the default
+);
+
+services.AddAiTools<ContactAITools>(x => x.Tools, """
+    You can search and edit the device address book. Always look a contact up by search first and
+    act on the returned id — never invent one. Confirm before deleting anyone.
+    """);
+```
+
+`search_contacts`, `get_contact`, and — because I opted in — `create_contact`, `update_contact`, `delete_contact`.
+
+Note the framing prompt doing real work there. Two sentences buy you "look it up before you act on it" and "don't nuke my mother-in-law without asking".
+
+### Reminders
+
+The plumber story, fixed:
+
+```csharp
+services.AddNotifications();
+services.AddNotificationAITools(tools => tools
+    .AddReminders(ReminderAICapabilities.ReadWrite, channel: "reminders")
+);
+```
+
+Underneath it's local notifications, but the tools are deliberately framed as **reminders**, because that's the word humans use: `list_reminders`, `create_reminder` (now / at a time / daily), `cancel_reminder`.
+
+If you pass a channel, register it first. In the sample that's a three-line `IMauiInitializeService`:
+
+```csharp
+sealed class ReminderChannelInstaller : IMauiInitializeService
+{
+    public void Initialize(IServiceProvider services)
+        => services.GetRequiredService<INotificationManager>().AddChannel(new Channel
+        {
+            Identifier = "reminders",
+            Description = "Reminders created by the assistant",
+            Importance = ChannelImportance.High
+        });
+}
+```
+
+### Location
+
+GPS is read-only by design, so there's no builder and no capability flags at all:
+
+```csharp
+services.AddGps();
+services.AddLocationAITool();
+```
+
+Three tools: `get_current_location`, `get_distance_to`, `estimate_travel_time`. They read the **last cached fix** and compute great-circle distance with an assumed average speed — so the tool results include a `note` field saying exactly that, and my framing prompt makes the model caveat its answers. An LLM confidently reporting a 12-minute ETA through a river is a bad look.
+
+> A papercut found while writing this post, and fixed because of it: up to 5.2.4, `Shiny.Locations` shipped a public type named `Shiny.Locations.Extensions`, which the compiler can't tell apart from the `Shiny.Locations.Extensions.AI` **namespace** once both assemblies are referenced — and that's `CS0434`, an *error*, not a warning, forcing an `extern alias` in the consuming project. In **5.2.5** the type is renamed to `LocationExtensions`, and all three `Extensions.AI` packages moved their `Add…AITools` registration into the plain `Shiny` namespace. Everything involved is an extension method, so call sites don't change — the snippet above is simply the version that works.
+
+### Health
+
+```csharp
+services.AddHealthIntegration();
+
+services.AddHealthAITools(tools => tools
+    .AddAllMetrics()                                             // read every numeric metric
+    .AddMetric(DataType.Weight, HealthAICapabilities.ReadWrite)
+    .AddMetric(DataType.Hydration, HealthAICapabilities.ReadWrite)
+    .AddWorkouts(HealthAICapabilities.ReadWrite)
+    .AddNutrition()
+    .AddBloodPressure()
+);
+```
+
+Look at the shape of that opt-in: **reads are broad, writes are three specific things.** The model can answer "how did I sleep last week" against every metric HealthKit and Health Connect expose, but the only things it can write into your medical record are weight, hydration and workouts. That asymmetry is the entire value of an allow-list API.
+
+One design note worth stealing: this package exposes *parameterized* tools — one read tool covering all numeric metrics via an enum argument — rather than one tool per metric. Forty tools in the list wrecks tool-selection accuracy. One tool with a good enum doesn't.
+
+### Music
+
+```csharp
+services.AddShinyMusic();
+
+services.AddMusicAITools(tools =>
+{
+    tools.AddLibrary()             // search / browse / genres / playlists / lyrics
+         .AddPlayback()            // play, pause, resume, stop, seek, now-playing
+         .AddPlaylistManagement();
+
+#if IOS
+    tools.AddCatalog();            // Apple Music catalog search - Apple platforms only
+#endif
+});
+```
+
+"Play something upbeat" turns into a library search by genre/era, a pick, and a `play_track` by id. `AddCatalog()` is excluded from `AddAll()` on purpose — it hits the Apple Music streaming catalog, which throws on Android, hence the `#if`.
+
+### Your own services
+
+Last one, and it's the one that generalises to *your* app. Mark an interface `[Tool]`, describe the methods, and `Shiny.Extensions.DependencyInjection`'s source generator emits a real `AIFunction` subclass per method — hand-built JSON schema, `JsonElement` accessors, no reflection, AOT clean.
+
+```csharp
+[Tool]
+[Description("Facts about this app itself")]
+public interface IAppInfoService
+{
+    [Description("Lists which Shiny AI capability modules were compiled into this build of the app. Use this when the user asks what you can do.")]
+    Task<string> GetEnabledModules();
+
+    [Description("Gets the app name, version, and the device platform it is currently running on")]
+    Task<string> GetAppEnvironment();
+}
+
+[Singleton]
+public class AppInfoService : IAppInfoService { /* … */ }
+```
+
+```csharp
+builder.Services.AddGeneratedServices();
+builder.Services.AddGeneratedAITools();
+```
+
+These land in DI as plain `AITool`, so they get wrapped into a pack the same way as everything else:
+
+```csharp
+builder.Services.AddAiTools(
+    sp => [.. sp.GetServices<AITool>()],
+    "You can answer questions about this app itself using the app-info tools."
+);
+```
+
+Ask the assistant "what can you actually do?" and it calls a tool to find out. Which is a bit meta, and also genuinely the most useful thing in a demo app.
+
+---
+
+## Part 4: the wiring
+
+Here is the entire `MauiProgram`. Not an excerpt — the whole thing.
+
+```csharp
+public static MauiApp CreateMauiApp()
+{
+    var builder = MauiApp.CreateBuilder();
+
+    builder
+        .UseMauiApp<App>()
+        .UseShiny()                     // platform lifecycle + permissions
+        .UseShinyControls()             // ChatView and friends
+        .UseShinyShell(shell => shell
+            .AddGeneratedMaps()         // [ShellMap] routes -> Shell routing + DI
+            .AddAiTools()               // generated AiMauiShellTools -> DI
+        )
+        .ConfigureFonts(fonts =>
+        {
+            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+        });
+
+    // everything the assistant is allowed to touch
+    builder.Services.AddAiModules();
+
+    // [Singleton] classes + [Tool] interfaces compiled into AIFunctions
+    builder.Services.AddGeneratedServices();
+    builder.Services.AddGeneratedAITools();
+    builder.Services.AddAiTools(
+        sp => [.. sp.GetServices<AITool>()],
+        "You can answer questions about this app itself using the app-info tools."
+    );
+
+    builder.Services.TryAddSingleton(TimeProvider.System);
+
+#if DEBUG
+    builder.Logging.AddDebug();
+#endif
+    return builder.Build();
+}
+```
+
+No AI registration at all beyond `AddAiModules()` — `Assistant` and `GitHubCopilotChatClientProvider` are `[Singleton]` classes, so `AddGeneratedServices()` wires them up.
+
+`AddAiModules()` is the one line that decides what your assistant is:
+
+```csharp
+public static IServiceCollection AddAiModules(this IServiceCollection services)
+{
+    services.AddShellNavigationAiTools();
+    services.AddNotesModule();
+
+#if MODULE_CONTACTS
+    services.AddContactsModule();
+#endif
+#if MODULE_NOTIFICATIONS
+    services.AddNotificationsModule();
+#endif
+#if MODULE_LOCATION
+    services.AddLocationModule();
+#endif
+#if MODULE_HEALTH
+    services.AddHealthModule();
+#endif
+#if MODULE_MUSIC
+    services.AddMusicModule();
+#endif
+
+    return services;
+}
+```
+
+## Turning modules off properly
+
+Commenting out a registration line leaves you carrying the NuGet package, the code, and — on iOS — possibly an entitlement you can't sign. So the sample does it from MSBuild instead:
+
+```xml
+<PropertyGroup>
+    <EnableContactsModule>true</EnableContactsModule>
+    <EnableNotificationsModule>true</EnableNotificationsModule>
+    <EnableLocationModule>true</EnableLocationModule>
+    <EnableHealthModule>true</EnableHealthModule>
+    <EnableMusicModule>true</EnableMusicModule>
+</PropertyGroup>
+```
+
+Each switch drives three things — packages, source file, compiler constant:
+
+```xml
+<ItemGroup Condition="'$(EnableHealthModule)' == 'true'">
+    <PackageReference Include="Shiny.Health" Version="2.0.0" />
+    <PackageReference Include="Shiny.Health.Extensions.AI" Version="2.0.0" />
+</ItemGroup>
+<PropertyGroup Condition="'$(EnableHealthModule)' == 'true'">
+    <DefineConstants>$(DefineConstants);MODULE_HEALTH</DefineConstants>
+</PropertyGroup>
+<ItemGroup Condition="'$(EnableHealthModule)' != 'true'">
+    <Compile Remove="Modules\HealthModule.cs" />
+</ItemGroup>
+```
+
+Set `EnableHealthModule=false` and HealthKit is gone from the build entirely — including the entitlement, which is conditioned on the same switch:
+
+```xml
+<PropertyGroup Condition="'$(EnableHealthModule)' == 'true' AND
+                          $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <CodesignEntitlements>Platforms/iOS/Entitlements.plist</CodesignEntitlements>
+</PropertyGroup>
+```
+
+I verified every combination builds — all on, all optional modules off, and a couple in between. The one thing MSBuild can't condition is XML, so the Android manifest and `Info.plist` keep all the permission entries with `<!-- MODULE: … -->` comment blocks around them; delete the block when you delete the module.
+
+## The bit everybody forgets
+
+**Registering AI tools is not an OS permission prompt.**
+
+It's an allow-list *you* control on behalf of the agent. Completely different mechanism, completely different consent. Every one of these packages says the same thing in its docs and it's still the number one thing people get wrong: the tools assume permission is already granted, because a permission prompt needs a foreground activity, and a tool call happens on a background thread halfway through a chat turn.
+
+So ask up front, from a real screen. The Settings tab has a "Grant permissions" button that does exactly this:
+
+```csharp
+results.Add($"Contacts:  {await contactStore.RequestAccess()}");
+results.Add($"Reminders: {await notificationManager.RequestAccess()}");
+results.Add($"Location:  {await gps.RequestAccess(GpsRequest.Foreground)}");
+results.Add($"Music:     {await mediaLibrary.RequestPermissionAsync()}");
+
+var granted = await health.RequestPermissions(
+    new (PermissionType Permission, DataType Type)[]
+    {
+        (PermissionType.Read,      DataType.StepCount),
+        (PermissionType.Read,      DataType.HeartRate),
+        (PermissionType.Read,      DataType.SleepDuration),
+        (PermissionType.ReadWrite, DataType.Weight),
+        (PermissionType.ReadWrite, DataType.Hydration),
+        (PermissionType.ReadWrite, DataType.Workout)
+    }
+);
+```
+
+Do it once, on a screen the user understands, before they ever ask the assistant for anything.
+
+## What it feels like
+
+Things that work on device, in a chat bubble, with no per-feature glue code:
+
+- *"Jot down that the boiler is leaking, tag it home"* → note editor opens, pre-filled
+- *"What notes do I have tagged work?"* → queried out of SQLite
+- *"Remind me to call the plumber at 3pm"* → a real, scheduled local notification
+- *"What's Jane's mobile?"* → address book search
+- *"How many steps did I do yesterday?"* → HealthKit / Health Connect
+- *"Where am I, and how far is that to the CN Tower?"* → GPS + distance, caveated as straight-line
+- *"Play something upbeat"* → library search, then playback
+- *"What can you actually do?"* → it calls a tool and reads you the module list
+
+Not one of those needed a hand-written `AIFunction`. The total amount of AI-specific infrastructure in the app is an `IAiToolPack` interface, one `Assistant` class whose interesting part fits on a screen, the Copilot device-code flow, and a chat session bridge.
+
+---
+
+## ⚠️ Before you clone this: Apple provisioning
+
+Read this bit, or you will lose an evening.
+
+The Health module requests the **HealthKit entitlement** via `Platforms/iOS/Entitlements.plist`. Entitlements are not Info.plist strings — they have to be baked into a **provisioning profile**, which means:
+
+- The App ID (`net.shinylib.aiwings`, or whatever you change it to) must have **HealthKit** enabled in your Apple Developer account
+- You must **regenerate** the provisioning profile after enabling it — an existing profile will not pick it up
+- A **free / personal-team Apple ID cannot issue a HealthKit profile at all**
+- If you skip any of that, codesign fails with *"Provisioning profile doesn't match the entitlements file"* — which is a genuinely unhelpful message for what is really "go tick a box on developer.apple.com"
+
+**If you just want to run the sample:** set `<EnableHealthModule>false</EnableHealthModule>` in the csproj. The entitlements file is then never applied and a plain automatic provisioning profile works fine. Everything else in the app — contacts, reminders, location, music, microphone, speech — needs only `Info.plist` usage strings, no special provisioning.
+
+You'll also need a **paid Apple Developer account** to run on a physical device for more than seven days, and Health data isn't much use in the simulator anyway.
+
+Android has none of this. Health Connect is a runtime permission and the app installs with a debug key.
+
+---
+
+## Packages & docs
+
+Everything used in the sample.
+
+### The brain
+
+| Package | Docs |
+|---|---|
+| [`Microsoft.Extensions.AI`](https://www.nuget.org/packages/Microsoft.Extensions.AI) | [Microsoft Learn](https://learn.microsoft.com/dotnet/ai/) |
+| [`Microsoft.Extensions.AI.OpenAI`](https://www.nuget.org/packages/Microsoft.Extensions.AI.OpenAI) | [Microsoft Learn](https://learn.microsoft.com/dotnet/ai/) |
+
+If you'd rather not hand-roll the Copilot device-code flow, persisted history and wake-word/voice loop, [`Shiny.AiConversation`](https://www.nuget.org/packages/Shiny.AiConversation) packages all of it — see [the docs](https://shinylib.net/aiconversation). I wrote it out longhand here because the point of the post is that none of it is magic.
+
+### The UI
+
+| Package | Docs |
+|---|---|
+| [`Shiny.Maui.Controls`](https://www.nuget.org/packages/Shiny.Maui.Controls) | [ChatView](https://shinylib.net/controls/chatview) |
+| [`Shiny.Maui.Shell`](https://www.nuget.org/packages/Shiny.Maui.Shell) | [Shell](https://shinylib.net/mauishell) · [AI navigation](https://shinylib.net/mauishell/ai) |
+| [`Shiny.Hosting.Maui`](https://www.nuget.org/packages/Shiny.Hosting.Maui) | [MAUI hosting](https://shinylib.net/mauihost) |
+
+### The hands
+
+| Package | Docs |
+|---|---|
+| [`Shiny.Contacts`](https://www.nuget.org/packages/Shiny.Contacts) + [`Shiny.Contacts.Extensions.AI`](https://www.nuget.org/packages/Shiny.Contacts.Extensions.AI) | [Contact store](https://shinylib.net/contactstore) · [AI tools](https://shinylib.net/contactstore/ai-tools) |
+| [`Shiny.Notifications`](https://www.nuget.org/packages/Shiny.Notifications) + [`Shiny.Notifications.Extensions.AI`](https://www.nuget.org/packages/Shiny.Notifications.Extensions.AI) | [Notifications](https://shinylib.net/notifications) · [AI tools](https://shinylib.net/notifications/ai-tools) |
+| [`Shiny.Locations`](https://www.nuget.org/packages/Shiny.Locations) + [`Shiny.Locations.Extensions.AI`](https://www.nuget.org/packages/Shiny.Locations.Extensions.AI) | [Locations](https://shinylib.net/locations) · [AI tools](https://shinylib.net/locations/ai-tools) |
+| [`Shiny.Health`](https://www.nuget.org/packages/Shiny.Health) + [`Shiny.Health.Extensions.AI`](https://www.nuget.org/packages/Shiny.Health.Extensions.AI) | [Health](https://shinylib.net/health) · [AI tools](https://shinylib.net/health/ai-tools) |
+| [`Shiny.Music`](https://www.nuget.org/packages/Shiny.Music) + [`Shiny.Music.Extensions.AI`](https://www.nuget.org/packages/Shiny.Music.Extensions.AI) | [Music](https://shinylib.net/music) · [AI tools](https://shinylib.net/music/ai-tools) |
+| [`Shiny.DocumentDb.Sqlite`](https://www.nuget.org/packages/Shiny.DocumentDb.Sqlite) + [`Shiny.DocumentDb.Extensions.AI`](https://www.nuget.org/packages/Shiny.DocumentDb.Extensions.AI) | [DocumentDb](https://shinylib.net/documentdb) · [AI tools](https://shinylib.net/documentdb/ai-tools) |
+| [`Shiny.Extensions.DependencyInjection`](https://www.nuget.org/packages/Shiny.Extensions.DependencyInjection) | [DI](https://shinylib.net/di) · [AI tools](https://shinylib.net/di/ai-tools) |
+
+---
+
+## The takeaway
+
+The chat control is the least interesting part of an AI feature. It took twenty-five lines of XAML and I'd argue you should spend about that much thought on it.
+
+The interesting part is the list of things you decided the model may do — and every one of those decisions is a `services.Add…AITools(builder => …)` call you can read in one sitting, review in a PR, and switch off from the csproj. Read-only by default. Opt-in by name. AOT-clean, because every one of these packs hand-writes its schemas instead of reflecting over your types at runtime.
+
+Give the thing hands. Just decide, deliberately, which ones.
+
+*Now go read the rest of [MAUI UI July](https://goforgoldman.com/posts/mauiuijuly-26/).*

@@ -1,0 +1,21 @@
+---
+// Lays two or three <Screenshot /> phone slots side by side; stacks on narrow screens.
+---
+
+<div class="shot-row"><slot /></div>
+
+<style>
+	.shot-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1em;
+		justify-content: center;
+		align-items: flex-start;
+		margin: 2em 0;
+	}
+	.shot-row :global(figure.shot) {
+		flex: 1 1 200px;
+		max-width: 240px;
+		margin: 0;
+	}
+</style>
