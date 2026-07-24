@@ -1,10 +1,13 @@
 ---
 title: 'Giving your .NET MAUI a real set of AI Wings'
-description: 'A .NET MAUI app built straight on Microsoft.Extensions.AI — an IChatClient onto GitHub Copilot, ChatOptions.Tools, and UseFunctionInvocation running the loop. The chat UI is a control; the hands are Shiny — contacts, reminders, GPS, health, music, a local document DB, your own services, and the app''s own navigation. All opt-in, all switchable, all AOT-clean.'
-pubDate: 'Jul 23 2026'
+description: 'A .NET MAUI app built straight on Microsoft.Extensions.AI — an IChatClient onto OpenAI, ChatOptions.Tools, and UseFunctionInvocation running the loop. The chat UI is a control; the hands are Shiny — contacts, reminders, GPS, health, music, a local document DB, your own services, and the app''s own navigation. All opt-in, all switchable, all AOT-clean.'
+pubDate: 'Jul 24 2026'
 heroImage: '../../../../assets/maui-ai-wings-hero.svg'
 tags: ['Shiny', '.NET MAUI', 'AI']
 ---
+
+import Screenshot from '../../../../components/Screenshot.astro';
+import ScreenshotRow from '../../../../components/ScreenshotRow.astro';
 
 *This post is part of [MAUI UI July 2026](https://goforgoldman.com/posts/mauiuijuly-26/). Thanks to Matt Goldman for running it again.*
 
@@ -77,69 +80,228 @@ public partial class ChatViewModel(IAssistant assistant) : ObservableObject
 
 Two properties. The control does bubbles, timestamps, markdown rendering on the AI side, the input bar, and cursor-based history paging — including "pull to load older", which it drives through your provider.
 
-The provider is the only real code, and it's mechanical: sends go to my own `IAssistant`, replies come back on an event, and history paging reads out of SQLite.
+<ScreenshotRow>
+  <Screenshot src="/images/aiwings/chat-empty.png" alt="The empty Assistant tab: a single ChatView with a placeholder input bar and Send button" caption="The whole Assistant tab — one ChatView, no message collection, no send command." />
+  <Screenshot src="/images/aiwings/chat-capabilities.png" alt="The assistant answering 'What can you actually do?' with the list of capability modules, and a token-usage line under the bubble" caption="Ask it what it can do and it calls a tool to find out. Token usage is appended to every AI bubble." />
+</ScreenshotRow>
+
+The provider is the only real code, and it's mechanical: sends go to my own `IAssistant`, replies come back on an event, and history paging reads out of SQLite. There are two types behind that single `Provider` property, and the split is the whole design.
+
+The `IChatSessionProvider` itself is just a factory — `ChatView` asks it for a session and then talks to *that*. Ours points every session at the same assistant:
 
 ```csharp
-public Task<ChatMessage> SendMessageAsync(OutgoingMessage message, CancellationToken ct = default)
+// One shared IAssistant behind every session. That's all this layer does.
+public class AiChatSessionProvider(IAssistant assistant) : IChatSessionProvider
 {
-    var sent = new ChatMessage(/* … your own bubble … */);
+    public const string DefaultSessionId = "ai";
 
-    // fire the round trip in the background - the reply surfaces via IAssistant.Replied
-    _ = this.assistant.Send(message.Body ?? String.Empty);
-    return Task.FromResult(sent);
+    public Task<IChatSession> CreateSessionAsync(string[] userIds, CancellationToken ct = default)
+        => Task.FromResult<IChatSession>(new AiChatSession(assistant));
+
+    public Task<IChatSession> GetSessionAsync(string sessionId, CancellationToken ct = default)
+        => Task.FromResult<IChatSession>(new AiChatSession(assistant));
 }
+```
 
-void OnReplied(object? sender, AssistantReply reply)
-    => this.RaiseAiMessage(reply.Text, reply.Usage);
+All the real work lives in the `IChatSession`, and it's long only because the interface is *complete* — a full chat backend supports editing, reactions, typing indicators, multiple participants. An AI chat needs almost none of that, so most of the class is politely saying "not applicable". First, identity and history paging:
+
+```csharp
+sealed class AiChatSession : IChatSession
+{
+    const string MeId = "me";
+    const string AiId = "ai";
+
+    readonly IAssistant assistant;
+    readonly ChatSessionUserInfo[] users;
+    readonly DateTimeOffset createdAt = DateTimeOffset.Now;
+
+    // message id -> timestamp, so cursor-based paging can resolve an "older than" bound
+    readonly ConcurrentDictionary<string, DateTimeOffset> timestamps = new(StringComparer.Ordinal);
+
+    public AiChatSession(IAssistant assistant)
+    {
+        this.assistant = assistant;
+        this.users =
+        [
+            new ChatSessionUserInfo(MeId, "Me", null, null, this.createdAt),
+            new ChatSessionUserInfo(
+                AiId, "Assistant",
+                new FontImageSource { Glyph = "\U0001F916", FontFamily = "OpenSansRegular", Size = 24, Color = Colors.White },
+                null,   // no per-user bubble colour - let the ChatView's OtherBubbleColor win
+                this.createdAt
+            )
+        ];
+        this.assistant.Replied += this.OnReplied;   // AI replies arrive asynchronously, not as a return value
+    }
+
+    public string CurrentUserId => MeId;
+
+    // Describes the session to the control: who's in it, and what it's allowed to do.
+    public ChatSessionInfo Info => new(
+        SessionId: AiChatSessionProvider.DefaultSessionId,
+        SessionName: "Assistant",
+        Users: this.users,
+        PermittedEmojis: [],                             // an AI chat has no reactions
+        BodyPermissions: MessageBodyPermissions.None,    // plain text in; markdown still renders on the way out
+        Permissions: ChatSessionPermissions.CanSendMessages,
+        CreatedAt: this.createdAt,
+        LastReadDate: DateTimeOffset.Now,
+        UnreadMessageCount: 0
+    );
+
+    // The only event we ever raise. The rest of the interface is intentionally silent.
+    public event EventHandler<ChatMessage>? MessageReceived;
+#pragma warning disable CS0067
+    public event EventHandler<MessageChanged>? MessageUpdated;
+    public event EventHandler<string>? MessageDeleted;
+    public event EventHandler<UserTypingEvent>? UserTyping;
+    public event EventHandler<ChatSessionUserInfo>? UserJoined;
+    public event EventHandler<ChatSessionUserInfo>? UserLeft;
+    public event EventHandler<ChatSessionInfo>? SessionUpdated;
+    public event EventHandler<ChatConnectionState>? ConnectionStateChanged;
+#pragma warning restore CS0067
+
+    // "Pull to load older" calls this. We only ever page backwards, out of SQLite.
+    public async Task<MessagePage> GetMessagesAsync(
+        string? cursorMessageId, MessagePageDirection direction, int count, CancellationToken ct = default)
+    {
+        if (direction == MessagePageDirection.Newer)
+            return new MessagePage([], false);           // nothing newer than "now" to fetch
+
+        DateTimeOffset? before = null;
+        if (cursorMessageId is not null && this.timestamps.TryGetValue(cursorMessageId, out var ts))
+            before = ts;                                 // resolve the cursor id back to a timestamp
+
+        var history = await this.assistant.GetHistory(before, count, ct).ConfigureAwait(false);
+        var mapped = history.Select(this.Map).ToList();
+        return new MessagePage(mapped, hasMore: history.Count >= count);
+    }
+```
+
+Then the parts that actually move messages — send, receive, and the token footer:
+
+```csharp
+    // ChatView hands us the user's outgoing text. We echo it back as their bubble
+    // immediately, and kick the LLM round trip off in the background.
+    public Task<ChatMessage> SendMessageAsync(OutgoingMessage message, CancellationToken ct = default)
+    {
+        message.Attachment?.Content.Dispose();           // we don't advertise images, but we still own the stream
+
+        var sent = this.NewMessage(MeId, message.Body, message.ClientMessageId, MessageStatus.Sent);
+
+        // fire-and-forget: the reply surfaces later via IAssistant.Replied -> OnReplied
+        _ = this.SendAsync(message.Body ?? String.Empty);
+        return Task.FromResult(sent);
+    }
+
+    async Task SendAsync(string text)
+    {
+        try
+        {
+            await this.assistant.Send(text).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            this.RaiseAiMessage("⚠️ " + ex.Message, null);   // surface failures as an AI bubble, don't crash the chat
+        }
+    }
+
+    // The assistant finished a turn - push its reply into the control as a received message.
+    void OnReplied(object? sender, AssistantReply reply) => this.RaiseAiMessage(reply.Text, reply.Usage);
+
+    void RaiseAiMessage(string text, UsageDetails? usage)
+    {
+        var body = AppendTokenFooter(text, usage?.InputTokenCount, usage?.OutputTokenCount, usage?.TotalTokenCount);
+        var msg = this.NewMessage(AiId, body, clientId: null, MessageStatus.Sent);
+        this.MessageReceived?.Invoke(this, msg);         // the control marshals this to the UI thread for us
+    }
+
+    // Builds a ChatMessage and records its timestamp so paging can find it later.
+    ChatMessage NewMessage(string senderId, string? body, string? clientId, MessageStatus status)
+    {
+        var now = DateTimeOffset.Now;
+        var id = Guid.NewGuid().ToString("N");
+        this.timestamps[id] = now;
+        return new ChatMessage(
+            MessageId: id,
+            ClientMessageId: String.IsNullOrEmpty(clientId) ? null : clientId,
+            SenderId: senderId,
+            Body: body,
+            ImageUrl: null,
+            Status: status,
+            StatusReason: null,
+            Timestamp: now,
+            EditedTimestamp: null,
+            Reactions: [],
+            ReadReceipts: []
+        );
+    }
+
+    // Persisted history -> a UI bubble. AI rows get the token footer re-attached.
+    ChatMessage Map(ChatEntry entry)
+    {
+        var id = entry.Id.ToString("N");
+        this.timestamps[id] = entry.Timestamp;
+        var isAi = entry.Role.Equals("assistant", StringComparison.OrdinalIgnoreCase);
+
+        return new ChatMessage(
+            MessageId: id, ClientMessageId: null,
+            SenderId: isAi ? AiId : MeId,
+            Body: isAi
+                ? AppendTokenFooter(entry.Text, entry.InputTokens, entry.OutputTokens, entry.TotalTokens)
+                : entry.Text,
+            ImageUrl: null, Status: MessageStatus.Read, StatusReason: null,
+            Timestamp: entry.Timestamp, EditedTimestamp: null, Reactions: [], ReadReceipts: []
+        );
+    }
+
+    // "1,204 tokens (980 in · 224 out)" tacked under each AI bubble.
+    static string AppendTokenFooter(string body, long? input, long? output, long? total)
+    {
+        if (total is null && input is null && output is null)
+            return body;
+
+        var ci = CultureInfo.InvariantCulture;
+        var totalStr = (total ?? ((input ?? 0) + (output ?? 0))).ToString("N0", ci);
+        var footer = input.HasValue && output.HasValue
+            ? $"{totalStr} tokens ({input.Value.ToString("N0", ci)} in · {output.Value.ToString("N0", ci)} out)"
+            : $"{totalStr} tokens";
+
+        return body + "\n\n— " + footer;
+    }
+```
+
+And finally the honest part: everything a chat *can* do that an AI conversation simply doesn't. Permissions in `Info` already gate these off in the UI, so they never get called — they exist only to satisfy the interface:
+
+```csharp
+    // ---- not applicable to an AI chat ----
+    public Task<ChatMessage> ResendMessageAsync(string clientMessageId, CancellationToken ct = default)
+        => throw new NotSupportedException();
+
+    public Task EditMessageAsync(string messageId, string body, CancellationToken ct = default) => Task.CompletedTask;
+    public Task DeleteMessageAsync(string messageId, CancellationToken ct = default) => Task.CompletedTask;
+    public Task ReactToMessageAsync(string messageId, string emoji, bool add, CancellationToken ct = default) => Task.CompletedTask;
+    public Task MarkReadAsync(string[] messageIds, CancellationToken ct = default) => Task.CompletedTask;
+    public Task ToggleTypingAsync(bool isTyping, CancellationToken ct = default) => Task.CompletedTask;
+    public Task InviteUserAsync(string userId, CancellationToken ct = default) => Task.CompletedTask;
+    public Task LeaveAsync(CancellationToken ct = default) => Task.CompletedTask;
+    public Task RenameAsync(string sessionName, CancellationToken ct = default) => Task.CompletedTask;
+
+    public ValueTask DisposeAsync()
+    {
+        this.assistant.Replied -= this.OnReplied;        // unsubscribe or the session leaks
+        return ValueTask.CompletedTask;
+    }
+}
 ```
 
 I append the token usage to each AI bubble, because when you give a model eight tool packs it is *extremely* educational to watch the input token count climb.
 
-## Signing in with GitHub Copilot
+## Getting a model
 
-For a demo app, "where do I get a model from" is usually the most annoying paragraph. I went with GitHub Copilot, because most .NET developers reading this already pay for it.
+The model plumbing is the part this post cares about least. I'm using **OpenAI** here purely because it's the quickest thing to stand up — `Microsoft.Extensions.AI.OpenAI` turns an `OpenAIClient` into an `IChatClient` and that's the whole setup. The point of `Microsoft.Extensions.AI` is that nothing downstream knows or cares where the model came from: swap in Azure OpenAI, Ollama, GitHub Copilot, or a local ONNX model and **nothing else in this post changes** — everything only ever sees `IChatClient`.
 
-The Copilot API speaks OpenAI, so once you have a token this is just `Microsoft.Extensions.AI.OpenAI`:
-
-```csharp
-var options = new OpenAIClientOptions { Endpoint = new Uri("https://api.githubcopilot.com") };
-options.AddPolicy(new CopilotHeadersPolicy(), PipelinePosition.PerCall);
-
-return new OpenAIClient(new ApiKeyCredential(copilotToken), options)
-    .GetChatClient("gpt-4o")
-    .AsIChatClient();
-```
-
-Getting the token is the interesting bit, because a phone has no redirect URI. GitHub's **device code flow** solves it: ask GitHub for a short user code, show it, copy it to the clipboard, open the browser, then poll until the user authorises.
-
-```csharp
-var device = await this.StartDeviceFlow(cancelToken);
-
-await MainThread.InvokeOnMainThreadAsync(async () =>
-{
-    await Clipboard.Default.SetTextAsync(device.UserCode);
-    await page.DisplayAlertAsync(
-        "GitHub Sign In",
-        $"Your device code is:\n\n{device.UserCode}\n\nIt's on your clipboard. Press OK to open GitHub and paste it.",
-        "OK"
-    );
-    await Browser.Default.OpenAsync(device.VerificationUri, BrowserLaunchMode.SystemPreferred);
-});
-
-using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
-cts.CancelAfter(TimeSpan.FromSeconds(device.ExpiresIn));
-
-while (!cts.IsCancellationRequested)
-{
-    await Task.Delay(TimeSpan.FromSeconds(device.Interval), cts.Token);
-    if (await this.PollForToken(device, cts.Token))
-        return;
-}
-```
-
-Two tokens are in play: the long-lived **GitHub OAuth token**, which goes in `SecureStorage`, and the short-lived **Copilot session token**, which is exchanged on demand and never persisted. A 401 on the exchange means the OAuth token was revoked — sign out and run the flow again.
-
-That's about 200 lines in `Ai/GitHubCopilotChatClientProvider.cs` and it's the *only* provider-specific code in the app. Swap it for `AzureOpenAIClient`, Ollama, or a local ONNX model and nothing else in this post changes. That is the entire point of `Microsoft.Extensions.AI`: everything downstream only knows `IChatClient`.
+The actual wiring — including `UseFunctionInvocation()`, the one line that turns a raw model into an agent — lives in `Ai/Assistant.cs`, and I walk through it in Part 2. Everything else in this post is just deciding *which* tools that agent is allowed to call.
 
 ---
 
@@ -181,7 +343,7 @@ async Task<IChatClient> GetClient(CancellationToken cancelToken)
     if (this.client is not null)
         return this.client;
 
-    var inner = await copilot.GetChatClient(cancelToken);
+    var inner = await provider.GetChatClient(cancelToken);
 
     this.client = inner
         .AsBuilder()
@@ -221,7 +383,7 @@ History is a plain `List<ChatMessage>` mirrored into SQLite — which is what ma
 
 ## Part 3: hands
 
-Each capability lives in exactly one file under `Modules/`. Registration, allow-list, framing prompt. Nothing else in the app knows the module exists.
+Each capability is a small, self-contained block of registration in `MauiProgram` — the Shiny service, the capability-gated AI tools, and the framing prompt, three or four lines you can read in one glance. Nothing else in the app knows it exists.
 
 ### Navigating your own app (Shiny.Maui.Shell)
 
@@ -286,7 +448,49 @@ services.AddSingleton<IAiToolPack>(sp =>
 });
 ```
 
-Now say *"jot down that the boiler is leaking, tag it home"* and the app pushes the note editor with Title, Body and Tag already filled in. The user reviews and taps Save.
+Now the payoff. Say *"jot down that the boiler is leaking, tag it home"*, and the model does exactly what the prompt asked — it calls `NavigateToRoute` with the values it inferred from that one sentence:
+
+```json
+{
+  "route": "note",
+  "Title": "Boiler is leaking",
+  "Tag":   "home"
+}
+```
+
+It filled the **required** `Title` and inferred the `Tag`; `Body` is optional (`required: false` on the `[ShellProperty]`), and here it left that one blank for me to fill in. Those `required` flags are the model's cue for what it must supply versus what it can leave alone.
+
+From here on there is **no AI code in sight** — it's pure `Shiny.Maui.Shell`. And here's the part worth stopping on: there's no `IQueryAttributable`, no `ApplyQueryAttributes`, no string dictionary to unpack. The generator emits a strongly-typed `NavigateToRoute` that resolves your ViewModel from DI and sets its properties **directly**, parsing each argument to the property's real type on the way in:
+
+```csharp
+// generated inside AiMauiShellTools.NavigateToRoute("note", args)
+await navigator.NavigateTo<NoteEditorViewModel>(vm =>
+{
+    if (args.TryGetValue("Title", out var title)) vm.Title = title;
+    if (args.TryGetValue("Body",  out var body))  vm.Body  = body;
+    if (args.TryGetValue("Tag",   out var tag))   vm.Tag   = tag;
+});
+```
+
+`NavigateTo<TViewModel>(configure)` news the ViewModel up from DI, runs that delegate on it, and pins **that exact instance** as the page's `BindingContext` — so the properties are already set before the first bind. Strings assign straight across; an enum, `Guid`, or `int` parameter is `Enum.Parse`'d / `Guid.Parse`'d to its real type inside the same delegate. The ViewModel stays a plain object with plain properties — no query-attribute plumbing to hand-write and keep in sync.
+
+And the form is just a form — plain two-way bindings, not one line aware that a model is driving it:
+
+```xml
+<Entry  Text="{Binding Title}" Placeholder="What's this about?" />
+<Editor Text="{Binding Body}"  Placeholder="Anything you want to remember..." />
+<Entry  Text="{Binding Tag}"   Placeholder="work / home / ideas" />
+
+<Button Text="Save"   Command="{Binding SaveCommand}" />
+<Button Text="Cancel" Command="{Binding CancelCommand}" />
+```
+
+The model set the title and tag; data binding filled those fields, and the optional body stayed empty for me. The Title `Entry` reads "Boiler is leaking" because the ViewModel's `Title` was already set when the page bound — identical to the user having typed it. That's the leverage `Shiny.Maui.Shell` gives you: **the assistant is just another caller of navigation you already have**, so it fills the form the same way a deep link, a notification tap, or a button would. The user reviews it and taps Save.
+
+<ScreenshotRow>
+  <Screenshot src="/images/aiwings/chat-navigate-request.png" alt="The Assistant chat: the user message 'Jot down that the boiler is leaking, tag it home' followed by the assistant replying that it has opened a screen to note down the boiler leak tagged under 'home', with a token-usage line" caption="One sentence in the chat. The assistant calls NavigateToRoute and confirms what it did — no note-taking UI code involved." />
+  <Screenshot src="/images/aiwings/chat-navigate-note.png" alt="The note editor pushed by the assistant, pre-filled with Title 'Boiler is leaking' and Tag 'home', the Body field left empty, with Save and Cancel buttons" caption="…and the editor opens pre-populated: Title and Tag inferred, Body left blank. The model navigates and pre-fills; the human reviews and commits." />
+</ScreenshotRow>
 
 That last sentence is the design, not a limitation. The model **navigates and pre-fills; the human commits.** Add a described `[ShellMap]` to any new ViewModel and it's reachable by voice on the next build — no tool code, no prompt maintenance.
 
@@ -344,6 +548,8 @@ services.AddAiTools<DocumentStoreAITools>(x => x.Tools, "…framing prompt…");
 ```
 
 The Notes tab is an ordinary `CollectionView` over **the same `IDocumentStore`**. No sync layer, no separate "AI data". The model writes; the list reloads on `OnAppearing` and there it is. That symmetry is worth more than it sounds — it means the AI is a peer of your UI, not a bolt-on.
+
+<Screenshot src="/images/aiwings/notes-list.png" alt="The Notes tab listing notes with titles, bodies and coloured tag chips. The 'Boiler is leaking' note the assistant just wrote sits at the top, above the sample notes." caption="The Notes tab is a plain CollectionView over the same store. The 'Boiler is leaking' note the assistant just created sits at the top — no sync layer, the AI is a peer of the UI." />
 
 The per-type builder is the interesting bit for real apps: `AllowProperties`, `IgnoreProperties` (secrets, big blobs), `MaxPageSize`, per-property descriptions. Capabilities are flags — `ReadOnly`, `All`, or hand-picked `Query | Count`.
 
@@ -403,8 +609,6 @@ services.AddLocationAITool();
 ```
 
 Three tools: `get_current_location`, `get_distance_to`, `estimate_travel_time`. They read the **last cached fix** and compute great-circle distance with an assumed average speed — so the tool results include a `note` field saying exactly that, and my framing prompt makes the model caveat its answers. An LLM confidently reporting a 12-minute ETA through a river is a bad look.
-
-> A papercut found while writing this post, and fixed because of it: up to 5.2.4, `Shiny.Locations` shipped a public type named `Shiny.Locations.Extensions`, which the compiler can't tell apart from the `Shiny.Locations.Extensions.AI` **namespace** once both assemblies are referenced — and that's `CS0434`, an *error*, not a warning, forcing an `extern alias` in the consuming project. In **5.2.5** the type is renamed to `LocationExtensions`, and all three `Extensions.AI` packages moved their `Add…AITools` registration into the plain `Shiny` namespace. Everything involved is an extension method, so call sites don't change — the snippet above is simply the version that works.
 
 ### Health
 
@@ -484,7 +688,7 @@ Ask the assistant "what can you actually do?" and it calls a tool to find out. W
 
 ## Part 4: the wiring
 
-Here is the entire `MauiProgram`. Not an excerpt — the whole thing.
+Here is the shape of `MauiProgram` — every capability from Part 3 registered inline, in the one method. There's no module indirection to chase; you read the whole assistant top to bottom:
 
 ```csharp
 public static MauiApp CreateMauiApp()
@@ -499,24 +703,49 @@ public static MauiApp CreateMauiApp()
             .AddGeneratedMaps()         // [ShellMap] routes -> Shell routing + DI
             .AddAiTools()               // generated AiMauiShellTools -> DI
         )
-        .ConfigureFonts(fonts =>
-        {
-            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-        });
+        .ConfigureFonts(/* OpenSans */);
 
-    // everything the assistant is allowed to touch
-    builder.Services.AddAiModules();
+    var services = builder.Services;
+
+    // Shell navigation, notes, contacts, reminders, location, music — each is the same
+    // services.Add…() + services.Add…AITools(…) + AddAiTools<…>(…) trio from Part 3.
+    services.AddSingleton<IAiToolPack>(sp => /* shell navigation pack */);
+
+    services.AddDocumentStore(/* … */);
+    services.AddDocumentStoreAITools(/* … */);
+    services.AddAiTools<DocumentStoreAITools>(x => x.Tools, "…notes…");
+
+    services.AddContactStore();
+    services.AddContactsAITools(/* … */);
+    services.AddAiTools<ContactAITools>(x => x.Tools, "…contacts…");
+
+    services.AddNotifications();
+    services.AddNotificationAITools(/* … */);
+    services.AddAiTools<NotificationAITools>(x => x.Tools, "…reminders…");
+
+    services.AddGps();
+    services.AddLocationAITool();
+    services.AddAiTools<LocationAITools>(x => x.Tools, "…location…");
+
+    services.AddShinyMusic();
+    services.AddMusicAITools(/* … */);
+    services.AddAiTools<MusicAITools>(x => x.Tools, "…music…");
+
+#if ENABLE_APPLE_HEALTH
+    services.AddHealthIntegration();
+    services.AddHealthAITools(/* … */);
+    services.AddAiTools<HealthAITools>(x => x.Tools, "…health…");
+#endif
 
     // [Singleton] classes + [Tool] interfaces compiled into AIFunctions
-    builder.Services.AddGeneratedServices();
-    builder.Services.AddGeneratedAITools();
-    builder.Services.AddAiTools(
+    services.AddGeneratedServices();
+    services.AddGeneratedAITools();
+    services.AddAiTools(
         sp => [.. sp.GetServices<AITool>()],
         "You can answer questions about this app itself using the app-info tools."
     );
 
-    builder.Services.TryAddSingleton(TimeProvider.System);
+    services.TryAddSingleton(TimeProvider.System);
 
 #if DEBUG
     builder.Logging.AddDebug();
@@ -525,75 +754,41 @@ public static MauiApp CreateMauiApp()
 }
 ```
 
-No AI registration at all beyond `AddAiModules()` — `Assistant` and `GitHubCopilotChatClientProvider` are `[Singleton]` classes, so `AddGeneratedServices()` wires them up.
+No separate AI registration — `Assistant` and `OpenAIChatClientProvider` are `[Singleton]` classes, so `AddGeneratedServices()` wires them up.
 
-`AddAiModules()` is the one line that decides what your assistant is:
+Notice the only `#if` in that whole list: **Health**. Every other capability is just always on — a line you delete if you don't want it. Health is the exception, because it's the one that drags an entitlement along with it.
 
-```csharp
-public static IServiceCollection AddAiModules(this IServiceCollection services)
-{
-    services.AddShellNavigationAiTools();
-    services.AddNotesModule();
+## Turning Health off properly
 
-#if MODULE_CONTACTS
-    services.AddContactsModule();
-#endif
-#if MODULE_NOTIFICATIONS
-    services.AddNotificationsModule();
-#endif
-#if MODULE_LOCATION
-    services.AddLocationModule();
-#endif
-#if MODULE_HEALTH
-    services.AddHealthModule();
-#endif
-#if MODULE_MUSIC
-    services.AddMusicModule();
-#endif
-
-    return services;
-}
-```
-
-## Turning modules off properly
-
-Commenting out a registration line leaves you carrying the NuGet package, the code, and — on iOS — possibly an entitlement you can't sign. So the sample does it from MSBuild instead:
+Most capabilities you turn off by deleting their registration line and their package reference — done. Health is the one that needs more care, because commenting out a line still leaves you carrying the NuGet packages and, on iOS, a HealthKit **entitlement you can't sign** without the right provisioning profile. So the sample gates the whole thing from MSBuild with a single switch:
 
 ```xml
 <PropertyGroup>
-    <EnableContactsModule>true</EnableContactsModule>
-    <EnableNotificationsModule>true</EnableNotificationsModule>
-    <EnableLocationModule>true</EnableLocationModule>
-    <EnableHealthModule>true</EnableHealthModule>
-    <EnableMusicModule>true</EnableMusicModule>
+    <EnableAppleHealth>true</EnableAppleHealth>
 </PropertyGroup>
 ```
 
-Each switch drives three things — packages, source file, compiler constant:
+That one switch drives three things — packages, compiler constant, and the entitlement:
 
 ```xml
-<ItemGroup Condition="'$(EnableHealthModule)' == 'true'">
+<ItemGroup Condition="'$(EnableAppleHealth)' == 'true'">
     <PackageReference Include="Shiny.Health" Version="2.0.0" />
     <PackageReference Include="Shiny.Health.Extensions.AI" Version="2.0.0" />
 </ItemGroup>
-<PropertyGroup Condition="'$(EnableHealthModule)' == 'true'">
-    <DefineConstants>$(DefineConstants);MODULE_HEALTH</DefineConstants>
+
+<PropertyGroup Condition="'$(EnableAppleHealth)' == 'true'">
+    <DefineConstants>$(DefineConstants);ENABLE_APPLE_HEALTH</DefineConstants>
 </PropertyGroup>
-<ItemGroup Condition="'$(EnableHealthModule)' != 'true'">
-    <Compile Remove="Modules\HealthModule.cs" />
-</ItemGroup>
-```
 
-Set `EnableHealthModule=false` and HealthKit is gone from the build entirely — including the entitlement, which is conditioned on the same switch:
-
-```xml
-<PropertyGroup Condition="'$(EnableHealthModule)' == 'true' AND
+<!-- HealthKit is an entitlement, which needs a provisioning profile that carries it.
+     Only wire the entitlements file up when Health is actually on. -->
+<PropertyGroup Condition="'$(EnableAppleHealth)' == 'true' AND
                           $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
     <CodesignEntitlements>Platforms/iOS/Entitlements.plist</CodesignEntitlements>
 </PropertyGroup>
 ```
 
-I verified every combination builds — all on, all optional modules off, and a couple in between. The one thing MSBuild can't condition is XML, so the Android manifest and `Info.plist` keep all the permission entries with `<!-- MODULE: … -->` comment blocks around them; delete the block when you delete the module.
+Set `EnableAppleHealth=false` and HealthKit is gone from the build entirely — the packages, the `ENABLE_APPLE_HEALTH`-gated block in `MauiProgram.cs`, and the entitlement — so a plain automatic provisioning profile just works. That's why it's the only capability behind a compiler constant: the rest don't carry an entitlement, so they never needed one.
 
 ## The bit everybody forgets
 
@@ -637,26 +832,7 @@ Things that work on device, in a chat bubble, with no per-feature glue code:
 - *"Play something upbeat"* → library search, then playback
 - *"What can you actually do?"* → it calls a tool and reads you the module list
 
-Not one of those needed a hand-written `AIFunction`. The total amount of AI-specific infrastructure in the app is an `IAiToolPack` interface, one `Assistant` class whose interesting part fits on a screen, the Copilot device-code flow, and a chat session bridge.
-
----
-
-## ⚠️ Before you clone this: Apple provisioning
-
-Read this bit, or you will lose an evening.
-
-The Health module requests the **HealthKit entitlement** via `Platforms/iOS/Entitlements.plist`. Entitlements are not Info.plist strings — they have to be baked into a **provisioning profile**, which means:
-
-- The App ID (`net.shinylib.aiwings`, or whatever you change it to) must have **HealthKit** enabled in your Apple Developer account
-- You must **regenerate** the provisioning profile after enabling it — an existing profile will not pick it up
-- A **free / personal-team Apple ID cannot issue a HealthKit profile at all**
-- If you skip any of that, codesign fails with *"Provisioning profile doesn't match the entitlements file"* — which is a genuinely unhelpful message for what is really "go tick a box on developer.apple.com"
-
-**If you just want to run the sample:** set `<EnableHealthModule>false</EnableHealthModule>` in the csproj. The entitlements file is then never applied and a plain automatic provisioning profile works fine. Everything else in the app — contacts, reminders, location, music, microphone, speech — needs only `Info.plist` usage strings, no special provisioning.
-
-You'll also need a **paid Apple Developer account** to run on a physical device for more than seven days, and Health data isn't much use in the simulator anyway.
-
-Android has none of this. Health Connect is a runtime permission and the app installs with a debug key.
+Not one of those needed a hand-written `AIFunction`. The total amount of AI-specific infrastructure in the app is an `IAiToolPack` interface, one `Assistant` class whose interesting part fits on a screen, and a chat session bridge.
 
 ---
 
@@ -671,7 +847,7 @@ Everything used in the sample.
 | [`Microsoft.Extensions.AI`](https://www.nuget.org/packages/Microsoft.Extensions.AI) | [Microsoft Learn](https://learn.microsoft.com/dotnet/ai/) |
 | [`Microsoft.Extensions.AI.OpenAI`](https://www.nuget.org/packages/Microsoft.Extensions.AI.OpenAI) | [Microsoft Learn](https://learn.microsoft.com/dotnet/ai/) |
 
-If you'd rather not hand-roll the Copilot device-code flow, persisted history and wake-word/voice loop, [`Shiny.AiConversation`](https://www.nuget.org/packages/Shiny.AiConversation) packages all of it — see [the docs](https://shinylib.net/aiconversation). I wrote it out longhand here because the point of the post is that none of it is magic.
+If you'd rather not hand-roll persisted history and the wake-word/voice loop, [`Shiny.AiConversation`](https://www.nuget.org/packages/Shiny.AiConversation) packages all of it — see [the docs](https://shinylib.net/aiconversation). I wrote it out longhand here because the point of the post is that none of it is magic.
 
 ### The UI
 
