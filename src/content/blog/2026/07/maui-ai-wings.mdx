@@ -855,6 +855,14 @@ If you'd rather not hand-roll persisted history and the wake-word/voice loop, [`
 
 ---
 
+## A word on cost
+
+Every tool you register ships its name, description, and full JSON schema to the model on **every single turn** — that's what lets it decide what to call. Hand it eight capability packs and that's dozens of tool definitions padding the front of every request, before the user has typed a word. The token footer under each bubble in this sample isn't decoration; it's there so you can *watch* the input count climb as you switch modules on.
+
+More tools means a bigger context window, which means more tokens per turn, which means real money — and, past a point, worse tool-selection accuracy as the model wades through choices it never needed. So don't reach for the whole toolbox because you can. Pick the capabilities the app actually needs, switch the rest off from the csproj, and let the libraries absorb the tedious part — the schemas, the DI wiring, the permission plumbing, the AOT-clean function generation. That's the whole trade this post is making: **you** own the decision of *which* tools; the libraries own the work of wiring them up.
+
+---
+
 ## The takeaway
 
 The chat control is the least interesting part of an AI feature. It took twenty-five lines of XAML and I'd argue you should spend about that much thought on it.
