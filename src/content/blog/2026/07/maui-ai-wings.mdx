@@ -387,6 +387,8 @@ Each capability is a small, self-contained block of registration in `MauiProgram
 
 ### Navigating your own app (Shiny.Maui.Shell)
 
+> **Try it:** *"Jot down that the boiler is leaking, tag it home"* → `NavigateToRoute`
+
 This is my favourite one, and it's the most *MAUI* thing in the post, so it goes first.
 
 You already decorate your ViewModels for Shell routing. Add descriptions written as **user intent** instead of page names, and the source generator emits AI tooling for free:
@@ -496,6 +498,8 @@ That last sentence is the design, not a limitation. The model **navigates and pr
 
 ### The app's own data (Shiny.DocumentDb + SQLite)
 
+> **Try it:** *"Show me every note I tagged health"* → `query` · *"Delete the boiler note"* → `delete`
+
 `Shiny.DocumentDb` turns SQLite into a schema-free JSON document store. Its AI layer turns a *registered document type* into query / count / aggregate / insert / update / delete tools — a typed, capability-gated database rather than "here, model, write some SQL".
 
 The document type is a plain class. The `[Description]` attributes aren't decoration — they're literally how the model learns what a note is, because they end up in the generated JSON schema:
@@ -555,6 +559,8 @@ The per-type builder is the interesting bit for real apps: `AllowProperties`, `I
 
 ### Contacts
 
+> **Try it:** *"What's Jon's mobile number?"* → `search_contacts` then `get_contact`
+
 ```csharp
 services.AddContactStore();
 services.AddContactsAITools(tools => tools
@@ -572,6 +578,8 @@ services.AddAiTools<ContactAITools>(x => x.Tools, """
 Note the framing prompt doing real work there. Two sentences buy you "look it up before you act on it" and "don't nuke my mother-in-law without asking".
 
 ### Reminders
+
+> **Try it:** *"Create a reminder for 2pm to call Jon"* → `create_reminder`
 
 The plumber story, fixed:
 
@@ -601,6 +609,8 @@ sealed class ReminderChannelInstaller : IMauiInitializeService
 
 ### Location
 
+> **Try it:** *"How long would it take me to drive to the airport?"* → `estimate_travel_time`
+
 GPS is read-only by design, so there's no builder and no capability flags at all:
 
 ```csharp
@@ -611,6 +621,8 @@ services.AddLocationAITool();
 Three tools: `get_current_location`, `get_distance_to`, `estimate_travel_time`. They read the **last cached fix** and compute great-circle distance with an assumed average speed — so the tool results include a `note` field saying exactly that, and my framing prompt makes the model caveat its answers. An LLM confidently reporting a 12-minute ETA through a river is a bad look.
 
 ### Health
+
+> **Try it:** *"How did I sleep last week?"* → read metric · *"Log that I drank 500ml of water"* → write hydration
 
 ```csharp
 services.AddHealthIntegration();
@@ -631,6 +643,8 @@ One design note worth stealing: this package exposes *parameterized* tools — o
 
 ### Music
 
+> **Try it:** *"Play something upbeat"* → library search then `play_track`
+
 ```csharp
 services.AddShinyMusic();
 
@@ -649,6 +663,8 @@ services.AddMusicAITools(tools =>
 "Play something upbeat" turns into a library search by genre/era, a pick, and a `play_track` by id. `AddCatalog()` is excluded from `AddAll()` on purpose — it hits the Apple Music streaming catalog, which throws on Android, hence the `#if`.
 
 ### Your own services
+
+> **Try it:** *"What can you actually do?"* → `GetEnabledModules`
 
 Last one, and it's the one that generalises to *your* app. Mark an interface `[Tool]`, describe the methods, and `Shiny.Extensions.DependencyInjection`'s source generator emits a real `AIFunction` subclass per method — hand-built JSON schema, `JsonElement` accessors, no reflection, AOT clean.
 
@@ -757,38 +773,6 @@ public static MauiApp CreateMauiApp()
 No separate AI registration — `Assistant` and `OpenAIChatClientProvider` are `[Singleton]` classes, so `AddGeneratedServices()` wires them up.
 
 Notice the only `#if` in that whole list: **Health**. Every other capability is just always on — a line you delete if you don't want it. Health is the exception, because it's the one that drags an entitlement along with it.
-
-## Turning Health off properly
-
-Most capabilities you turn off by deleting their registration line and their package reference — done. Health is the one that needs more care, because commenting out a line still leaves you carrying the NuGet packages and, on iOS, a HealthKit **entitlement you can't sign** without the right provisioning profile. So the sample gates the whole thing from MSBuild with a single switch:
-
-```xml
-<PropertyGroup>
-    <EnableAppleHealth>true</EnableAppleHealth>
-</PropertyGroup>
-```
-
-That one switch drives three things — packages, compiler constant, and the entitlement:
-
-```xml
-<ItemGroup Condition="'$(EnableAppleHealth)' == 'true'">
-    <PackageReference Include="Shiny.Health" Version="2.0.0" />
-    <PackageReference Include="Shiny.Health.Extensions.AI" Version="2.0.0" />
-</ItemGroup>
-
-<PropertyGroup Condition="'$(EnableAppleHealth)' == 'true'">
-    <DefineConstants>$(DefineConstants);ENABLE_APPLE_HEALTH</DefineConstants>
-</PropertyGroup>
-
-<!-- HealthKit is an entitlement, which needs a provisioning profile that carries it.
-     Only wire the entitlements file up when Health is actually on. -->
-<PropertyGroup Condition="'$(EnableAppleHealth)' == 'true' AND
-                          $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-    <CodesignEntitlements>Platforms/iOS/Entitlements.plist</CodesignEntitlements>
-</PropertyGroup>
-```
-
-Set `EnableAppleHealth=false` and HealthKit is gone from the build entirely — the packages, the `ENABLE_APPLE_HEALTH`-gated block in `MauiProgram.cs`, and the entitlement — so a plain automatic provisioning profile just works. That's why it's the only capability behind a compiler constant: the rest don't carry an entitlement, so they never needed one.
 
 ## The bit everybody forgets
 
