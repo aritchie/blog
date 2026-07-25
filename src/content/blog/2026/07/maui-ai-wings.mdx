@@ -1,6 +1,6 @@
 ---
 title: 'Giving your .NET MAUI a real set of AI Wings'
-description: 'A .NET MAUI app built straight on Microsoft.Extensions.AI — an IChatClient onto OpenAI, ChatOptions.Tools, and UseFunctionInvocation running the loop. The chat UI is a control; the hands are Shiny — contacts, reminders, GPS, health, music, a local document DB, your own services, and the app''s own navigation. All opt-in, all switchable, all AOT-clean.'
+description: 'A .NET MAUI app built straight on Microsoft.Extensions.AI — an IChatClient onto OpenAI, ChatOptions.Tools, and UseFunctionInvocation running the loop. The chat UI is a control; the hands are Shiny — contacts, reminders, calendar, GPS, health, music, a local document DB, your own services, and the app''s own navigation. All opt-in, all switchable, all AOT-clean.'
 pubDate: 'Jul 24 2026'
 heroImage: '../../../../assets/maui-ai-wings-hero.svg'
 tags: ['Shiny', '.NET MAUI', 'AI']
@@ -17,7 +17,7 @@ The chat UI is the easy half. I know, because I shipped a control for it and it 
 
 So this is the other post. We're going to build a MAUI app for iOS and Android where the chat is a control you drop in, and the interesting work is deciding — deliberately, one line at a time — what the model is actually allowed to *do* on the phone.
 
-By the end it can write notes into a local database, look up your contacts, schedule real reminders, tell you where you are, read your step count, put music on, and **navigate your own app to the right screen with the form pre-filled**. And you can switch any of it off from the csproj.
+By the end it can write notes into a local database, look up your contacts, schedule real reminders, book a calendar event, tell you where you are, read your step count, put music on — starting at the guitar solo, if that's what you asked for — and **navigate your own app to the right screen with the form pre-filled**. And you can switch any of it off from the csproj.
 
 The whole sample is here: **[github.com/aritchie/MauiUI2026](https://github.com/aritchie/MauiUI2026)** (it's also the code every snippet below is lifted from).
 
@@ -295,7 +295,7 @@ And finally the honest part: everything a chat *can* do that an AI conversation 
 }
 ```
 
-I append the token usage to each AI bubble, because when you give a model eight tool packs it is *extremely* educational to watch the input token count climb.
+I append the token usage to each AI bubble, because when you give a model nine tool packs it is *extremely* educational to watch the input token count climb.
 
 ## Getting a model
 
@@ -607,6 +607,41 @@ sealed class ReminderChannelInstaller : IMauiInitializeService
 }
 ```
 
+### Calendar
+
+> **Try it:** *"Am I free Thursday afternoon?"* → `search_events` · *"Book lunch with Jon Friday at noon"* → `create_event`
+
+Reminders and calendar events feel like the same thing right up until you ship. A reminder is a local notification that pokes *you*; a calendar event is a shared, syncing record other people can see. Different package, different allow-list.
+
+`Shiny.Calendar` is device calendar access — calendars, events, attendees, recurrence — and `Shiny.Calendar.Extensions.AI` turns it into tools with the same per-operation opt-in as everything else:
+
+```csharp
+services.AddCalendarStore();
+
+services.AddCalendarAITools(tools => tools
+    .AddCalendar(CalendarAICapabilities.Read | CalendarAICapabilities.Create)
+);
+
+services.AddAiTools<CalendarAITools>(x => x.Tools, """
+    You can read the user's calendar and book new events. Search before you book so you can warn
+    about conflicts, and always state the calendar and the local time you used. Never move or
+    cancel an existing event.
+    """);
+```
+
+`CalendarAICapabilities` is a `[Flags]` enum — `Read`, `Create`, `Update`, `Delete`, plus `Write` and `All` — and each flag maps to a distinct set of tools:
+
+| Flag | Tools |
+|---|---|
+| `Read` | `list_calendars`, `search_events`, `get_event` |
+| `Create` | `create_event` |
+| `Update` | `update_event` |
+| `Delete` | `delete_event` |
+
+I stopped at `Read | Create` on purpose, and that line is the whole argument of this post in miniature. The model can tell me I'm free on Thursday and put lunch in the book, but `update_event` and `delete_event` were never compiled into the tool list, so there is no prompt-injected sentence, no hallucination, and no clever jailbreak that deletes my kid's birthday. It can't call what it was never handed.
+
+`search_events` takes an ISO-8601 window (defaulting to a month back and three months ahead), an optional `calendarId` from `list_calendars`, and a free-text query matched against title, location and description. Which is exactly why the system prompt injects the current local time every turn — "Thursday afternoon" is meaningless to a model that thinks it's still training day.
+
 ### Location
 
 > **Try it:** *"How long would it take me to drive to the airport?"* → `estimate_travel_time`
@@ -643,15 +678,15 @@ One design note worth stealing: this package exposes *parameterized* tools — o
 
 ### Music
 
-> **Try it:** *"Play something upbeat"* → library search then `play_track`
+> **Try it:** *"Play something upbeat"* → library search then `play_track` · *"Play the famous guitar solo from November Rain"* → `analyze_song_structure` then `play_track` with `start_seconds`
 
 ```csharp
 services.AddShinyMusic();
 
 services.AddMusicAITools(tools =>
 {
-    tools.AddLibrary()             // search / browse / genres / playlists / lyrics
-         .AddPlayback()            // play, pause, resume, stop, seek, now-playing
+    tools.AddLibrary()             // search / browse / genres / playlists / lyrics / song structure
+         .AddPlayback()            // play (optionally from a timestamp), pause, resume, stop, seek, now-playing
          .AddPlaylistManagement();
 
 #if IOS
@@ -660,7 +695,79 @@ services.AddMusicAITools(tools =>
 });
 ```
 
+Same shape as everything else: areas are additive, and an empty registration throws rather than quietly handing the model nothing.
+
+| Area | Tools |
+|---|---|
+| `AddLibrary()` | `search_tracks`, `browse_tracks`, `list_music_categories`, `list_playlists`, `get_playlist_tracks`, `get_lyrics`, `analyze_song_structure` |
+| `AddPlayback()` | `play_track`, `control_playback`, `get_now_playing` |
+| `AddPlaylistManagement()` | `create_playlist`, `modify_playlist`, `delete_playlist` |
+| `AddCatalog()` | `search_catalog` |
+
 "Play something upbeat" turns into a library search by genre/era, a pick, and a `play_track` by id. `AddCatalog()` is excluded from `AddAll()` on purpose — it hits the Apple Music streaming catalog, which throws on Android, hence the `#if`.
+
+#### The one that surprised me
+
+That was the version I demoed for a while, and it was fine. Then someone asked for *"the famous guitar solo from November Rain"* and I realised the whole model of "search, then press play at zero" was leaving the best part on the table. Songs have **structure**, and a model already knows an enormous amount about the songs in your library — it just has no idea where anything *is* in the file.
+
+So `AddLibrary()` now also mints `analyze_song_structure`, and the trick is that it doesn't try to be clever. It hands the model two independent readings of the track and lets the model's own knowledge do the matching:
+
+```csharp
+// "Play the famous guitar solo from November Rain"
+var track = (await library.SearchTracksAsync("November Rain")).First();
+
+// 1. Precise instrumental boundaries from time-synced (LRC) lyrics — no audio decode,
+//    so this works even on DRM-protected tracks
+var lyrics = await lyricsProvider.GetLyricsAsync(track);
+var gaps = lyrics.GetInstrumentalGaps(track.Duration);   // intro, mid break, final solo, outro
+
+// 2. Energy sections from an offline PCM scan — tells a loud solo from a quiet intro.
+//    Returns null for DRM / streaming-only tracks.
+var levels = await library.AnalyzeLevelsAsync(track.Id);
+var solo = levels?.Sections
+    .Where(s => s.Energy == AudioEnergy.Loud)
+    .MaxBy(s => s.Start);                                // the last big loud stretch
+
+var startAt = solo?.Start ?? gaps.LastOrDefault()?.Start ?? TimeSpan.Zero;
+```
+
+The two readings cover each other's blind spots, and that's the entire design. Lyric gaps are exact but say nothing about *volume* — an intro and a solo look identical. Energy sections know loud from quiet but have no idea where the singing stopped, and they go dark entirely on Apple Music DRM, where nothing can decode the audio. Together you get "here are the stretches with no vocals, and here's how loud each one is."
+
+What the tool returns is just that, in seconds, plus a nudge:
+
+```json
+{
+  "trackId": "1583",
+  "title": "November Rain",
+  "artist": "Guns N' Roses",
+  "durationSeconds": 537.4,
+  "lyricsSynced": true,
+  "instrumentalGaps": [
+    { "startSeconds": 0.0,   "endSeconds": 61.2,  "durationSeconds": 61.2 },
+    { "startSeconds": 250.8, "endSeconds": 292.4, "durationSeconds": 41.6 },
+    { "startSeconds": 447.1, "endSeconds": 537.4, "durationSeconds": 90.3 }
+  ],
+  "audioAnalyzed": true,
+  "audioSections": [
+    { "startSeconds": 0.0,   "endSeconds": 61.2,  "energy": "quiet", "averageLevel": 0.21 },
+    { "startSeconds": 250.8, "endSeconds": 292.4, "energy": "loud",  "averageLevel": 0.78 },
+    { "startSeconds": 447.1, "endSeconds": 537.4, "energy": "loud",  "averageLevel": 0.83 }
+  ],
+  "hint": "Pick the section matching the request from your knowledge of the song, then call play_track with start_seconds set to its start."
+}
+```
+
+Three instrumental stretches. The library can't tell you which one is "the famous one" — but the model can, because it's read the internet. It picks the 7:27 outro, and calls:
+
+```json
+{ "track_id": "1583", "start_seconds": 447.1 }
+```
+
+`play_track` grew an optional `start_seconds` for exactly this. No audio is played by the analysis tool — it decodes to PCM offline and throws the samples away, so the model can look before it leaps.
+
+I like this one because of where the intelligence sits. The library does the boring, mechanical, device-side thing it's actually good at: *here are the timestamps where nobody is singing, and here's how loud it is at each one.* The model does the thing **it's** good at and the device cannot possibly do: knowing that in that song, the one people mean is the one at the end. Neither half is clever on its own. I didn't write a single line of "solo detection" heuristics, and I'd have got it wrong if I had.
+
+Two caveats worth knowing before you demo it. `audioSections` comes back `null` for DRM-protected tracks — you get the lyric gaps and nothing else, which is why the response reports `audioAnalyzed` honestly instead of pretending. And `instrumentalGaps` needs *time-synced* lyrics; plain-text lyrics give you nothing, so `lyricsSynced` tells the model which kind it got. Both fields exist so the model can hedge its answer instead of inventing a timestamp.
 
 ### Your own services
 
@@ -723,7 +830,7 @@ public static MauiApp CreateMauiApp()
 
     var services = builder.Services;
 
-    // Shell navigation, notes, contacts, reminders, location, music — each is the same
+    // Shell navigation, notes, contacts, reminders, calendar, location, music — each is the same
     // services.Add…() + services.Add…AITools(…) + AddAiTools<…>(…) trio from Part 3.
     services.AddSingleton<IAiToolPack>(sp => /* shell navigation pack */);
 
@@ -738,6 +845,10 @@ public static MauiApp CreateMauiApp()
     services.AddNotifications();
     services.AddNotificationAITools(/* … */);
     services.AddAiTools<NotificationAITools>(x => x.Tools, "…reminders…");
+
+    services.AddCalendarStore();
+    services.AddCalendarAITools(/* … */);
+    services.AddAiTools<CalendarAITools>(x => x.Tools, "…calendar…");
 
     services.AddGps();
     services.AddLocationAITool();
@@ -785,6 +896,7 @@ So ask up front, from a real screen. The Settings tab has a "Grant permissions" 
 ```csharp
 results.Add($"Contacts:  {await contactStore.RequestAccess()}");
 results.Add($"Reminders: {await notificationManager.RequestAccess()}");
+results.Add($"Calendar:  {await calendarStore.RequestAccess(CalendarAccessType.ReadWrite)}");
 results.Add($"Location:  {await gps.RequestAccess(GpsRequest.Foreground)}");
 results.Add($"Music:     {await mediaLibrary.RequestPermissionAsync()}");
 
@@ -811,9 +923,11 @@ Things that work on device, in a chat bubble, with no per-feature glue code:
 - *"What notes do I have tagged work?"* → queried out of SQLite
 - *"Remind me to call the plumber at 3pm"* → a real, scheduled local notification
 - *"What's Jane's mobile?"* → address book search
+- *"Am I free Thursday afternoon? Book lunch with Jon if I am"* → calendar search, then a real event
 - *"How many steps did I do yesterday?"* → HealthKit / Health Connect
 - *"Where am I, and how far is that to the CN Tower?"* → GPS + distance, caveated as straight-line
 - *"Play something upbeat"* → library search, then playback
+- *"Play the famous guitar solo from November Rain"* → song-structure analysis, then playback starting at 7:27
 - *"What can you actually do?"* → it calls a tool and reads you the module list
 
 Not one of those needed a hand-written `AIFunction`. The total amount of AI-specific infrastructure in the app is an `IAiToolPack` interface, one `Assistant` class whose interesting part fits on a screen, and a chat session bridge.
@@ -847,6 +961,7 @@ If you'd rather not hand-roll persisted history and the wake-word/voice loop, [`
 |---|---|
 | [`Shiny.Contacts`](https://www.nuget.org/packages/Shiny.Contacts) + [`Shiny.Contacts.Extensions.AI`](https://www.nuget.org/packages/Shiny.Contacts.Extensions.AI) | [Contact store](https://shinylib.net/contactstore) · [AI tools](https://shinylib.net/contactstore/ai-tools) |
 | [`Shiny.Notifications`](https://www.nuget.org/packages/Shiny.Notifications) + [`Shiny.Notifications.Extensions.AI`](https://www.nuget.org/packages/Shiny.Notifications.Extensions.AI) | [Notifications](https://shinylib.net/notifications) · [AI tools](https://shinylib.net/notifications/ai-tools) |
+| [`Shiny.Calendar`](https://www.nuget.org/packages/Shiny.Calendar) + [`Shiny.Calendar.Extensions.AI`](https://www.nuget.org/packages/Shiny.Calendar.Extensions.AI) | [Calendar store](https://shinylib.net/calendarstore) · [AI tools](https://shinylib.net/calendarstore/ai-tools) |
 | [`Shiny.Locations`](https://www.nuget.org/packages/Shiny.Locations) + [`Shiny.Locations.Extensions.AI`](https://www.nuget.org/packages/Shiny.Locations.Extensions.AI) | [Locations](https://shinylib.net/locations) · [AI tools](https://shinylib.net/locations/ai-tools) |
 | [`Shiny.Health`](https://www.nuget.org/packages/Shiny.Health) + [`Shiny.Health.Extensions.AI`](https://www.nuget.org/packages/Shiny.Health.Extensions.AI) | [Health](https://shinylib.net/health) · [AI tools](https://shinylib.net/health/ai-tools) |
 | [`Shiny.Music`](https://www.nuget.org/packages/Shiny.Music) + [`Shiny.Music.Extensions.AI`](https://www.nuget.org/packages/Shiny.Music.Extensions.AI) | [Music](https://shinylib.net/music) · [AI tools](https://shinylib.net/music/ai-tools) |
@@ -857,7 +972,7 @@ If you'd rather not hand-roll persisted history and the wake-word/voice loop, [`
 
 ## A word on cost
 
-Every tool you register ships its name, description, and full JSON schema to the model on **every single turn** — that's what lets it decide what to call. Hand it eight capability packs and that's dozens of tool definitions padding the front of every request, before the user has typed a word. The token footer under each bubble in this sample isn't decoration; it's there so you can *watch* the input count climb as you switch modules on.
+Every tool you register ships its name, description, and full JSON schema to the model on **every single turn** — that's what lets it decide what to call. Hand it nine capability packs and that's dozens of tool definitions padding the front of every request, before the user has typed a word. The token footer under each bubble in this sample isn't decoration; it's there so you can *watch* the input count climb as you switch modules on.
 
 More tools means a bigger context window, which means more tokens per turn, which means real money — and, past a point, worse tool-selection accuracy as the model wades through choices it never needed. So don't reach for the whole toolbox because you can. Pick the capabilities the app actually needs, switch the rest off from the csproj, and let the libraries absorb the tedious part — the schemas, the DI wiring, the permission plumbing, the AOT-clean function generation. That's the whole trade this post is making: **you** own the decision of *which* tools; the libraries own the work of wiring them up.
 
