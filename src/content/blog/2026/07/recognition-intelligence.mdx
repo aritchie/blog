@@ -105,37 +105,6 @@ IServiceProvider? Services => this.Handler?.MauiContext?.Services;
 
 That's how `FaceRecognitionView` gets its `IFaceIntelligence` and its analyzer without the consumer registering anything except `AddTransient<FaceRecognitionAnalyzer>()` — transient because it carries per-camera state, so two camera pages don't share a stability counter.
 
-### The MAUI gotcha that cost me a day: `CameraView` no-ops before its handler connects
-
-If you take one MAUI-specific thing from this post, take this one.
-
-`CameraView` routes every call through `Handler as ICameraViewController`, and **every method null-guards to a silent success**. `RequestPermissionAsync()` returns `Task.FromResult(false)`. `StartAsync()` returns `Task.CompletedTask`. Nothing throws. Nothing logs.
-
-And `ContentPage.OnAppearing` fires *before* the handler exists. So the natural implementation —
-
-```csharp
-protected override void OnAppearing()
-{
-    base.OnAppearing();
-    await this.Camera.StartAsync();   // silently does absolutely nothing
-}
-```
-
-— gives you a black preview, forever, with no error anywhere. Worse, it *presents* as a permission problem: `RequestPermissionAsync()` returns `false` while `AVCaptureDevice.GetAuthorizationStatus(Video)` cheerfully reports `Authorized` and no prompt ever appears. That mismatch is the tell. (`BindingContext` is null in `OnAppearing` on these pages too, so a status message you write to your VM from there also vanishes — which is how you end up debugging a page that looks completely inert.)
-
-The fix is to start from **both** signals and make the start idempotent, so whichever lands last wins:
-
-```csharp
-this.camera.HandlerChanged += (_, _) => this.Start();
-this.Loaded += (_, _) => this.Start();          // Start() no-ops if already started
-this.Unloaded += (_, _) => this.Stop();
-
-// Fires BEFORE the handler is torn down, unlike Unloaded — so the camera can still be stopped.
-this.HandlerChanging += (_, e) => { if (e.NewHandler is null) this.Stop(); };
-```
-
-This is now inside both controls, which is the real argument for wrapping a camera in a control at all: the trap is invisible, it costs a day, and it only has to be solved once. If a camera page ever looks dead, **check `Handler` before you check permissions**.
-
 ### The recognition control's surface
 
 Small on purpose:
@@ -290,9 +259,9 @@ Note `ModelBytesProvider` rather than a path. Bundled assets aren't real file pa
 
 One thing worth being precise about, because the word misleads people: **"training" here is enrollment, not model training.** Nothing is trained on-device. You're storing vectors and doing nearest-neighbour lookups against them. Which means enrollment is instant, forgetting someone is a `DELETE`, and there's no drift, no retraining job, no model artifact per user.
 
-### Running ONNX in a MAUI app: the four things that bite
+### Running ONNX in a MAUI app: the three things that bite
 
-If you've never shipped ONNX Runtime inside a MAUI app, these are the ones that cost real time. None are exotic; all four are load-bearing.
+If you've never shipped ONNX Runtime inside a MAUI app, these are the ones that cost real time. None are exotic; all three are load-bearing.
 
 **1. Your model is not a file.** `Resources/Raw` gets bundled into the app package, and on iOS and Android that package is not a filesystem path you can hand to `new InferenceSession(path)`. Read the bytes instead:
 
@@ -310,33 +279,7 @@ The options type accepts a provider, raw bytes, or a path (in that priority) —
 
 **2. Load lazily, or you own every startup failure.** Sessions are created on first use, not at registration. A 13 MB model deserialized during DI setup is startup latency every launch, on every device, whether or not the user visits that screen — and if the file is missing, you've turned a screen-level error message into a crash before the first frame. Lazy means the failure lands inside the operation that needed it, where the page can catch it and say "model missing" like any other error.
 
-**3. iOS/MacCatalyst will fail to *link* — and the error looks like nothing to do with you.**
-
-```
-Undefined symbols for architecture arm64:
-  "_RegisterCustomOps", referenced from: ...
-```
-
-Here's the mechanism, because it's non-obvious. ONNX Runtime's managed binding P/Invokes `RegisterCustomOps`, a symbol the desktop static lib doesn't define — it lives in `onnxruntime-extensions`. On Apple platforms the .NET registrar force-references *every* P/Invoke target with a `-u` linker flag, so the app head demands a symbol nothing provides. Android is unaffected; it loads the `.so` dynamically.
-
-Adding `-Wl,-U,_RegisterCustomOps` (allow undefined) is the obvious fix and **it isn't enough** — on the Xcode 16+ linker a soft `-U` can't override a hard `-u` require. The symbol has to be dropped before the flag is emitted:
-
-```xml
-<Target Name="_DropOnnxRegisterCustomOpsForcedSymbol"
-        AfterTargets="_LoadLinkerOutput"
-        BeforeTargets="_ComputeLinkNativeExecutableInputs">
-  <ItemGroup>
-    <_ProcessedReferenceNativeSymbol Remove="_RegisterCustomOps" />
-    <ReferenceNativeSymbol Remove="_RegisterCustomOps" />
-  </ItemGroup>
-</Target>
-```
-
-This ships inside the `.Onnx` packages in `build/` **and** `buildTransitive/`, so it flows into your app head automatically and you never meet the error at all. It's safe only because these packages never register custom ops — if you *do* use `onnxruntime-extensions`, set `DisableOnnxRegisterCustomOpsWorkaround=true` and link the real symbol.
-
-Two caveats I'd want to know as a consumer: it hooks **internal, non-contract** iOS SDK target names, so a future workload rename would silently no-op it and the link error would return (verified on iOS SDK 26.5 / .NET 10.0.8). And packaging a library as `net10.0-ios` doesn't help — a class library never performs the native link, so `buildTransitive` is genuinely the right home for this.
-
-**4. Keep the inference path reflection-free.** Everything here is `IsAotCompatible`, which for ONNX means the tensor work is fine (it's just arrays and spans) but the *serialization* around it isn't free — hence a source-generated `JsonSerializerContext` for the stored documents, fed to the document store explicitly. If you add a persisted type, it goes in that context or it fails at runtime in a trimmed build and nowhere else.
+**3. Keep the inference path reflection-free.** Everything here is `IsAotCompatible`, which for ONNX means the tensor work is fine (it's just arrays and spans) but the *serialization* around it isn't free — hence a source-generated `JsonSerializerContext` for the stored documents, fed to the document store explicitly. If you add a persisted type, it goes in that context or it fails at runtime in a trimmed build and nowhere else.
 
 <Screenshot
   src="/images/recogiq/app-home.png"
@@ -837,7 +780,7 @@ You'll still need to supply the models yourself — `Sample/fetch-models.sh` pul
 
 The part I'd want to leave you with isn't any individual model. It's that the interesting engineering was almost never in the inference call — it was in the boring plumbing around it. One coordinate space. Enroll and recognize sharing a pipeline byte for byte. A microphone that isn't quietly normalizing away the thing you're trying to measure. Gates that check what's measurable instead of what's flattering to demo.
 
-And since this is a UI series: all of that is exactly the kind of thing a **control** is for. Nobody should have to learn about AspectFill cropping, even-odd clip paths, or the fact that `CameraView` politely does nothing before its handler connects, just to put a name on screen when someone walks up to a tablet. That knowledge should be paid for once, by whoever writes the control, and never again by anyone who uses it.
+And since this is a UI series: all of that is exactly the kind of thing a **control** is for. Nobody should have to learn about AspectFill cropping or even-odd clip paths just to put a name on screen when someone walks up to a tablet. That knowledge should be paid for once, by whoever writes the control, and never again by anyone who uses it.
 
 Get that right and a 13 MB model on a phone will surprise you. Get it wrong and no threshold in the world will save you.
 
