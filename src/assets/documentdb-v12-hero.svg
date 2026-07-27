@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accentCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="accentGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="accentViolet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="netGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <ellipse cx="600" cy="290" rx="520" ry="290" fill="url(#netGlow)"/>
+
+  <!-- ===== admin UI browser window (centre) ===== -->
+  <g transform="translate(340, 96)">
+    <rect x="0" y="0" width="520" height="330" rx="14" fill="url(#chrome)" stroke="#334155" stroke-width="1.5"/>
+    <!-- title bar -->
+    <path d="M0,14 a14,14 0 0 1 14,-14 h492 a14,14 0 0 1 14,14 v22 h-520 z" fill="#0b1220"/>
+    <circle cx="20" cy="18" r="4.5" fill="#ef4444" opacity="0.75"/>
+    <circle cx="36" cy="18" r="4.5" fill="#f59e0b" opacity="0.75"/>
+    <circle cx="52" cy="18" r="4.5" fill="#10b981" opacity="0.75"/>
+    <text x="76" y="22" fill="#64748b" font-family="system-ui" font-size="11">ShinyDocDbMyAdmin</text>
+    <line x1="0" y1="36" x2="520" y2="36" stroke="#334155" stroke-width="1"/>
+
+    <!-- sidebar -->
+    <rect x="0" y="36" width="118" height="294" fill="#0b1220"/>
+    <line x1="118" y1="36" x2="118" y2="330" stroke="#334155" stroke-width="1"/>
+    <text x="14" y="60" fill="#475569" font-family="system-ui" font-size="8" letter-spacing="1">CONNECTIONS</text>
+    <rect x="12" y="70" width="76" height="7" rx="3.5" fill="#22d3ee" opacity="0.65"/>
+    <rect x="22" y="88" width="60" height="6" rx="3" fill="#475569"/>
+    <rect x="30" y="104" width="52" height="6" rx="3" fill="#475569"/>
+    <rect x="30" y="120" width="64" height="6" rx="3" fill="#475569"/>
+    <rect x="24" y="134" width="86" height="14" rx="4" fill="#8b5cf6" opacity="0.22"/>
+    <rect x="30" y="138" width="46" height="6" rx="3" fill="#a78bfa"/>
+
+    <!-- tabs -->
+    <rect x="134" y="50" width="46" height="16" rx="4" fill="#22d3ee" opacity="0.2"/>
+    <text x="140" y="62" fill="#22d3ee" font-family="system-ui" font-size="9">Browse</text>
+    <text x="192" y="62" fill="#64748b" font-family="system-ui" font-size="9">Structure</text>
+    <text x="252" y="62" fill="#64748b" font-family="system-ui" font-size="9">History</text>
+    <text x="304" y="62" fill="#64748b" font-family="system-ui" font-size="9">Geometry</text>
+    <text x="366" y="62" fill="#64748b" font-family="system-ui" font-size="9">SQL</text>
+
+    <!-- grid header -->
+    <line x1="134" y1="78" x2="500" y2="78" stroke="#334155" stroke-width="1"/>
+    <rect x="134" y="84" width="34" height="6" rx="3" fill="#64748b"/>
+    <rect x="196" y="84" width="52" height="6" rx="3" fill="#64748b"/>
+    <rect x="276" y="84" width="60" height="6" rx="3" fill="#64748b"/>
+    <rect x="364" y="84" width="40" height="6" rx="3" fill="#64748b"/>
+    <rect x="432" y="84" width="44" height="6" rx="3" fill="#64748b"/>
+    <line x1="134" y1="98" x2="500" y2="98" stroke="#334155" stroke-width="1"/>
+
+    <!-- grid rows -->
+    <g fill="#334155">
+      <rect x="134" y="108" width="46" height="6" rx="3" fill="#22d3ee" opacity="0.7"/>
+      <rect x="196" y="108" width="40" height="6" rx="3"/>
+      <rect x="276" y="108" width="70" height="6" rx="3"/>
+      <rect x="364" y="108" width="30" height="6" rx="3" fill="#34d399" opacity="0.7"/>
+      <rect x="432" y="108" width="52" height="6" rx="3"/>
+
+      <rect x="134" y="128" width="46" height="6" rx="3" fill="#22d3ee" opacity="0.7"/>
+      <rect x="196" y="128" width="44" height="6" rx="3"/>
+      <rect x="276" y="128" width="56" height="6" rx="3"/>
+      <rect x="364" y="128" width="34" height="6" rx="3" fill="#34d399" opacity="0.7"/>
+      <rect x="432" y="128" width="46" height="6" rx="3"/>
+
+      <rect x="134" y="148" width="46" height="6" rx="3" fill="#22d3ee" opacity="0.7"/>
+      <rect x="196" y="148" width="36" height="6" rx="3"/>
+      <rect x="276" y="148" width="64" height="6" rx="3"/>
+      <rect x="364" y="148" width="26" height="6" rx="3" fill="#34d399" opacity="0.7"/>
+      <rect x="432" y="148" width="54" height="6" rx="3"/>
+
+      <rect x="134" y="168" width="46" height="6" rx="3" fill="#22d3ee" opacity="0.7"/>
+      <rect x="196" y="168" width="48" height="6" rx="3"/>
+      <rect x="276" y="168" width="52" height="6" rx="3"/>
+      <rect x="364" y="168" width="32" height="6" rx="3" fill="#34d399" opacity="0.7"/>
+      <rect x="432" y="168" width="40" height="6" rx="3"/>
+    </g>
+
+    <!-- expanded json row -->
+    <rect x="134" y="188" width="352" height="122" rx="8" fill="#0b1220" stroke="#334155" stroke-width="1"/>
+    <text x="146" y="206" fill="#a78bfa" font-family="monospace" font-size="10">{</text>
+    <text x="160" y="222" fill="#f472b6" font-family="monospace" font-size="10">"number"</text>
+    <text x="222" y="222" fill="#64748b" font-family="monospace" font-size="10">:</text>
+    <text x="232" y="222" fill="#34d399" font-family="monospace" font-size="10">"SO-4205"</text>
+    <text x="160" y="238" fill="#f472b6" font-family="monospace" font-size="10">"customer"</text>
+    <text x="234" y="238" fill="#64748b" font-family="monospace" font-size="10">: {</text>
+    <text x="174" y="254" fill="#f472b6" font-family="monospace" font-size="10">"tier"</text>
+    <text x="216" y="254" fill="#64748b" font-family="monospace" font-size="10">:</text>
+    <text x="226" y="254" fill="#34d399" font-family="monospace" font-size="10">"gold"</text>
+    <text x="160" y="270" fill="#64748b" font-family="monospace" font-size="10">},</text>
+    <text x="160" y="286" fill="#f472b6" font-family="monospace" font-size="10">"total"</text>
+    <text x="210" y="286" fill="#64748b" font-family="monospace" font-size="10">:</text>
+    <text x="220" y="286" fill="#22d3ee" font-family="monospace" font-size="10">853.15</text>
+    <text x="146" y="302" fill="#a78bfa" font-family="monospace" font-size="10">}</text>
+  </g>
+
+  <!-- ===== provider nodes (left + right) ===== -->
+  <g font-family="system-ui" font-size="10" text-anchor="middle">
+    <g>
+      <rect x="92" y="120" width="112" height="30" rx="15" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.9"/>
+      <text x="148" y="139" fill="#22d3ee">SQLite</text>
+    </g>
+    <g>
+      <rect x="92" y="164" width="112" height="30" rx="15" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.9"/>
+      <text x="148" y="183" fill="#22d3ee">PostgreSQL</text>
+    </g>
+    <g>
+      <rect x="92" y="208" width="112" height="30" rx="15" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.9"/>
+      <text x="148" y="227" fill="#22d3ee">SQL Server</text>
+    </g>
+    <g>
+      <rect x="92" y="252" width="112" height="30" rx="15" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" opacity="0.9"/>
+      <text x="148" y="271" fill="#a78bfa">MongoDB</text>
+    </g>
+    <g>
+      <rect x="92" y="296" width="112" height="30" rx="15" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" opacity="0.9"/>
+      <text x="148" y="315" fill="#a78bfa">Cosmos DB</text>
+    </g>
+    <g>
+      <rect x="92" y="340" width="112" height="30" rx="15" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" opacity="0.9"/>
+      <text x="148" y="359" fill="#a78bfa">DynamoDB</text>
+    </g>
+    <text x="148" y="392" fill="#475569" font-size="10">+ 13 more</text>
+
+    <g>
+      <rect x="996" y="120" width="112" height="30" rx="15" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.9"/>
+      <text x="1052" y="139" fill="#34d399">Collections</text>
+    </g>
+    <g>
+      <rect x="996" y="164" width="112" height="30" rx="15" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.9"/>
+      <text x="1052" y="183" fill="#34d399">Soft delete</text>
+    </g>
+    <g>
+      <rect x="996" y="208" width="112" height="30" rx="15" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.9"/>
+      <text x="1052" y="227" fill="#34d399">ctx.Cancel()</text>
+    </g>
+    <g>
+      <rect x="996" y="252" width="112" height="30" rx="15" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.9"/>
+      <text x="1052" y="271" fill="#34d399">Temporal</text>
+    </g>
+    <g>
+      <rect x="996" y="296" width="112" height="30" rx="15" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.9"/>
+      <text x="1052" y="315" fill="#34d399">Vector · Geo</text>
+    </g>
+    <g>
+      <rect x="996" y="340" width="112" height="30" rx="15" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.9"/>
+      <text x="1052" y="359" fill="#34d399">Trim / AOT</text>
+    </g>
+    <text x="1052" y="392" fill="#475569" font-size="10">one API</text>
+  </g>
+
+  <!-- connector lines -->
+  <g stroke="#06b6d4" stroke-width="1.2" fill="none" opacity="0.35">
+    <path d="M204,135 C270,135 290,200 338,215"/>
+    <path d="M204,179 C270,179 290,210 338,225"/>
+    <path d="M204,223 C270,223 300,230 338,235"/>
+  </g>
+  <g stroke="#8b5cf6" stroke-width="1.2" fill="none" opacity="0.35">
+    <path d="M204,267 C270,267 300,255 338,245"/>
+    <path d="M204,311 C270,311 300,275 338,255"/>
+    <path d="M204,355 C270,355 300,290 338,265"/>
+  </g>
+  <g stroke="#10b981" stroke-width="1.2" fill="none" opacity="0.35">
+    <path d="M862,215 C910,200 930,135 996,135"/>
+    <path d="M862,225 C910,179 930,179 996,179"/>
+    <path d="M862,235 C910,230 930,223 996,223"/>
+    <path d="M862,245 C910,255 930,267 996,267"/>
+    <path d="M862,255 C910,275 930,311 996,311"/>
+    <path d="M862,265 C910,290 930,355 996,355"/>
+  </g>
+
+  <!-- v12 badge -->
+  <g filter="url(#glow)">
+    <rect x="828" y="86" width="66" height="30" rx="15" fill="#8b5cf6" fill-opacity="0.18" stroke="#a78bfa" stroke-width="1.4"/>
+    <text x="861" y="106" text-anchor="middle" fill="#c4b5fd" font-family="system-ui" font-size="14" font-weight="bold">v12</text>
+  </g>
+
+  <!-- ===== title ===== -->
+  <text x="600" y="500" text-anchor="middle" fill="#f1f5f9" font-family="system-ui" font-size="52" font-weight="bold" filter="url(#softGlow)">Shiny.DocumentDb</text>
+  <text x="600" y="548" text-anchor="middle" fill="#22d3ee" font-family="system-ui" font-size="27" font-weight="600">Doing All The Things</text>
+  <text x="600" y="584" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="15">an admin UI · schema-free collections · soft delete · trim-clean</text>
+
+  <!-- decorative dots -->
+  <circle cx="56" cy="72" r="3" fill="#22d3ee" opacity="0.5"/>
+  <circle cx="80" cy="52" r="2" fill="#a78bfa" opacity="0.4"/>
+  <circle cx="44" cy="466" r="2.5" fill="#34d399" opacity="0.4"/>
+  <circle cx="1148" cy="72" r="3" fill="#a78bfa" opacity="0.5"/>
+  <circle cx="1124" cy="52" r="2" fill="#22d3ee" opacity="0.4"/>
+  <circle cx="1156" cy="466" r="2.5" fill="#34d399" opacity="0.4"/>
+</svg>
