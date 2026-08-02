@@ -4,6 +4,7 @@ import HeaderLink from './HeaderLink.astro';
 import SocialLinks from './SocialLinks.astro';
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png'
+import shinysoftLogo from '../assets/shinysoft-logo.png'
 ---
 
 <header>
@@ -24,7 +25,9 @@ import logo from '../assets/logo.png'
 				<HeaderLink href="/projects">Projects</HeaderLink>
 				<HeaderLink href="/speaking">Speaking</HeaderLink>
 				<HeaderLink href="/about">About</HeaderLink>
-				<HeaderLink href="https://shinysoft.biz" target="_blank">ShinySoft</HeaderLink>
+				<HeaderLink href="https://shinysoft.biz" target="_blank" rel="noopener" class="shinysoft-link">
+					<Image src={shinysoftLogo} alt="ShinySoft Technologies" width={320} height={109} loading="eager" />
+				</HeaderLink>
 				<!--<HeaderLink href="https://www.youtube.com/@GoneDotNet" target="_blank">Gone .NET</HeaderLink>-->
 			</div>
 			<SocialLinks />
@@ -142,6 +145,17 @@ import logo from '../assets/logo.png'
 	.nav-menu a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
+	}
+
+	.nav-menu a.shinysoft-link {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.75em 0.5em;
+	}
+
+	.nav-menu a.shinysoft-link img {
+		width: auto;
+		height: 32px;
 	}
 	
 	.social-links,

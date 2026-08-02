@@ -9,6 +9,7 @@ import TagCloud from '../components/TagCloud.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import me from '../assets/me.jpg';
 import mvp from '../assets/msft_mvp.png';
+import shinysoft from '../assets/shinysoft-logo.png';
 
 const posts = (await getCollection('blog'))
 	.filter((post) => (import.meta.env.DEV || post.data.draft !== true) && post.data.pubDate <= new Date())
@@ -62,6 +63,16 @@ for (const post of posts) {
 				border-radius: 0;
 				width: 180px;
 				height: auto;
+			}
+			.sidebar .shinysoft-link {
+				display: inline-block;
+				margin-top: 0.5rem;
+			}
+			.sidebar .shinysoft-link img {
+				border-radius: 0;
+				width: 220px;
+				height: auto;
+				margin-bottom: 0;
 			}
 			.contact-links {
 				display: flex;
@@ -202,6 +213,12 @@ for (const post of posts) {
 					<p class="about-text">
 						Check out all of my <a href="/projects/">open source projects</a>.
 					</p>
+					<p class="about-text">
+						I run <a href="https://shinysoft.biz" target="_blank" rel="noopener">ShinySoft Technologies</a>, a consultancy building mobile apps, web applications, backend services, and cloud infrastructure.
+					</p>
+					<a class="shinysoft-link" href="https://shinysoft.biz" target="_blank" rel="noopener">
+						<Image src={shinysoft} width={440} alt="ShinySoft Technologies" />
+					</a>
 					<p class="about-text">
 						Need help with your next project? Get in touch!
 					</p>
