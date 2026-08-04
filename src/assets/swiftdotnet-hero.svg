@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="netGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.28"/>
+      <stop offset="55%" stop-color="#8b5cf6" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <ellipse cx="600" cy="250" rx="540" ry="250" fill="url(#netGlow)"/>
+
+  <!-- ===== the one C# view tree ===== -->
+  <g transform="translate(370, 40)">
+    <rect x="0" y="0" width="460" height="176" rx="14" fill="url(#chrome)" stroke="#334155" stroke-width="1.5"/>
+    <path d="M0,14 a14,14 0 0 1 14,-14 h432 a14,14 0 0 1 14,14 v22 h-460 z" fill="#0b1220"/>
+    <circle cx="20" cy="18" r="4.5" fill="#ef4444" opacity="0.75"/>
+    <circle cx="36" cy="18" r="4.5" fill="#f59e0b" opacity="0.75"/>
+    <circle cx="52" cy="18" r="4.5" fill="#10b981" opacity="0.75"/>
+    <text x="76" y="22" fill="#64748b" font-family="system-ui" font-size="11">ContentView.cs</text>
+    <line x1="0" y1="36" x2="460" y2="36" stroke="#334155" stroke-width="1"/>
+
+    <text x="22" y="60" font-family="monospace" font-size="12" xml:space="preserve"><tspan fill="#c084fc">public override</tspan><tspan fill="#67e8f9"> View</tspan><tspan fill="#e2e8f0"> Body =&gt;</tspan></text>
+    <text x="38" y="80" font-family="monospace" font-size="12" xml:space="preserve"><tspan fill="#c084fc">new</tspan><tspan fill="#fbbf24"> VStack</tspan><tspan fill="#64748b">(</tspan></text>
+    <text x="54" y="100" font-family="monospace" font-size="12" xml:space="preserve"><tspan fill="#c084fc">new</tspan><tspan fill="#fbbf24"> Text</tspan><tspan fill="#64748b">(</tspan><tspan fill="#34d399">$"Count: {_count.Value}"</tspan><tspan fill="#64748b">)</tspan></text>
+    <text x="54" y="120" font-family="monospace" font-size="12" xml:space="preserve"><tspan fill="#64748b">.</tspan><tspan fill="#f472b6">Font</tspan><tspan fill="#64748b">(</tspan><tspan fill="#67e8f9">Font</tspan><tspan fill="#64748b">.</tspan><tspan fill="#e2e8f0">LargeTitle</tspan><tspan fill="#64748b">),</tspan></text>
+    <text x="54" y="140" font-family="monospace" font-size="12" xml:space="preserve"><tspan fill="#c084fc">new</tspan><tspan fill="#fbbf24"> Button</tspan><tspan fill="#64748b">(</tspan><tspan fill="#34d399">"Increment"</tspan><tspan fill="#64748b">, () =&gt; </tspan><tspan fill="#e2e8f0">_count.Value++</tspan><tspan fill="#64748b">)</tspan></text>
+    <text x="38" y="160" font-family="monospace" font-size="12" xml:space="preserve"><tspan fill="#64748b">).</tspan><tspan fill="#f472b6">Spacing</tspan><tspan fill="#64748b">(</tspan><tspan fill="#fb923c">24</tspan><tspan fill="#64748b">);</tspan></text>
+  </g>
+
+  <!-- ===== the pipeline ===== -->
+  <g stroke="#f97316" stroke-width="1.4" fill="none" opacity="0.5">
+    <path d="M600,216 L600,238"/>
+  </g>
+  <g filter="url(#glow)">
+    <rect x="452" y="238" width="296" height="34" rx="17" fill="#f97316" fill-opacity="0.12" stroke="#fb923c" stroke-width="1.4"/>
+    <text x="600" y="260" text-anchor="middle" fill="#fdba74" font-family="monospace" font-size="13">TreeDiffer → replace · updateProps</text>
+  </g>
+
+  <!-- route labels -->
+  <g font-family="system-ui" font-size="11" text-anchor="middle">
+    <text x="320" y="300" fill="#94a3b8">native shim (Swift · Kotlin)</text>
+    <text x="880" y="300" fill="#94a3b8">pure C# interpreter</text>
+  </g>
+
+  <!-- connectors down to the platform row -->
+  <g stroke="#22d3ee" stroke-width="1.1" fill="none" opacity="0.32">
+    <path d="M560,272 C440,290 300,300 200,322"/>
+    <path d="M575,272 C520,296 420,306 348,322"/>
+    <path d="M590,272 C570,296 520,308 496,322"/>
+  </g>
+  <g stroke="#34d399" stroke-width="1.1" fill="none" opacity="0.32">
+    <path d="M610,272 C620,296 640,306 644,322"/>
+  </g>
+  <g stroke="#a78bfa" stroke-width="1.1" fill="none" opacity="0.32">
+    <path d="M625,272 C660,296 740,308 792,322"/>
+    <path d="M638,272 C700,296 840,306 940,322"/>
+    <path d="M650,272 C760,290 920,300 1088,322"/>
+  </g>
+
+  <!-- ===== platform row ===== -->
+  <g font-family="system-ui" text-anchor="middle">
+    <g>
+      <rect x="126" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2"/>
+      <text x="200" y="340" fill="#e2e8f0" font-size="12" font-weight="600">iOS</text>
+      <text x="200" y="356" fill="#22d3ee" font-size="10">SwiftUI</text>
+    </g>
+    <g>
+      <rect x="274" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2"/>
+      <text x="348" y="340" fill="#e2e8f0" font-size="12" font-weight="600">macOS</text>
+      <text x="348" y="356" fill="#22d3ee" font-size="10">SwiftUI · AppKit</text>
+    </g>
+    <g>
+      <rect x="422" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2"/>
+      <text x="496" y="340" fill="#e2e8f0" font-size="12" font-weight="600">tvOS</text>
+      <text x="496" y="356" fill="#22d3ee" font-size="10">SwiftUI</text>
+    </g>
+    <g>
+      <rect x="570" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#10b981" stroke-width="1.2"/>
+      <text x="644" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Android</text>
+      <text x="644" y="356" fill="#34d399" font-size="10">Jetpack Compose</text>
+    </g>
+    <g>
+      <rect x="718" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2"/>
+      <text x="792" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Linux</text>
+      <text x="792" y="356" fill="#a78bfa" font-size="10">GTK4</text>
+    </g>
+    <g>
+      <rect x="866" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <text x="940" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Windows</text>
+      <text x="940" y="356" fill="#a78bfa" font-size="10">WinUI 3</text>
+    </g>
+    <g>
+      <rect x="1014" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2"/>
+      <text x="1088" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Web</text>
+      <text x="1088" y="356" fill="#a78bfa" font-size="10">HTML / DOM</text>
+    </g>
+
+    <!-- skia row -->
+    <g filter="url(#glow)">
+      <rect x="390" y="382" width="420" height="40" rx="20" fill="#f97316" fill-opacity="0.10" stroke="#fb923c" stroke-width="1.4"/>
+      <text x="600" y="407" fill="#fdba74" font-size="13" font-weight="600">Skia — self-drawn canvas, every OS</text>
+    </g>
+  </g>
+
+  <!-- ===== title ===== -->
+  <text x="600" y="500" text-anchor="middle" fill="#f1f5f9" font-family="system-ui" font-size="54" font-weight="bold" filter="url(#softGlow)">SwiftDotNet</text>
+  <text x="600" y="546" text-anchor="middle" fill="#fb923c" font-family="system-ui" font-size="26" font-weight="600">SwiftUI for .NET — everywhere</text>
+  <text x="600" y="582" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="15">one C# view tree · real native controls · two backend routes · zero reflection</text>
+
+  <circle cx="56" cy="72" r="3" fill="#fb923c" opacity="0.5"/>
+  <circle cx="80" cy="52" r="2" fill="#a78bfa" opacity="0.4"/>
+  <circle cx="44" cy="466" r="2.5" fill="#34d399" opacity="0.4"/>
+  <circle cx="1148" cy="72" r="3" fill="#a78bfa" opacity="0.5"/>
+  <circle cx="1124" cy="52" r="2" fill="#22d3ee" opacity="0.4"/>
+  <circle cx="1156" cy="466" r="2.5" fill="#fb923c" opacity="0.4"/>
+</svg>
