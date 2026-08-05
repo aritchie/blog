@@ -1,9 +1,9 @@
 ---
 title: 'SwiftDotNet — It Started With "What If I Could Just Write SwiftUI in C#?"'
-description: 'A shower thought about writing SwiftUI from C# turned into a Kotlin shim for Jetpack Compose, and then into the realization that the shim was never the point. One C# view tree, a diff engine, and a patch protocol — now rendering as real SwiftUI, real Compose, real GTK4, real WinUI, real DOM, and a from-scratch SkiaSharp toolkit that paints the whole thing itself. Plus 28 real controls built on it, what writing your own looks like on each backend, and an honest accounting of how far the Skia renderers still have to go. Think .NET Comet, but without the MAUI underneath it.'
+description: 'A shower thought about writing SwiftUI from C# turned into a Kotlin shim for Jetpack Compose, and then into the realization that the shim was never the point. One C# view tree, a diff engine, and a patch protocol — now rendering as real SwiftUI, real Compose, real GTK4, real WinUI, real DOM, a from-scratch SkiaSharp toolkit that paints the whole thing itself, and — as of today — characters in a terminal, images and all. Plus 28 real controls built on it, what writing your own looks like on each backend, and an honest accounting of how far the Skia renderers still have to go. Think .NET Comet, but without the MAUI underneath it.'
 pubDate: 'Aug 04 2026'
 heroImage: '../../../../assets/swiftdotnet-hero.svg'
-tags: ['SwiftDotNet', '.NET', 'SwiftUI', 'Jetpack Compose', 'SkiaSharp', 'Cross Platform']
+tags: ['SwiftDotNet', '.NET', 'SwiftUI', 'Jetpack Compose', 'SkiaSharp', 'Terminal UI', 'Cross Platform']
 ---
 
 Every cross-platform UI framework I've ever used asks you to accept the same trade: you write once, and in
@@ -122,7 +122,7 @@ So SwiftDotNet ended up with **one Core and two backend routes**:
 | Route | Why | Backends |
 |---|---|---|
 | **Native shim** | The toolkit is compiler-plugin-locked; C# can't author it | iOS / macOS / tvOS (Swift), Android (Kotlin) |
-| **Pure C# interpreter** | The toolkit is C#-bindable; no native code needed | Linux/GTK4, Windows/WinUI 3, Web/DOM, Skia |
+| **Pure C# interpreter** | The toolkit is C#-bindable; no native code needed | Linux/GTK4, Windows/WinUI 3, Web/DOM, Terminal, Skia |
 
 And the DSL, `State<T>`, `Node`, `TreeDiffer`, the patch protocol and `SwiftApp` are shared **verbatim**
 across every one of them. Only the leaf renderer differs.
@@ -179,7 +179,7 @@ The Skia backend taught me the single most useful sentence in the repo:
 
 > **A control that renders is not a control that works.**
 
-Here's how I learned it. There's a real controls library on top of this thing (Part 6), and seven of its
+Here's how I learned it. There's a real controls library on top of this thing (Part 7), and seven of its
 controls depend on continuous gestures — `Slider`, `RangeSlider`, `ColorPicker`, `FloatingPanel`,
 `SwipeContainer`, `ReorderableList`, `ImageViewer`. On every other backend those inherit the toolkit's gesture
 recognizers for free. A self-drawing backend has none.
@@ -213,9 +213,121 @@ And a gotcha that cost me an evening and that I'd like to save you: that shadow 
 with can't become first responder — `Focus()` silently returns `false` and no keyboard ever appears. Android
 allows the programmatic focus either way, so it fails on exactly one platform.
 
-## Part 5: when it stopped being a renderer and started being a framework
+## Part 5: the punchline — a backend with no pixels at all
 
-A view tree that reaches seven toolkits is a neat trick. It is not something you'd build an app in. The next
+Skia answered "what if the backend has no toolkit?" So the obvious next question was rude:
+
+> What if it has no **pixels**?
+
+Today I pointed the same `ContentView` at a **terminal**. Not a logging view of it. The actual UI — nav
+stack, sections, text fields, toggles, sliders, dialogs — drawn as characters in a TTY. Over SSH, in a
+container, on a box with no display server at all.
+
+[XenoAtom.Terminal.UI](https://xenoatom.github.io/terminal/) turned out to be the right substrate: it's a
+retained-mode, *bindable* widget toolkit — two-pass measure/arrange layout, routed events, focus, themes —
+not a compiler-plugin framework. Which puts it squarely on route two. No shim, no native code, one more
+`IBridge` implementation, and all 40 node kinds mapped onto real terminal controls: `Section` → a captioned
+box, `DisclosureGroup` → `Collapsible`, `TabView` → `TabControl`, `Sheet` and `Alert` → real modal dialogs,
+`NavigationStack` → a title bar over a content switcher with Esc-to-pop.
+
+Here are two sections of the shared sample's flyout menu — same `ContentView`, not a word of it changed,
+narrowed here to fit the page:
+
+```
+┌ Controls ───────────────────────────────────────────────┐
+│                    🔤 Text & Input  ›                    │
+│                  ⋮ Values & Steppers  ›                  │
+│                        ★ Rating  ›                       │
+└─────────────────────────────────────────────────────────┘
+
+┌ Layout ─────────────────────────────────────────────────┐
+│                    ▦ Shapes & Grid  ›                    │
+│                  ▤ Stacks & Alignment  ›                 │
+│                   ▭ Cards & Borders  ›                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### But what about images?
+
+This is the question I actually wanted to answer, and it's the most fun I've had in the repo.
+
+A terminal cell is not a pixel — but it *does* have a glyph, a foreground colour and a background colour.
+That's more than one bit of information per cell, and you can spend it cleverly. So an `Image` node
+downsamples to a cell grid and renders in one of three modes, picked from what the terminal admits to
+supporting:
+
+| Mode | The trick |
+|---|---|
+| **HalfBlock** (default) | One `▀` per cell, foreground = the upper half-pixel, background = the lower. **Doubles your vertical resolution for free** and keeps full colour. |
+| **Quadrant** | 2×2 sub-cell sampling onto `▘▝▀▖▌▞▛▗▚▐▜▄▙▟█`, splitting each cell's four samples around their mean luminance. Doubles horizontal resolution too, at the cost of two colours per cell. Better for line art and logos. |
+| **Ascii** | Luminance onto the ramp `" .:-=+*#%@"`. The only one that survives a monochrome terminal or `TERM=dumb`. |
+
+Two details that matter more than they sound like they should. Downsampling is a **box average**, not
+nearest-neighbour — at 20–60 columns, nearest-neighbour throws away most of the source and aliases into
+mush. And aspect ratio is corrected for the ~2:1 cell, so a square image comes out square instead of twice
+as tall as it is wide.
+
+Terminals that speak Sixel or the Kitty protocol can do better than art, of course — real pixels. That path
+exists too, and it's where I made the one dependency decision I'd defend hardest: it's a **separate opt-in
+package**, because the library that provides it drags in SkiaSharp plus native assets for three desktop
+RIDs. A terminal app that never shows an image should not pay tens of megabytes for the privilege. So the
+core backend depends on exactly one package, ships a **hand-rolled PNG decoder** (`System.IO.Compression`
+for the inflate, everything above it — chunk walking, bit unpacking, all five scanline filters — written
+out), and stays trim/AOT-clean. Turn on the add-on and images become real Sixel/Kitty pixels *with the
+character art as their fallback content*, so a terminal that can't do graphics degrades on its own.
+
+### The backend that finally made testing possible
+
+Here's the thing I did not expect.
+
+GTK and Web can't be tested headlessly in CI — they need a display server and a browser. Skia can, which is
+why it's far and away the most test-covered backend in the repo. But the terminal one is the *easiest* to
+write assertions for, because **a terminal frame is just text**. Render the visual tree into a cell buffer,
+read it back as markup, and you get something you can eyeball in a failure message:
+
+```
+[#ff0000 on #0000ff]▀[/]
+```
+
+That's one half-block cell: red on top, blue underneath. You can write an assertion against that. So the
+image pipeline has real tests — the half-block trick, the box averaging, alpha compositing against the
+theme background, the PNG decoder against fixtures encoded in the test itself.
+
+And it immediately earned its keep. Three layout bugs were invisible to every type-level assertion I had —
+each control was correct, only the *widths* were wrong — and fell straight out the moment I rendered to an
+actual buffer:
+
+| Symptom | Cause |
+|---|---|
+| Every `Section` shrink-wrapped to its longest row; labels truncated mid-word | The per-node wrapper I use to carry padding/background/border was swallowing its content's *stretch* intent |
+| `Spacer` did nothing — `left` and `right` came out adjacent | This toolkit resolves size by alignment *before* flex gets a say, so a shrink-wrapped stack gives a Spacer no slack to absorb |
+| `Rectangle().Frame(80, 32)` drew at its natural size inside a correctly-sized frame | Shapes weren't greedy. In SwiftUI they are. |
+
+Which is Part 4's lesson wearing a different hat: **a control that renders is not a control that works** —
+and sometimes you only find out when you can finally read the frame back.
+
+### Two traps, so you don't pay for them
+
+Both libraries are SwiftUI-shaped, which means both libraries **use the same names**. `State<T>`, `Color`,
+`Style`, `Theme`, `VStack`, `Button`, `Grid`, `Slider`, `Link`, `Rectangle` — all of them exist twice. Add
+`using XenoAtom.Terminal.UI;` to a file and every `State<int>` in your own views becomes an ambiguity error.
+So the host takes a *SwiftDotNet* options type rather than the toolkit's, and app code never has to import
+the colliding namespace at all. Inside the backend, the one file where the two vocabularies meet aliases the
+terminal side with a `T` prefix and a comment explaining why.
+
+The second cost me a genuinely stupid amount of time. `Slider<T>` clamps and step-snaps on **every write to
+`Value`**, against whatever `Minimum`/`Maximum`/`Step` happen to be set at that instant — and it defaults to
+a 0–10 range with a step of 1. Which means the three-argument constructor is a trap:
+
+```csharp
+new Slider<double>(0, 100, 42).Value   // → 10. It applies Value before Maximum.
+```
+
+Set the range, then the step, then the value. In that order, every time.
+
+## Part 6: when it stopped being a renderer and started being a framework
+
+A view tree that reaches eight toolkits is a neat trick. It is not something you'd build an app in. The next
 stretch was the unglamorous stuff that decides whether anyone ever could.
 
 **Hosting and DI**, deliberately shaped like `MauiProgram.cs`, because that's the shape .NET developers
@@ -271,7 +383,7 @@ Which means global styles work identically on **every** backend — including Sk
 inheritance mechanism of their own — with **zero per-backend code**. An explicit local modifier always wins,
 and nothing is injected unless you set an environment, so it costs nothing when unused.
 
-## Part 6: there are real controls on this thing
+## Part 7: there are real controls on this thing
 
 A DSL that can do `VStack` and `Button` proves nothing. Anybody can ship a toy. The question that actually
 decides whether a UI framework is real is: **can you build serious controls on it without reaching back into
@@ -296,8 +408,8 @@ demo fodder.
 And here's the part that made me trust the architecture: **every single one is a pure composite.** Each is an
 ordinary `View` whose `Body` lowers to core views the backends already draw. There is not one `ctx.NewNode`
 call in the entire project. Zero new node kinds. Zero new backend code. I wrote `DataGrid` once, in plain C#,
-and it renders on SwiftUI, Compose, GTK4, WinUI, the DOM and Skia because it decomposes into stacks, text,
-shapes and modifiers that all six already understood.
+and it renders on SwiftUI, Compose, GTK4, WinUI, the DOM, Skia and a terminal because it decomposes into
+stacks, text, shapes and modifiers that all seven already understood.
 
 That gives you a rule I now reach for constantly when triaging:
 
@@ -334,8 +446,8 @@ public sealed class Rating : View
 }
 ```
 
-That's the whole control. It works on SwiftUI, Compose, GTK4, WinUI, the DOM and Skia, and it participates in
-global styles for free because it's just views.
+That's the whole control. It works on SwiftUI, Compose, GTK4, WinUI, the DOM, Skia and a terminal, and it
+participates in global styles for free because it's just views.
 
 **Door two — a native primitive.** When the thing genuinely isn't a composition — a real map, a hardware
 gauge, a camera preview, a platform widget with no C# equivalent — you subclass `CustomView` instead. You
@@ -376,7 +488,12 @@ GtkRenderers.Register("NativeRating", ctx =>
 
 // Windows — WinRenderers.Register(type, ctx => FrameworkElement)
 // Web     — WebRenderers.Register(type, WebRenderer delegate)
+// Terminal — TuiRenderers.Register(type, ctx => Visual)
 ```
+
+That last one does double duty on the terminal backend: it's also how you reach the controls
+XenoAtom.Terminal.UI ships that the DSL has no node kind for — `Table`, `DataGridControl`, `TreeView`,
+`CodeEditor`, `MarkdownControl`, the chart family.
 
 **Skia is the interesting one**, because it owns the pixels — so a renderer has to both `Measure` itself and
 `Paint` itself. It's the self-drawing analog of GTK's create/update widget pair:
@@ -449,28 +566,30 @@ the rest whenever. The control shows up as an honest "not implemented here" box 
 taking the app down. That's how `Map` shipped — it's the canonical real example of this seam, with MapKit on
 Apple, MapLibre on Web and Android, a hand-drawn one on Skia, and a placeholder anywhere I haven't got to.
 
-## Part 7: …and the Skia renderers still have a ways to go
+## Part 8: …and the Skia renderers still have a ways to go
 
-All 28 controls **render** on all seven backends. I want to be careful with that sentence, because after Part 4
+All 28 controls **render** on all eight backends. I want to be careful with that sentence, because after Part 4
 you know exactly how much it isn't saying.
 
 Rendering is the easy half. What differs backend to backend is *interaction and effects*, and Skia — being the
 one with no toolkit underneath it — has the longest list of things that are drawn correctly and behave
 approximately. Straight from the audit table in the docs:
 
-| | Apple | Web | Compose | **Skia** | GTK | WinUI |
-|---|---|---|---|---|---|---|
-| Continuous drag (7 controls) | ✅ | ✅ | ✅ | **✅ ¹** | ✅ | ✅ ² |
-| Pinch (`ImageViewer`) | ✅ | ✅ | ✅ | **✅ ¹** | ✅ | ✅ ² |
-| Shimmer / pulse loop | ✅ | ✅ | ✅ | **✅ ³** | ✅ ³ | ❌ |
-| Real backdrop blur | ✅ | ✅ | tint | **tint** | tint | tint |
-| `CameraView` | ✅ | ❌ | ❌ | **placeholder** | ❌ | ❌ |
+| | Apple | Web | Compose | **Skia** | GTK | WinUI | TUI |
+|---|---|---|---|---|---|---|---|
+| Continuous drag (7 controls) | ✅ | ✅ | ✅ | **✅ ¹** | ✅ | ✅ ² | ❌ ⁴ |
+| Pinch (`ImageViewer`) | ✅ | ✅ | ✅ | **✅ ¹** | ✅ | ✅ ² | ❌ ⁴ |
+| Shimmer / pulse loop | ✅ | ✅ | ✅ | **✅ ³** | ✅ ³ | ❌ | ❌ |
+| Real backdrop blur | ✅ | ✅ | tint | **tint** | tint | tint | tint |
+| `CameraView` | ✅ | ❌ | ❌ | **placeholder** | ❌ | ❌ | ❌ |
 
 ¹ **Only if the host wires `SkiaPointerRouter`.** A host that forwards only taps leaves all seven drag-driven
 controls inert while looking perfectly correct. All three in-repo hosts are wired — yours wouldn't be.
 ² WinUI is uncompiled and untested. ³ The wire carries no from/to pair, so a loop is always opacity 1 → 0.4:
 `BadgeView.Pulse` reads as an opacity pulse rather than a size pulse, and `SkeletonView`'s shimmer *fades*
-instead of travelling across the control. It looks fine. It isn't what I wrote.
+instead of travelling across the control. It looks fine. It isn't what I wrote. ⁴ A terminal reports button
+press/release and wheel — not drag paths, not pinch. Those are honest no-ops there, along with transforms,
+shadows and animation, because a cell grid has nowhere to put them.
 
 `.Material` blur is a translucent **tint**, not a real backdrop blur, so `FrostedGlassView` is frosted in
 spirit only. And `CameraView` on Skia deliberately renders an honest viewfinder placeholder rather than faking
@@ -501,7 +620,7 @@ If you want the pixel-identical look or a target the native backends can't reach
 genuinely usable today. If you want a screen reader to work, use a native backend and come back to this one
 later.
 
-## Part 8: hot reload showed up for free, and iOS made me work for it
+## Part 9: hot reload showed up for free, and iOS made me work for it
 
 I didn't build hot reload. I built four properties that turned out to add up to it:
 
@@ -546,7 +665,7 @@ herring** — it's the debug agent looking for an IDE and it's non-fatal, includ
 perfectly. And use `--property:Foo=Bar`, not `-p:Foo=Bar`: `dotnet watch` reads `-p` as `--project` and will
 tell you the project file `Foo=Bar` doesn't exist.
 
-## Part 9: tooling, because seven backends is a lot of incantations
+## Part 10: tooling, because eight backends is a lot of incantations
 
 The last stretch was a Rider plugin, and the most useful thing in it isn't the plugin — it's the doctor.
 
@@ -555,14 +674,14 @@ references, and `swiftdotnet-doctor` runs the plugin's discovery, host-OS gate, 
 planning **headlessly inside a real Rider process**, then prints the exact command each head would run:
 
 ```
-heads (12)
+heads (13)
   ✓ SampleApp (net10.0-ios)
       backend  : Apple (SwiftUI)
       devices  : iPhone Air (499AF569-C96C-4E5E-9361-CCEF93410629)
       run      : dotnet build …/SampleApp.csproj -t:Run -f net10.0-ios -c Debug \
                  -p:SwiftDotNetHotReload=true -p:_DeviceName=:v2:udid=499AF569-…
 …
-12 of 12 head(s) runnable on macos
+13 of 13 head(s) runnable on macos
 ```
 
 Copy-pasteable, and it exits non-zero when nothing is runnable so it doubles as a CI check. There's also a
@@ -602,9 +721,10 @@ What's underneath is where they part company, and every difference below traces 
 | **Update mechanism** | MVU over MAUI's in-process object graph | Structural-path **diff engine** → patch → native `@Observable` / `mutableStateOf` VNode tree across a C-ABI / JNI **bridge** |
 | **Backend routes** | One — MAUI handlers, for everything | **Two** — native shim for compiler-locked toolkits, pure-C# interpreter for bindable ones |
 | **Dependencies** | The **entire MAUI stack** | Core is dependency-free, platform-neutral C#; each backend pulls only its own toolkit |
-| **Platform reach** | Wherever MAUI runs: Windows, Android, iOS, macOS (Catalyst), Blazor | iOS, **tvOS**, native macOS/AppKit, Android, **Linux/GTK4**, Windows/WinUI 3, **Web/DOM**, plus a self-drawing **Skia** renderer |
+| **Platform reach** | Wherever MAUI runs: Windows, Android, iOS, macOS (Catalyst), Blazor | iOS, **tvOS**, native macOS/AppKit, Android, **Linux/GTK4**, Windows/WinUI 3, **Web/DOM**, plus a self-drawing **Skia** renderer and a **terminal** one |
 | **Linux** | Not a MAUI target | **Real GTK4 widgets**, pure C#, no shim |
 | **Self-drawn option** | — | A from-scratch SkiaSharp toolkit for a pixel-identical look and for embedded/framebuffer targets |
+| **Headless / no display server** | — | A **terminal** backend: the same view tree as characters in a TTY, images included |
 | **Status** | **Archived July 11, 2025** — *"a proof of concept… no official support"*, read-only | Active, early-stage |
 
 **Why the substrate choice matters.** Comet's bet was to lean on MAUI's abstraction and inherit its platforms
@@ -642,17 +762,23 @@ has to say *where*. So, honestly:
 | Linux | GTK4 | ✅ Desktop — 325 real `Gtk.Widget`s, pure C# |
 | Web | HTML/DOM | ✅ Chrome, Blazor WASM |
 | **Skia** | **Self-drawn canvas** | ✅ macOS window, headless PNG, iOS sim + Android emulator via MAUI |
+| **Terminal** | **Characters in a TTY** | ✅ Headless on macOS — 35 CI tests; not yet driven by hand in a live terminal |
 | Windows | WinUI 3 | 🧩 Scaffolded — needs a Windows box to compile |
 
 The same 28-control library builds on top of it, and the same 5-tab sample `ContentView` — one file — drives
 every row.
 
-Beyond the Skia gaps in Part 7, here's what else is missing, and I'd rather say it than have you find it:
-**accessibility modifiers are not built at all** — there's no `.AccessibilityLabel`/`Hint`/`Value` yet on any
-backend, native ones included. Per-view local state ownership is the cross-cutting milestone several features
-are blocked on — child constructor injection, enter/leave transitions, keyed `ForEach` for animated inserts.
-The bridge protocol is still JSON on the hot path. Everything is simulator/emulator-verified, not
-device-verified. And **none of it is on NuGet yet**.
+That terminal row is doing the most work of any checkmark in the table, so let me be precise about it: it
+means the tree builds and renders through the toolkit's real layout and render pipeline, asserted by tests.
+Its focus order, mouse reporting and alternate-screen lifecycle are all framework-supplied and unexercised
+by me. I have not sat and driven it, and a green checkmark shouldn't imply I did.
+
+Beyond that and the Skia gaps in Part 8, here's what else is missing, and I'd rather say it than have you
+find it: **accessibility modifiers are not built at all** — there's no `.AccessibilityLabel`/`Hint`/`Value`
+yet on any backend, native ones included. Per-view local state ownership is the cross-cutting milestone
+several features are blocked on — child constructor injection, enter/leave transitions, keyed `ForEach` for
+animated inserts. The bridge protocol is still JSON on the hot path. Everything is simulator/emulator-verified,
+not device-verified. And **none of it is on NuGet yet**.
 
 ## Seventeen days
 
@@ -668,7 +794,9 @@ deciding, and each one is the reason the next thing was cheap.
 The thing I keep coming back to is how much fell out of one narrow decision made on day one. **C# describes;
 the platform authors.** Say that, and Compose is nearly free. Say it again and GTK, WinUI and the DOM don't
 need native code at all. Say it a third time and you can write a renderer that has no toolkit underneath it
-whatsoever, and the view tree doesn't notice.
+whatsoever, and the view tree doesn't notice. Say it once more and the renderer doesn't need pixels either —
+the same `ContentView` comes up in a terminal, and the only thing I had to decide was how to spend a
+character cell.
 
 I still don't know if this becomes a real thing or stays a very elaborate answer to a shower thought. But it
 renders real SwiftUI from C#, which is all I originally wanted, and then it kept going.
