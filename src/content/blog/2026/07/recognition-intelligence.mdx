@@ -7,8 +7,6 @@ tags: ['Shiny', '.NET MAUI', 'MAUI UI July', 'AI', 'ONNX']
 ---
 
 import { Image } from 'astro:assets';
-import Screenshot from '../../../../components/Screenshot.astro';
-import ScreenshotRow from '../../../../components/ScreenshotRow.astro';
 import NugetPackages from '../../../../components/NugetPackages.astro';
 import architecture from '../../../../assets/recognition-intelligence-architecture.svg';
 
@@ -128,11 +126,6 @@ void OnFaceRecognized(object? sender, FaceRecognizedEventArgs e)
 ```
 
 Tuning lives on the analyzer, not on the control's XAML surface, because these are frame-pipeline concerns rather than UI ones: `StabilityFrames` (3), `RecognitionInterval` (2 s), `MaxAnalysisWidth` (720), `MinConfidence` (0.7).
-
-<ScreenshotRow>
-  <Screenshot src="/images/recogiq/face-recognize.png" alt="Live face recognition with an overlay box and matched name" />
-  <Screenshot src="/images/recogiq/face-enroll.png" alt="Guided face enrollment with the target oval overlay" />
-</ScreenshotRow>
 
 ### The enrollment control is a wizard in a box
 
@@ -280,12 +273,6 @@ The options type accepts a provider, raw bytes, or a path (in that priority) —
 **2. Load lazily, or you own every startup failure.** Sessions are created on first use, not at registration. A 13 MB model deserialized during DI setup is startup latency every launch, on every device, whether or not the user visits that screen — and if the file is missing, you've turned a screen-level error message into a crash before the first frame. Lazy means the failure lands inside the operation that needed it, where the page can catch it and say "model missing" like any other error.
 
 **3. Keep the inference path reflection-free.** Everything here is `IsAotCompatible`, which for ONNX means the tensor work is fine (it's just arrays and spans) but the *serialization* around it isn't free — hence a source-generated `JsonSerializerContext` for the stored documents, fed to the document store explicitly. If you add a persisted type, it goes in that context or it fails at runtime in a trimmed build and nowhere else.
-
-<Screenshot
-  src="/images/recogiq/app-home.png"
-  alt="Sample app home — Face, Voice and Document tabs"
-  caption="The sample app: face, voice and document tabs, all offline."
-/>
 
 ## Recognition rides the frame analyzer, not the shutter
 
@@ -450,18 +437,7 @@ Two reasons this isn't just purism. There's no published Shiny audio-capture pac
 
 The one rule the seam carries: **record enrollment and recognition through the same path.** A speaker embedding encodes the channel as much as the voice, so a template captured at a different rate or through a different processing chain than the probe carries a systematic offset — the exact same failure the face stack hit with stills versus frames, in a different medium.
 
-<Screenshot
-  src="/images/recogiq/voice-enroll-control.png"
-  alt="VoiceEnrollmentView mid-run — prompt list with ticks, countdown, and the VU meter with its threshold tick"
-  caption="VoiceEnrollmentView mid-run: accepted prompts ticked off, the countdown, and the level meter with the acceptance threshold marked."
-/>
-
 And the sentences it shows are **not** passphrases. The model is text-independent and nothing verifies that the sentence was read — that would need speech-to-text. They're there because phonetically rich sentences exercise more of the vocal tract, and because having something to read keeps a person talking for the whole window instead of trailing off after two seconds.
-
-<ScreenshotRow>
-  <Screenshot src="/images/recogiq/voice-enroll.png" alt="Guided voice enrollment showing the prompt sentence and agreement score" />
-  <Screenshot src="/images/recogiq/voice-recognize.png" alt="Voice identification result with the nearest distance shown" />
-</ScreenshotRow>
 
 ### Two days I'd like back: it was never the threshold
 
@@ -668,11 +644,6 @@ if (await dialogs.Confirm("Forget", $"Remove everything stored for '{id}'?", "Fo
 
 `Forget` is the entire deletion story, and it's worth knowing it's this simple *before* someone asks you the GDPR question. There's no model to retrain and no artifact to expire — the templates are rows, so erasing a person is a `DELETE` that returns how many rows went.
 
-<ScreenshotRow>
-  <Screenshot src="/images/recogiq/face-people.png" alt="Enrolled people list with thumbnails and shot counts" />
-  <Screenshot src="/images/recogiq/voice-speakers.png" alt="Enrolled speakers list with recording counts" />
-</ScreenshotRow>
-
 ## Documents: scan, then extract
 
 The third stack is a different shape, because scanning is **modal** — it takes over the screen — so it composes as a service rather than another frame analyzer.
@@ -697,12 +668,6 @@ Two choices in that type are deliberate and I'd argue with anyone who wanted to 
 
 - **No CVV. Ever.** There is no property and the parser never looks for one. PCI-DSS forbids storing it post-authorization, and an API that surfaces it is an invitation to store it. There's a test — `NoCvvIsEverExposed` — that asserts this structurally so nobody adds it by accident.
 - **`ToString()` is overridden to mask the PAN.** A positional record's generated `ToString` prints every property, so `logger.LogInformation("{Card}", card)` would put a live card number in your logs. `MaskedNumber` and `Last4` are the display forms. The sample deliberately shows the masked number, because a demo screen rendering a live PAN teaches exactly the wrong habit.
-
-<Screenshot
-  src="/images/recogiq/document-scan.png"
-  alt="Document scan result showing extracted receipt fields"
-  caption="Scan → OCR → parse, all on-device. The card path masks the PAN by construction."
-/>
 
 ## What's still wrong
 
