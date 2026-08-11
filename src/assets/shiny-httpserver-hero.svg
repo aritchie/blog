@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="netGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.30"/>
+      <stop offset="55%" stop-color="#06b6d4" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <ellipse cx="600" cy="250" rx="560" ry="250" fill="url(#netGlow)"/>
+
+  <!-- ===== the whole server, in three lines ===== -->
+  <g transform="translate(310, 34)">
+    <rect x="0" y="0" width="580" height="140" rx="14" fill="url(#chrome)" stroke="#334155" stroke-width="1.5"/>
+    <path d="M0,14 a14,14 0 0 1 14,-14 h552 a14,14 0 0 1 14,14 v22 h-580 z" fill="#0b1220"/>
+    <circle cx="20" cy="18" r="4.5" fill="#ef4444" opacity="0.75"/>
+    <circle cx="36" cy="18" r="4.5" fill="#f59e0b" opacity="0.75"/>
+    <circle cx="52" cy="18" r="4.5" fill="#10b981" opacity="0.75"/>
+    <text x="76" y="22" fill="#64748b" font-family="system-ui" font-size="11">Program.cs</text>
+    <line x1="0" y1="36" x2="580" y2="36" stroke="#334155" stroke-width="1"/>
+
+    <text x="22" y="66" font-family="monospace" font-size="12.5" xml:space="preserve"><tspan fill="#c084fc">var</tspan><tspan fill="#e2e8f0"> server = </tspan><tspan fill="#c084fc">new</tspan><tspan fill="#fbbf24"> HttpServer</tspan><tspan fill="#64748b">(</tspan><tspan fill="#c084fc">new</tspan><tspan fill="#67e8f9"> HttpServerOptions</tspan><tspan fill="#64748b"> { </tspan><tspan fill="#e2e8f0">Port = </tspan><tspan fill="#fb923c">8080</tspan><tspan fill="#64748b"> });</tspan></text>
+    <text x="22" y="92" font-family="monospace" font-size="12.5" xml:space="preserve"><tspan fill="#e2e8f0">server.</tspan><tspan fill="#f472b6">OnGet</tspan><tspan fill="#64748b">(</tspan><tspan fill="#34d399">"/ping"</tspan><tspan fill="#64748b">, ctx =&gt; ctx.</tspan><tspan fill="#e2e8f0">Response</tspan><tspan fill="#64748b">.</tspan><tspan fill="#f472b6">WriteAsync</tspan><tspan fill="#64748b">(</tspan><tspan fill="#34d399">"pong"</tspan><tspan fill="#64748b">));</tspan></text>
+    <text x="22" y="118" font-family="monospace" font-size="12.5" xml:space="preserve"><tspan fill="#c084fc">await</tspan><tspan fill="#e2e8f0"> server.</tspan><tspan fill="#f472b6">RunAsync</tspan><tspan fill="#64748b">();</tspan></text>
+  </g>
+
+  <!-- ===== protocol band ===== -->
+  <g stroke="#a78bfa" stroke-width="1.4" fill="none" opacity="0.5">
+    <path d="M600,174 L600,196"/>
+  </g>
+  <g filter="url(#glow)">
+    <rect x="326" y="196" width="548" height="34" rx="17" fill="#8b5cf6" fill-opacity="0.12" stroke="#a78bfa" stroke-width="1.4"/>
+    <text x="600" y="218" text-anchor="middle" fill="#c4b5fd" font-family="monospace" font-size="13">HTTP/1.1 · HTTP/2 (HPACK) · HTTP/3 (QPACK) · WebSockets · SSE</text>
+  </g>
+
+  <g font-family="system-ui" font-size="11" text-anchor="middle">
+    <text x="600" y="252" fill="#94a3b8">no ASP.NET Core · only Microsoft.Extensions.* abstractions</text>
+  </g>
+
+  <!-- connectors down to the platform row -->
+  <g stroke="#22d3ee" stroke-width="1.1" fill="none" opacity="0.32">
+    <path d="M560,268 C440,288 300,300 200,322"/>
+    <path d="M578,268 C520,294 420,306 348,322"/>
+  </g>
+  <g stroke="#34d399" stroke-width="1.1" fill="none" opacity="0.32">
+    <path d="M594,268 C572,294 520,308 496,322"/>
+    <path d="M606,268 C628,294 680,308 644,322"/>
+  </g>
+  <g stroke="#a78bfa" stroke-width="1.1" fill="none" opacity="0.32">
+    <path d="M622,268 C660,296 740,308 792,322"/>
+    <path d="M640,268 C760,288 920,300 1000,322"/>
+  </g>
+
+  <!-- ===== platform row ===== -->
+  <g font-family="system-ui" text-anchor="middle">
+    <g>
+      <rect x="126" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2"/>
+      <text x="200" y="340" fill="#e2e8f0" font-size="12" font-weight="600">iOS</text>
+      <text x="200" y="356" fill="#22d3ee" font-size="10">.NET MAUI</text>
+    </g>
+    <g>
+      <rect x="274" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2"/>
+      <text x="348" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Android</text>
+      <text x="348" y="356" fill="#22d3ee" font-size="10">.NET MAUI</text>
+    </g>
+    <g>
+      <rect x="422" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#10b981" stroke-width="1.2"/>
+      <text x="496" y="340" fill="#e2e8f0" font-size="12" font-weight="600">macOS</text>
+      <text x="496" y="356" fill="#34d399" font-size="10">Mac Catalyst</text>
+    </g>
+    <g>
+      <rect x="570" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#10b981" stroke-width="1.2"/>
+      <text x="644" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Windows</text>
+      <text x="644" y="356" fill="#34d399" font-size="10">desktop · service</text>
+    </g>
+    <g>
+      <rect x="718" y="322" width="148" height="42" rx="10" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2"/>
+      <text x="792" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Linux</text>
+      <text x="792" y="356" fill="#a78bfa" font-size="10">container · edge</text>
+    </g>
+    <g>
+      <rect x="866" y="322" width="208" height="42" rx="10" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2"/>
+      <text x="970" y="340" fill="#e2e8f0" font-size="12" font-weight="600">Native AOT</text>
+      <text x="970" y="356" fill="#a78bfa" font-size="10">trim-clean, enforced by build</text>
+    </g>
+  </g>
+
+  <!-- ===== the tunnel ===== -->
+  <g stroke="#22d3ee" stroke-width="1.2" fill="none" opacity="0.45">
+    <path d="M600,364 L600,384"/>
+  </g>
+  <g filter="url(#glow)">
+    <rect x="330" y="384" width="540" height="40" rx="20" fill="#06b6d4" fill-opacity="0.10" stroke="#22d3ee" stroke-width="1.4"/>
+    <text x="600" y="409" text-anchor="middle" fill="#a5f3fc" font-family="monospace" font-size="13">ITunnelProvider  →  https://your-phone.example  (outbound only)</text>
+  </g>
+  <text x="600" y="442" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="11">SSH remote forwarding · quick tunnels · Azure Relay — reachable from behind CGNAT</text>
+
+  <!-- ===== title ===== -->
+  <text x="600" y="502" text-anchor="middle" fill="#f1f5f9" font-family="system-ui" font-size="52" font-weight="bold" filter="url(#softGlow)">Shiny.Net.HttpServer</text>
+  <text x="600" y="546" text-anchor="middle" fill="#a78bfa" font-family="system-ui" font-size="25" font-weight="600">a real HTTP server where ASP.NET Core will not go</text>
+  <text x="600" y="582" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="15">six packages · four tiers · zero reflection · MCP in your pocket</text>
+
+  <circle cx="56" cy="72" r="3" fill="#a78bfa" opacity="0.5"/>
+  <circle cx="80" cy="52" r="2" fill="#22d3ee" opacity="0.4"/>
+  <circle cx="44" cy="466" r="2.5" fill="#34d399" opacity="0.4"/>
+  <circle cx="1148" cy="72" r="3" fill="#22d3ee" opacity="0.5"/>
+  <circle cx="1124" cy="52" r="2" fill="#a78bfa" opacity="0.4"/>
+  <circle cx="1156" cy="466" r="2.5" fill="#a78bfa" opacity="0.4"/>
+</svg>

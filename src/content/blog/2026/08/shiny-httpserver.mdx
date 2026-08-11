@@ -1,0 +1,241 @@
+---
+title: 'Shiny.Net.HttpServer — A Real HTTP Server Where ASP.NET Core Will Not Go'
+description: 'Six new packages: a dependency-light, AOT/trim-clean HTTP/1.1, HTTP/2 and HTTP/3 server that runs anywhere .NET runs — including inside a .NET MAUI app on iOS and Android. Routing, middleware, DI scopes, WebSockets, SSE, TLS with managed self-signed certs, an OpenAPI document built with zero reflection, source-generated typed endpoints, tunnelling so a phone is reachable from the internet, and an MCP server you can point Claude at.'
+pubDate: 'Aug 11 2026'
+heroImage: '../../../../assets/shiny-httpserver-hero.svg'
+tags: ['Shiny', '.NET', '.NET MAUI', 'AOT', 'HTTP', 'MCP']
+---
+
+I wanted to point an AI client at an app running on my phone.
+
+Not at a cloud service that the phone syncs with. At the phone. The device is where the interesting
+data already lives — the notes, the files, the sensors, the thing the user actually did five minutes
+ago — and I wanted an MCP server sitting right there, on the device, so a model could ask it
+questions directly.
+
+The MCP SDK has an HTTP transport. Lovely. It is an ASP.NET Core package.
+
+And that is the wall. ASP.NET Core does not run on .NET MAUI. It never has. It is not a MAUI problem
+or an iOS problem exactly — it is that Kestrel and the hosting stack assume a world of
+`Microsoft.AspNetCore.App`, a framework reference you cannot take on a phone. So the moment you want
+to *serve* HTTP from a device rather than call it, you are on your own.
+
+I have hit this wall enough times now — an MCP endpoint, a webhook receiver for local debugging, a
+"send this file to my laptop" screen, a config UI for a headless appliance, a Blazor WASM app served
+off a Raspberry Pi — that I finally stopped working around it.
+
+So: **[Shiny.Net.HttpServer](https://shinylib.net/httpserver)**. A real HTTP server, written from
+scratch, that runs anywhere .NET runs. It is in beta today.
+
+```csharp
+var server = new HttpServer(new HttpServerOptions { Port = 8080 });
+server.OnGet("/ping", ctx => ctx.Response.WriteAsync("pong"));
+await server.RunAsync();
+```
+
+That is the whole thing running. Three lines, no host builder, no `Microsoft.AspNetCore.App`.
+
+## What "dependency-light" actually means here
+
+This is the part I care about most, so let me be precise rather than hand-wavy.
+
+The only dependencies are `Microsoft.Extensions.*` **abstractions**. That is it. Everything else is
+built on what ships in the box:
+
+- JSON is `System.Text.Json`, source-generated, no reflection
+- The JWT package does its own crypto — no `Microsoft.IdentityModel`, no `System.IdentityModel.Tokens.Jwt`
+- HTTP/2's HPACK and HTTP/3's QPACK are implemented in the library
+- The OpenAPI document is assembled from compile-time metadata, not a document object model
+- TLS certificates — including self-signed ones generated on the device — are managed code
+
+I did not do this to be clever. I did it because every one of those is a package that either drags in
+a dependency graph you cannot afford on a phone, or does something reflective that dies under
+trimming. And on iOS, trimming is not a choice you get to make.
+
+Which leads to the rule the whole repo is built around: **every shipping project has the trim, AOT
+and single-file analyzers turned on.** "AOT-clean" is a build failure if you get it wrong, not a
+sentence in a readme. There is exactly one package that opts out, and it says so loudly and explains
+why — more on that below.
+
+## The four tiers
+
+The thing I wanted to avoid was a framework with one correct way to write an endpoint. So there are
+four, each built on the one below, and they compose in the same app.
+
+**Tier 0 — one delegate.** No routing, no ceremony. You get a request, you write a response.
+
+```csharp
+server.OnRequest(async ctx => await ctx.Response.WriteAsync("hello"));
+```
+
+**Tier 1 — routes.** Templates with constraints, and they are mutable at runtime, which matters more
+than it sounds when the server is embedded in an app that toggles features.
+
+```csharp
+server.OnGet("/api/users/{id:int}", async ctx => { /* … */ });
+```
+
+**Tier 2 — middleware.** ASP.NET-shaped, because everyone already knows the shape.
+
+```csharp
+server.UseAuthentication();
+server.Use(new MyRequestCounter());
+server.UseEmbeddedFiles(typeof(App).Assembly, "MyApp.wwwroot");
+```
+
+**Tier 3 — source-generated typed endpoints.** A class, constructor injection, typed parameters
+bound at compile time. The generator emits the route registration, the binding and the OpenAPI
+metadata. No reflection at runtime, nothing to trim away.
+
+```csharp
+[Route("/api/users")]
+public class UserEndpoints(IUserService users, ILogger<UserEndpoints> logger)
+{
+    [Get("/{id:int}")]
+    public async Task<IActionResult> GetUser(int id, CancellationToken ct)
+        => await users.FindAsync(id, ct) is { } u ? new OkObjectResult(u) : new NotFoundResult();
+}
+
+app.MapMyAppEndpoints();   // emitted for every [Route] class in the assembly
+```
+
+Both result spellings work — `Results.Ok(…)` if you think in minimal APIs, `IActionResult` if you
+think in MVC. I got tired of picking sides.
+
+## What is in the box
+
+The short version, because the [docs](https://shinylib.net/httpserver) go deeper on all of it:
+
+- **Protocols** — HTTP/1.1, HTTP/2, HTTP/3, WebSockets, Server-Sent Events. The version is never
+  guessed: ALPN over TLS, connection preface over cleartext.
+- **Content** — static files from disk *or* embedded resources, a published Blazor WebAssembly app,
+  streaming multipart uploads, byte ranges and conditional GETs, a file browser over a directory,
+  brotli/gzip/deflate.
+- **Security** — authentication and authorization split ASP.NET-style, with Basic, API key, cookie
+  and JWT schemes, plus policies, roles, claims, CORS, rate limiting and IP filtering — all with
+  per-endpoint policies.
+- **TLS** — multiple endpoints with per-endpoint TLS, self-signed certificates generated in managed
+  code (iOS and Android included), client certificates, and SPKI pinning for your own `HttpClient`.
+- **Lifecycle** — start, stop and restart at runtime, serialized and idempotent, with observable
+  state. An embedded server gets *toggled*, not just booted, and that turned out to be a surprising
+  amount of the design.
+
+A real `IServiceScope` per request, RFC 9457 problem details, content negotiation, and an
+exception-handler chain are all there too.
+
+## Getting a phone onto the internet
+
+A server on a phone is useless if nothing can reach it. A cellular device sits behind carrier-grade
+NAT with no routable address and no port you could forward, and you cannot ship an agent process
+like ngrok or cloudflared to iOS — there is no process to spawn.
+
+So tunnelling is a first-class part of this, through a pluggable `ITunnelProvider`. The device opens
+an ordinary **outbound** connection and asks the far end to forward traffic back down it. There is a
+reference relay (both ends), an Azure Relay provider, and SSH remote forwarding — `ssh -R`, in
+library form, in pure managed code so it runs on iOS.
+
+And then the one I actually use, which needs no account and nothing installed:
+
+```csharp
+builder.Services.AddQuickTunnel();
+
+// from a Share button:
+var url = await tunnel.StartAsync();   // https://xxxxx.free.pinggy.net
+```
+
+`QuickTunnel` is `INotifyPropertyChanged`, so a view binds straight to `PublicUrl` and `State`.
+**Bind to it — do not read it once.** A free tunnel hands out a different address on every reconnect,
+and a phone reconnects every time it changes network. An app that painted the first URL on a label is
+showing a dead link ten minutes later.
+
+A war story from building this, since it is the kind of thing that only shows up against real
+servers: the default host used to be localhost.run, and it never worked. It forwards fine, but it
+never *confirms* the SSH session request that carries your assigned URL. The `ssh` binary does not
+wait for that confirmation and prints the address anyway; SSH.NET waits, and there is no supported
+way around it because the channel types are internal to the library. So the tunnel came up, stalled
+for thirty seconds, and then reported a URL scraped out of the provider's welcome banner — which
+was a link to *their* dashboard. It looked like it worked. It absolutely did not.
+
+That is fixed. The default is a host that answers, the URL pattern is anchored per provider instead
+of grabbing the first `https://` it sees, the capture is properly time-bounded, and a tunnel that
+cannot learn its address now returns null and tells you why instead of inventing one. Which is a
+better failure than the one I shipped.
+
+## An MCP server in your pocket
+
+Back to where this started.
+
+```csharp
+builder.Services
+    .AddMcpServer(o => o.ServerInfo = new() { Name = "thermostat", Version = "1.0.0" })
+    .WithTools<ThermostatTools>()
+    .WithHttpTransport();
+
+var app = builder.Build();
+app.MapMcp();              // POST/GET/DELETE/OPTIONS on /mcp
+```
+
+That is a Model Context Protocol server, Streamable HTTP, hosted inside a MAUI app. Put a quick
+tunnel in front of it and you can paste the URL into an MCP client and have a model talking to the
+device from anywhere.
+
+The MCP package is trim- and AOT-clean like the rest, with one wrinkle the compiler cannot catch for
+you. A tool's parameter and return types get published to the client as a JSON schema, and building
+that schema by reflection does not survive trimming. Tools that trade only in primitives need
+nothing. For everything else, hand it a source-generated context:
+
+```csharp
+[JsonSerializable(typeof(Query))]
+[JsonSerializable(typeof(IReadOnlyList<Reading>))]
+public partial class ToolJson : JsonSerializerContext;
+
+.WithTools<ThermostatTools>(ToolJson.Default.Options)
+```
+
+Miss one and `MapMcp()` throws at startup naming the type and the context to add — rather than
+handing you a `NotSupportedException` from deep inside the container on the first request, which is
+what it used to do.
+
+## The packages
+
+| Package | What it is |
+| --- | --- |
+| `Shiny.Net.HttpServer` | The server — protocols, routing, middleware, DI, static files, WebSockets, SSE, sessions, OpenAPI, CORS, rate limiting, IP filtering, tunnelling |
+| `Shiny.Net.HttpServer.SourceGenerators` | Tier 3. An analyzer — it runs in the compiler and never lands in your output |
+| `Shiny.Net.HttpServer.Jwt` | JWT auth on in-box crypto |
+| `Shiny.Net.HttpServer.Ssh` | SSH remote forwarding and quick tunnels |
+| `Shiny.Net.HttpServer.AzureRelay` | Azure Relay tunnel provider |
+| `Shiny.Net.HttpServer.Mcp` | MCP over Streamable HTTP, no ASP.NET Core required |
+
+## The honest bits
+
+Two packages are deliberately not AOT-clean, and I would rather say so here than have you find out
+during a Release build.
+
+`Shiny.Net.HttpServer.Ssh` carries SSH.NET, which brings BouncyCastle and its own algorithm
+registries. `Shiny.Net.HttpServer.AzureRelay` drags in Azure.Identity, MSAL and IdentityModel. Both
+live in their own packages precisely so that the trade is yours to make: reference them and you
+accept the weight, skip them and the core server stays a few megabytes of clean AOT.
+
+This is also a **beta**. The API surface is where I want it and the test suite is real, but it has
+not had a thousand people hitting it in anger yet. If you put it somewhere interesting, I want to
+hear what broke.
+
+And the standing warning, because a tunnel makes it matter: **a quick tunnel hands a public HTTPS
+address to anyone who learns it**, pointed at a server whose defaults were chosen for loopback. Put
+[authentication](https://shinylib.net/httpserver/authentication) in front of it *before* you open
+one, not after.
+
+## Go play
+
+```bash
+dotnet add package Shiny.Net.HttpServer
+dotnet add package Shiny.Net.HttpServer.SourceGenerators
+```
+
+Docs are at **[shinylib.net/httpserver](https://shinylib.net/httpserver)**, source at
+**[github.com/shinyorg/httpserver](https://github.com/shinyorg/httpserver)**. There is a MAUI sample
+in the repo that does the whole tour — serves a page, exposes a file browser, requires a password,
+runs an MCP server and puts the lot on the public internet behind a button.
+
+Your phone is a perfectly good web server. It always was. It just needed something to run.
