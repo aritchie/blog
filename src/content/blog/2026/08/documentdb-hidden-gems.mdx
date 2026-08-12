@@ -1,0 +1,213 @@
+---
+title: 'Shiny.DocumentDb — Hidden Gems'
+description: "Thirteen major versions in, there's a lot of DocumentDb that shipped in a bullet list and never got explained. A store that diffs documents for you, a read path that never deserializes, and an extensibility surface that soft delete is entirely built out of."
+pubDate: 'Aug 13 2026'
+heroImage: '../../../../assets/documentdb-hidden-gems-hero.svg'
+tags: ['Shiny', '.NET', 'Document DB', 'JSON', 'API']
+---
+
+I have a bad habit with release posts. I write up the headline, list everything else in one line each, hit
+publish, and move on to the next release. Do that thirteen times and you end up where I am now: a library
+with a genuinely large surface, where a decent chunk of the good stuff has never been explained to anyone,
+including the people using it.
+
+I noticed because someone asked me how to build an audit trail on top of DocumentDb. There's a feature that
+does it. It's been there since v7. It got one bullet.
+
+So this is the sweep — the things I actually reach for, that never made a headline. Three of them get real
+depth because they change how you'd write the surrounding code. The rest are quick hits.
+
+*(Everything below uses the v13 spelling, where per-type configuration lives in one `ConfigureDocument<T>`
+block. If you're on v12, the same methods exist, just flatter.)*
+
+## The store already knows what changed
+
+You've got a document in the database and an object in memory that a form, a merge, or an LLM has been
+editing. The next question is always *what actually changed?* — for an audit line, a confirmation dialog, a
+"this touches four fields, are you sure".
+
+I wrote that comparer by hand more than once before I put it in the library.
+
+```csharp
+var patch = await store.GetDiff<Order>(order.Id, edited);
+// JsonPatchDocument<Order> — a real RFC 6902 patch. null if there's no such document.
+```
+
+The thing I like about it is that it's a **read**. Nothing's been written yet, so you can call it at the
+moment the question is actually being asked — before the save, not after it.
+
+The write side has the same idea pointed the other way. `Upsert` is an RFC 7396 merge, so the properties
+you didn't set stay as they are:
+
+```csharp
+await store.Upsert(new Order { Id = id, Status = "shipped" });
+```
+
+And when it's one field, don't bother with the object at all:
+
+```csharp
+await store.SetProperty<Order>(id, o => o.Status, "shipped");
+await store.RemoveProperty<Order>(id, o => o.CancelReason);
+```
+
+One statement against the JSON column. No read first, so nothing to lose an update to.
+
+### And then temporal makes it faintly ridiculous
+
+```csharp
+options.ConfigureDocument<Order>(cfg => cfg.MapTemporal(o => o.Retention = TimeSpan.FromDays(90)));
+```
+
+That's the whole setup. Now every write leaves a version behind, and:
+
+```csharp
+var temporal = (ITemporalDocumentStore)store;
+
+await temporal.History<Order>(id);                 // every version
+await temporal.AsOf<Order>(id, lastTuesday);       // the document as it was
+await temporal.ChangesByActor<Order>("user:42");   // everything one person touched
+await temporal.GetDiffBetween<Order>(id, 3, 7);    // a patch between two versions
+await temporal.Restore<Order>(id, version: 3);     // put it back
+```
+
+Audit trail, point-in-time read, per-user change log, undo button. One line of config, every provider.
+
+This is the one that prompted the post, and I'll be blunt about why: nearly everyone hand-rolls a
+`ChangeLog` table, and a hand-rolled one only ever records the fields somebody remembered to record. This
+one records the document.
+
+## Stop deserializing JSON just to serialize it again
+
+Here's a shape you've written, and so have I, a hundred times:
+
+```csharp
+var order = await store.Get<Order>(id);   // JSON -> Order
+return Results.Ok(order);                 // Order -> JSON
+```
+
+The database handed over a perfectly good JSON document. We parsed it into an object graph, allocated
+every string and list inside it, then serialized it straight back into bytes that are — whitespace aside —
+what we started with. `Order` did nothing. It was overhead wearing a type name.
+
+DocumentDb stores JSON. So take the JSON:
+
+```csharp
+var raw = await store.Query<Order>().Where(o => o.Id == id).FirstOrDefaultRawJson();
+return raw is null ? Results.NotFound() : Results.Content(raw, "application/json");
+```
+
+For a list, don't even build the list — stream it into the response as it comes off the reader:
+
+```csharp
+ctx.Response.ContentType = "application/json";
+await store.Query<Order>()
+    .Where(o => o.Status == "open")
+    .OrderByDescending(o => o.CreatedAt)
+    .WriteJsonArrayTo(ctx.Response.Body, ct);
+```
+
+The bit that makes this actually usable, and the bit I'm pleased with: **you still build the query with the
+typed API.** `Where`, `OrderBy`, `Paginate`, your global filters, soft delete, tenancy — all still apply,
+because the only thing that changed is the terminal. Compiler checks your predicate; database hands you
+bytes.
+
+I should be honest about where it pays off. On the relational providers and Cosmos these are the persisted
+bytes, untouched — zero parses. Everywhere else the provider has to materialize `T` to finish the query, so
+it re-serializes on the way out: same JSON, same API, no win. And a type with encrypted properties throws
+outright, because the stored body is ciphertext and only the typed path decrypts. There's a
+`SupportsRawJson` flag to check rather than catching that.
+
+## What soft delete taught me about my own extensibility
+
+Soft delete is a one-liner:
+
+```csharp
+options.ConfigureDocument<Customer>(cfg => cfg.AddSoftDelete(x => x.IsDeleted));
+```
+
+The part I want to show you isn't the feature. It's that **no store knows it exists.** Here is essentially
+the entire implementation:
+
+```csharp
+options.AddInterceptor(interceptor);       // cancel the delete, set the flag instead
+options.AddBulkInterceptor(interceptor);   // same for ExecuteDelete / Clear
+options.Mappings.AddQueryFilter("soft-delete", mapping.NotDeleted);
+```
+
+Three public calls. It works identically across twenty-odd backends because it never touches one. That was
+the test I set myself when I added those primitives in v12 — if I can't build a real feature out of them
+without editing a provider, they're not good enough primitives.
+
+So here's a new one, built the same way. An append-only archive: deletes don't delete, they move.
+
+```csharp
+public class ArchiveOnDelete : IDocumentInterceptor
+{
+    public async Task BeforeWrite(DocumentWriteContext ctx, CancellationToken ct)
+    {
+        if (ctx.Operation != DocumentOperation.Delete || ctx.DocumentType != typeof(Order))
+            return;
+
+        var order = await ctx.Store.Get<Order>(ctx.Id!, cancellationToken: ct);
+        if (order != null)
+        {
+            await ctx.Session
+                .Add(new ArchivedOrder { Id = order.Id, Body = order, ArchivedAt = DateTimeOffset.UtcNow })
+                .SaveChanges(ct);
+        }
+        ctx.Cancel();   // the store performs no delete; the caller is told it succeeded
+    }
+
+    public Task AfterWrite(DocumentWriteContext ctx, CancellationToken ct) => Task.CompletedTask;
+}
+```
+
+`ctx.Session` is scoped to the write's own transaction, so the archive row commits with the operation that
+caused it or not at all. And `Cancel()` is only legal inside `BeforeWrite` — call it later and it throws
+rather than quietly doing nothing, which is a lesson from an earlier design where it did.
+
+The other half of the trick is that query filters have **names**:
+
+```csharp
+options.ConfigureDocument<Order>(cfg => cfg.AddQueryFilter("archived", o => !o.IsArchived));
+
+store.Query<Order>().IgnoreQueryFilters("archived");   // lift just this one
+```
+
+Which is all `IncludeDeleted()` is — a one-line extension over `IgnoreQueryFilters(SoftDelete.FilterName)`.
+Anonymous global filters are fine right up until the admin screen needs to see past exactly one of them.
+
+## The quick hits
+
+**`ToQueryString()`** — see what your LINQ became, without running it. `q.Sql` and `q.Parameters`. SQL on
+the relational providers and Cosmos, rendered BSON on MongoDB.
+
+**Cursor pagination** — `ToCursorPage(cursor, take)` gives you keyset paging with an opaque token, an `Id`
+tiebreaker added for you, and a shape hash so a cursor can't be replayed against a different query. Stays
+O(log n) however deep you go, and doesn't shuffle under concurrent writes the way `Skip`/`Take` does.
+
+**`DocumentFunctions.Soundex`** — fuzzy name matching that pushes down to native `SOUNDEX()`, or
+`fuzzystrmatch` on PostgreSQL, or a registered UDF where there's nothing built in.
+
+**`NotifyOnChange()`** — a change feed scoped to *one query*, as an `IAsyncEnumerable`.
+
+**`IDocumentSeeder`** — versioned seed data with a marker row so it runs once. Bump `Version` to re-run.
+
+**JSON Schema** — `cfg.MapJsonSchemaFromFile("schemas/order.json")`, draft 2020-12, validated against the
+exact bytes about to hit disk. Schema-free doesn't have to mean unvalidated, and it's per type, so you can
+pin down the two documents that matter and leave everything else open.
+
+**Computed properties** — `cfg.MapComputedProperty(x => x.LineTotal, x => x.Quantity * x.UnitPrice,
+indexed: true)`. Derived, but still filterable and sortable, and materialized into a real indexable column
+where the backend has one.
+
+**`IDocumentMaintenance`** — `ClearAll()` for test resets (it takes the temporal, spatial and vector
+sidecars with it), `SweepOrphanedBlobs<T>()` for blob rows whose document vanished out of band.
+
+## One more thing I've under-sold
+
+ShinyDocDbMyAdmin has had a **terminal** front end since v12.5 — same tool as the web UI, as a `dotnet
+tool`, works over SSH — and the web one has shipped as a **Docker Desktop extension** since 13.0.1, which
+hands it every database container already running on your machine, pre-connected.
+
+Neither has ever had a post. Both are about to.

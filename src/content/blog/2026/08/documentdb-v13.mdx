@@ -1,0 +1,259 @@
+---
+title: 'Shiny.DocumentDb v13 — Encryption, an Outbox, and a Front Door'
+description: "v13 puts AES-256-GCM field encryption in the core package, adds a transactional outbox that commits with the write that caused it, and gives a document type a front door — REST + Server-Sent Events, and an MCP server. Plus Orleans streams on the database you already have, and admin tools that read an encrypted store without a key."
+pubDate: 'Aug 12 2026'
+heroImage: '../../../../assets/documentdb-v13-hero.svg'
+tags: ['Shiny', '.NET', 'Document DB', 'Security', 'AI', 'Orleans']
+---
+
+import Screenshot from '../../../../components/Screenshot.astro';
+
+Somewhere around v10 I stopped thinking of DocumentDb as a place to put documents. v13 is where that
+finished happening. It's still a document store, but the interesting work this cycle was all about the
+edges — what sits *in front of* the store, and what the store hands to something else.
+
+You can now put an HTTP resource in front of a document type in one line. Or an MCP server, so Claude can
+poke at your data. Or an Orleans stream provider. Or an outbox that commits the message in the same
+transaction as the write that caused it. And underneath all of that, individual fields can be encrypted at
+rest, on every provider.
+
+It's a big one, so let me start with the part that'll bite you.
+
+## The breaking one: `ConfigureDocument<T>`
+
+Every flat per-type mapping method is gone. `MapTypeToTable`, `MapIdProperty`, `AddQueryFilter`,
+`MapSpatialProperty`, `MapVectorProperty`, `MapTemporal`, `MapBlob`, `OnBeforeWrite` — all of them. The
+type gets named once, and its whole configuration reads top to bottom:
+
+```csharp
+options.ConfigureDocument<Patient>(cfg =>
+{
+    cfg.Table = "Patients";
+    cfg.MapIdProperty(x => x.Id);
+    cfg.AddSoftDelete(x => x.IsDeleted);
+    cfg.MapSpatialProperty(r => r.Location);
+    cfg.MapProperty(x => x.Ssn, p => p.Encrypt(EncryptionMode.Deterministic));
+    cfg.MapVectorProperty(d => d.Embedding, dimensions: 1536);
+    cfg.MapTemporal(o => o.Retention = TimeSpan.FromDays(90));
+});
+```
+
+I resisted this for two versions because it's a genuinely annoying migration for anyone with a lot of
+types. What changed my mind was writing the encryption feature: the flat surface meant *every* options
+class in *every* provider package needed a new method, and half of them would have been mechanical copies
+of each other. The builder is written once against `IDocumentStoreOptions`, so every provider gets the same
+surface for free, and provider packages layer their own vocabulary on top (`cfg.ToContainer` on Cosmos,
+`cfg.ToCollection` on MongoDB, and so on).
+
+There's a full old→new table in the migration guide. It's mostly find-and-replace.
+
+While I was in there I added **validate-on-build**: one configuration sweep when the store is constructed
+that reports *every* problem at once, instead of the old one-per-restart game. It catches things the
+backend can't do (a vector mapping on LiteDB) and, usefully, randomized-encrypted properties used where the
+database has to read *through* them — a full-text index, a computed expression, the concurrency version.
+
+## Field-level encryption
+
+Whole-database encryption protects the file. It does nothing about the DBA, the backup, or the read
+replica. Sometimes what you actually want is "this one column is unreadable without a key".
+
+```csharp
+opts.UseEncryptor(new AesGcmDocumentEncryptor("k1", key));
+
+opts.ConfigureDocument<Patient>(cfg =>
+{
+    cfg.MapProperty(x => x.Ssn, p => p.Encrypt());
+    cfg.MapProperty(x => x.Email, p => p.Encrypt(EncryptionMode.Deterministic));
+});
+```
+
+That's the whole thing. `Get`, `ToList`, `Insert`, LINQ — nothing about reading or writing changes. The
+stored body just holds `enc:1:k1:…` where the value was.
+
+The implementation is the bit I'm pleased with. It's installed as a **`JsonTypeInfo` modifier**, which
+means every write path is covered *by construction*. That matters more than it sounds: the two places a
+bolt-on encryption layer always forgets are temporal history and backup export, and neither of them needed
+a line of code, because both go through serialization like everything else. No provider knows encryption
+exists.
+
+**Deterministic mode** keeps equality filters working — the predicate's constant gets rewritten into the
+ciphertext actually stored, so `Where(x => x.Email == "a@b.com")` still matches. The docs say in bold what
+that costs: deterministic ciphertext leaks equality and frequency. Anything that can't be answered against
+ciphertext — a range, a `Contains`, an `OrderBy` — throws with an explanation instead of quietly matching
+nothing, which was a deliberate choice. Silently returning zero rows is a much worse failure than an
+exception.
+
+**One thing to check before upgrading.** Encrypted properties now leave the library as plaintext rather
+than re-encrypted envelopes. The converters are symmetric, so anything that materialized a document and
+serialized it again through the store's own options was re-encrypting what it had just decrypted — OData
+responses, AI tool results, and `GetDiff`.
+
+`GetDiff` was properly broken by this. Under randomized mode it compared the stored envelope against a
+freshly-encrypted one, and the same plaintext encrypts differently every time, so **every** mapped property
+came back as changed on every call. Embarrassing, and now fixed. But do look at your exposed OData entity
+sets first — a field that used to go over the wire as an opaque string now goes over it as its value.
+
+## An outbox that actually commits with the write
+
+The dual-write problem, for the three people who haven't hit it: you save an order and publish
+`OrderPlaced`. Two systems, no shared transaction. Process dies in the middle. Now you either have an order
+nobody heard about, or a message about an order that doesn't exist.
+
+```csharp
+await using var session = store.OpenSession();
+session.Add(order).Enqueue(new OrderPlaced(order.Id, order.Total));
+await session.SaveChanges();     // both rows commit together, or neither does
+```
+
+Delivery is at-least-once with backoff and dead-lettering, and claiming is per-message optimistic
+concurrency — so you scale workers by running more of them, with no coordinator to configure. The
+`traceparent` from enqueue is restored at dispatch, so a consumer's span links back to the request that
+caused the message, which is the kind of thing you don't appreciate until you're staring at a trace at 2am.
+
+Now the part I want to be straight about: **this doesn't ship everywhere.** Relational providers and
+LiteDB, and that's it. Every other backend implements a unit of work by *compensation* — undo the writes
+you already made — which does exactly nothing for a process that dies mid-unit. That's the precise window
+an outbox exists to close, so shipping it there would be shipping a promise that doesn't hold. There's a
+`SupportsTransactions` capability now, and those backends are refused at host startup, by name.
+
+Cosmos is a further no, and for a reason I find slightly funny: "same transaction" there means "same
+logical partition", and the store partitions by type name — so an `Order` and an `OutboxMessage` are never
+in the same one. Use the change feed.
+
+## A front door
+
+Two features, same idea: stop making people write the boring layer.
+
+```csharp
+app.MapDocuments<Order>("/orders", o =>
+{
+    o.Operations = DocumentEndpoints.All;
+    o.AllowFilterOn(x => x.Status, x => x.Total);
+    o.Scope<ITenantContext>((tenant, _) => x => x.TenantId == tenant.TenantId);
+})
+.RequireAuthorization("orders");
+```
+
+List, by-id, count, create, replace, merge-patch, delete, and a live Server-Sent-Events tail. Filtering
+goes through the store's own string grammar behind a **per-endpoint allowlist** — an unlisted field is a
+`400`, not a table scan, because "expose the query language over HTTP" is otherwise a great way to hand
+someone a denial-of-service button.
+
+`Scope(...)` is resolved per request from the request's own DI scope, AND-ed into everything, and the
+caller can't remove it. Out-of-scope documents come back `404` rather than `403`, because a `403` confirms
+the row exists.
+
+And the MCP server:
+
+```bash
+shiny-documentdb-mcp --provider sqlite --connection "Data Source=app.db"
+```
+
+Point Claude Code or Claude Desktop at a store and let it explore. The tools are the *same* ones the
+`Extensions.AI` integration uses — one implementation, one security model, which was the whole point.
+Read-only by default; writes need **two** separate locks. No raw-SQL tool, no schema mutation, page caps,
+property hiding, and an audit line per call.
+
+The stdio tool figures out what to expose from the stored `TypeName` discriminators, so it needs no
+compiled document classes at all. Point it at any DocumentDb database and it just works.
+
+## The admin tools, which I've badly under-sold
+
+Two things here have never had a post, which is my fault.
+
+### It reads an encrypted store without a key
+
+The admin tools shipped before encryption did, so at first they knew nothing about it — an encrypted field
+was just a weird-looking string. Now they read the envelope, describe it, and refuse to quietly destroy
+it, all with **no key at all**.
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-encryption-browse.jpg" alt="Browse grid with the protected columns switched on, each cell reading 'encrypted · key k2' and one row still showing a plaintext tax id" caption="An envelope renders as what it is, not as a wall of base64 — and the one row that's still plaintext is visible as such." />
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-encryption.jpg" alt="Encryption card listing two protected paths with their observed mode, the key ids in the sample, and per-key counts across the whole type" caption="Per-key counts across the type — the one question RewrapAsync can't answer: did it finish?" />
+
+That card exists because of a specific fear. `RewrapAsync<T>()` moves documents onto a new key, but nothing
+tells you whether it *finished*, and retiring a key while documents are still under it makes those
+documents permanently unreadable. So the card counts how many values sit under each key id, how many are
+still plaintext, and how many are under a key it's never seen. It reports mode as `deterministic
+(observed)` only when a repeated ciphertext proves it, and never claims "randomized", because that's
+unprovable.
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-encryption-downgrade.jpg" alt="The same editor refusing to save: taxId would be written in clear text, with a Save in clear text button beside Cancel" caption="The downgrade guard. Saving a plaintext value over an envelope needs an explicit, named confirmation." />
+
+The failure this prevents isn't an exception — the library reads a non-envelope as pre-encryption
+plaintext, quite deliberately, so you can turn encryption on for a populated store. Which means saving a
+document through the admin UI without the key would have silently un-encrypted a field, forever, with no
+error anywhere. Now it throws unless you say so out loud.
+
+### There's a terminal version
+
+This shipped in 12.5 and I never wrote it up. **ShinyDocDbMyAdmin.Tui** is a `dotnet tool` that is the same
+tool as the web UI — same connection store, same screens, no browser, works over SSH.
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-tui-browse.png" alt="The browse grid for the Order type, with columns inferred from the JSON bodies and the explorer tree on the left" caption="Same column inference, same explorer tree. Both front ends are one core with a different renderer." />
+
+I said in the v12 post that there'd deliberately never be a `dotnet tool` version, because packing native
+provider binaries for every RID came out around 120MB. Reader, it's 152MB. I built it anyway, because
+"I'm SSH'd into a box and want to look at the documents" turned out to be the case I hit most.
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-tui-query-console.png" alt="The filter grammar console, with the table, type, where, order-by and project fields" caption="The filter console — the string grammar, not SQL, so it's the same query on every provider." />
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-tui-history.png" alt="The temporal history for the Order type, one row per version with operation, interval, duration and actor" caption="Temporal history, in a terminal." />
+
+<Screenshot phone={false} src="/images/docdb-v13/admin-tui-vectors.png" alt="Embedding statistics for the Product type: dimensions, norms and per-document components" caption="Embedding stats, including per-document components. Yes, in a terminal." />
+
+Geometry, full-text, blobs, import/export and the new outbox and streams screens are all in there too.
+
+There's also a **Docker Desktop extension** now:
+
+```bash
+docker extension install aritchie/shiny-docdb-myadmin-extension
+```
+
+It adds a tab that starts the admin container and hands it every database container already running on
+your machine, *connected* — Postgres, MySQL, MariaDB, SQL Server, Oracle, CockroachDB, discovered by image
+with credentials read from each container's own environment. It addresses them over the Docker network, so
+a database that never published a port still works.
+
+## Orleans streams, and a lock that wasn't
+
+13.2 added an Orleans persistent stream provider. Your cluster already uses DocumentDb for membership,
+grain storage and reminders — now it can use it for streams too, with no queue service to run and a backlog
+you can actually look at when something won't drain.
+
+Two decisions I'd happily defend:
+
+**No identity column for sequencing.** Identity hands out values at insert time, but rows become visible at
+commit time — so a slow transaction can be stepped over by the receiver's watermark and its event never
+delivered at all. Instead each queue has a counter row whose position is reserved under a row lock inside
+the enqueue transaction. Assignment order and commit order become the same order, and the sequence is
+gap-free.
+
+**`IsRewindable` is true.** A subscriber can resume from a token older than anything in memory, because the
+cache replays the events table instead of reporting a cache miss. No queue-backed provider can do that —
+behind Azure Queue or SQS, the message is gone the moment it's handed over.
+
+Building that turned up something embarrassing: **`LockMode` had never worked.** It shipped validated but
+inert — the API demanded an active transaction and then issued a completely ordinary read, so
+`session.Get(id, LockMode.Update)` blocked nothing, anywhere, on any backend. It looked right in every test
+that didn't check for contention. It now emits the engine's own syntax — `FOR UPDATE`, `FOR SHARE`,
+`LOCK IN SHARE MODE` on MariaDB, `WITH (UPDLOCK, HOLDLOCK)` on SQL Server — and Oracle throws for
+`LockMode.Share` rather than degrading to an unlocked read, because it has no shared row lock and pretending
+otherwise is how you get the bug I just described.
+
+## The rest
+
+- **VectorData connector** — MEVD (`VectorStore` / `VectorStoreCollection`) over *any* vector-capable
+  DocumentDb backend. Every other MEVD connector is single-store; this one lets you run SQLite on the dev
+  box and pgvector in production off the same record model.
+- **`First` / `Single` terminals**, with predicate and string overloads, and they push the row limit down
+  rather than materializing everything to take one.
+- **Multi-property `ExecuteUpdate`** — `b.Set(...).Set(...)` in one atomic statement.
+- **Raw JSON terminals** — end a typed query with JSON instead of `T`, so a document headed for an HTTP
+  response never becomes an object. I wrote about these in
+  [Hidden Gems](/blog/2026/08/documentdb-hidden-gems/).
+- **Multi-tenancy hardened** — bounded store cache with LRU + idle eviction, any provider per tenant, and a
+  fix for a genuinely nasty bug where the DI container disposed a tenant's shared store at the end of the
+  first request that touched it.
+
+Full changelog is in the [release notes](https://shinylib.net/documentdb/release-notes/).

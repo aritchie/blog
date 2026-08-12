@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="facetA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="facetB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="facetC" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="facetD" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <radialGradient id="netGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.32"/>
+      <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="gemGlow">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <ellipse cx="600" cy="270" rx="540" ry="280" fill="url(#netGlow)"/>
+
+  <!-- ===== central cut gem ===== -->
+  <g transform="translate(600, 250)" filter="url(#gemGlow)">
+    <!-- crown table -->
+    <polygon points="-62,-58 62,-58 100,-14 -100,-14" fill="url(#facetA)" opacity="0.30"/>
+    <polygon points="-62,-58 62,-58 34,-14 -34,-14" fill="url(#facetA)" opacity="0.55"/>
+    <polygon points="-62,-58 -34,-14 -100,-14" fill="url(#facetD)" opacity="0.45"/>
+    <polygon points="62,-58 34,-14 100,-14" fill="url(#facetD)" opacity="0.45"/>
+    <!-- pavilion -->
+    <polygon points="-100,-14 -34,-14 0,96" fill="url(#facetB)" opacity="0.42"/>
+    <polygon points="-34,-14 34,-14 0,96" fill="url(#facetC)" opacity="0.50"/>
+    <polygon points="34,-14 100,-14 0,96" fill="url(#facetB)" opacity="0.42"/>
+    <!-- outline + facet lines -->
+    <g fill="none" stroke="#e0f2fe" stroke-width="1.4" opacity="0.75">
+      <polygon points="-62,-58 62,-58 100,-14 0,96 -100,-14"/>
+      <line x1="-100" y1="-14" x2="100" y2="-14"/>
+      <line x1="-62" y1="-58" x2="-34" y2="-14"/>
+      <line x1="62" y1="-58" x2="34" y2="-14"/>
+      <line x1="-34" y1="-14" x2="0" y2="96"/>
+      <line x1="34" y1="-14" x2="0" y2="96"/>
+    </g>
+    <!-- sparkle -->
+    <g stroke="#f1f5f9" stroke-width="2" opacity="0.9" filter="url(#glow)">
+      <line x1="-46" y1="-40" x2="-46" y2="-24"/>
+      <line x1="-54" y1="-32" x2="-38" y2="-32"/>
+    </g>
+  </g>
+
+  <!-- ===== feature facets, left ===== -->
+  <g font-family="system-ui" font-size="12">
+    <g>
+      <rect x="80" y="128" width="196" height="34" rx="17" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.92"/>
+      <text x="178" y="150" text-anchor="middle" fill="#22d3ee" font-family="monospace">GetDiff&lt;T&gt;()</text>
+    </g>
+    <g>
+      <rect x="56" y="186" width="196" height="34" rx="17" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" opacity="0.92"/>
+      <text x="154" y="208" text-anchor="middle" fill="#a78bfa" font-family="monospace">SetProperty()</text>
+    </g>
+    <g>
+      <rect x="46" y="244" width="196" height="34" rx="17" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.92"/>
+      <text x="144" y="266" text-anchor="middle" fill="#34d399" font-family="monospace">ToCursorPage()</text>
+    </g>
+    <g>
+      <rect x="56" y="302" width="196" height="34" rx="17" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.92"/>
+      <text x="154" y="324" text-anchor="middle" fill="#22d3ee" font-family="monospace">ToQueryString()</text>
+    </g>
+    <g>
+      <rect x="80" y="360" width="196" height="34" rx="17" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" opacity="0.92"/>
+      <text x="178" y="382" text-anchor="middle" fill="#a78bfa" font-family="monospace">MapTemporal()</text>
+    </g>
+  </g>
+
+  <!-- ===== feature facets, right ===== -->
+  <g font-family="system-ui" font-size="12">
+    <g>
+      <rect x="924" y="128" width="196" height="34" rx="17" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.92"/>
+      <text x="1022" y="150" text-anchor="middle" fill="#34d399" font-family="monospace">WriteJsonArrayTo()</text>
+    </g>
+    <g>
+      <rect x="948" y="186" width="196" height="34" rx="17" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.92"/>
+      <text x="1046" y="208" text-anchor="middle" fill="#22d3ee" font-family="monospace">ctx.Cancel()</text>
+    </g>
+    <g>
+      <rect x="958" y="244" width="196" height="34" rx="17" fill="#0b1220" stroke="#8b5cf6" stroke-width="1.2" opacity="0.92"/>
+      <text x="1056" y="266" text-anchor="middle" fill="#a78bfa" font-family="monospace">NotifyOnChange()</text>
+    </g>
+    <g>
+      <rect x="948" y="302" width="196" height="34" rx="17" fill="#0b1220" stroke="#10b981" stroke-width="1.2" opacity="0.92"/>
+      <text x="1046" y="324" text-anchor="middle" fill="#34d399" font-family="monospace">Soundex()</text>
+    </g>
+    <g>
+      <rect x="924" y="360" width="196" height="34" rx="17" fill="#0b1220" stroke="#06b6d4" stroke-width="1.2" opacity="0.92"/>
+      <text x="1022" y="382" text-anchor="middle" fill="#22d3ee" font-family="monospace">Project("…")</text>
+    </g>
+  </g>
+
+  <!-- connector lines into the gem -->
+  <g stroke="#06b6d4" stroke-width="1.1" fill="none" opacity="0.30">
+    <path d="M276,145 C380,150 440,190 500,222"/>
+    <path d="M252,203 C360,208 430,215 500,232"/>
+    <path d="M242,261 C360,262 430,250 500,244"/>
+  </g>
+  <g stroke="#8b5cf6" stroke-width="1.1" fill="none" opacity="0.30">
+    <path d="M252,319 C360,318 430,285 500,256"/>
+    <path d="M276,377 C380,372 440,300 500,266"/>
+  </g>
+  <g stroke="#10b981" stroke-width="1.1" fill="none" opacity="0.30">
+    <path d="M700,222 C760,190 820,150 924,145"/>
+    <path d="M700,232 C770,215 840,208 948,203"/>
+    <path d="M700,244 C770,250 840,262 958,261"/>
+    <path d="M700,256 C770,285 840,318 948,319"/>
+    <path d="M700,266 C760,300 820,372 924,377"/>
+  </g>
+
+  <!-- small satellite gems -->
+  <g opacity="0.85">
+    <polygon points="600,406 622,428 600,450 578,428" fill="url(#facetC)" opacity="0.6" stroke="#a7f3d0" stroke-width="1"/>
+    <polygon points="516,396 532,412 516,428 500,412" fill="url(#facetA)" opacity="0.5" stroke="#a5f3fc" stroke-width="0.9"/>
+    <polygon points="684,396 700,412 684,428 668,412" fill="url(#facetB)" opacity="0.5" stroke="#ddd6fe" stroke-width="0.9"/>
+  </g>
+
+  <!-- ===== title ===== -->
+  <text x="600" y="518" text-anchor="middle" fill="#f1f5f9" font-family="system-ui" font-size="52" font-weight="bold" filter="url(#softGlow)">Shiny.DocumentDb</text>
+  <text x="600" y="562" text-anchor="middle" fill="#22d3ee" font-family="system-ui" font-size="30" font-weight="600">Hidden Gems</text>
+  <text x="600" y="596" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="15">the API that shipped in a bullet list and never got explained</text>
+
+  <!-- decorative dots -->
+  <circle cx="56" cy="72" r="3" fill="#22d3ee" opacity="0.5"/>
+  <circle cx="80" cy="52" r="2" fill="#a78bfa" opacity="0.4"/>
+  <circle cx="44" cy="452" r="2.5" fill="#34d399" opacity="0.4"/>
+  <circle cx="1148" cy="72" r="3" fill="#a78bfa" opacity="0.5"/>
+  <circle cx="1124" cy="52" r="2" fill="#22d3ee" opacity="0.4"/>
+  <circle cx="1156" cy="452" r="2.5" fill="#34d399" opacity="0.4"/>
+</svg>
