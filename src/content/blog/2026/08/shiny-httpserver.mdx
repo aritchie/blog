@@ -365,8 +365,7 @@ exists, you may not have it" is a leak dressed up as correctness.
 
 | Package | What it is |
 | --- | --- |
-| `Shiny.Net.HttpServer` | The server — protocols, routing, middleware, DI, static files, WebSockets, SSE, sessions, OpenAPI, CORS, rate limiting, IP filtering, content negotiation with XML/MessagePack/protobuf, tunnelling |
-| `Shiny.Net.HttpServer.SourceGenerators` | Tier 3. An analyzer — it runs in the compiler and never lands in your output |
+| `Shiny.Net.HttpServer` | The server — protocols, routing, middleware, DI, static files, WebSockets, SSE, sessions, OpenAPI, CORS, rate limiting, IP filtering, content negotiation with XML/MessagePack/protobuf, tunnelling. Carries the tier 3 generator as an analyzer, so it runs in the compiler and never lands in your output |
 | `Shiny.Net.HttpServer.Jwt` | JWT auth on in-box crypto |
 | `Shiny.Net.HttpServer.Ssh` | SSH remote forwarding and quick tunnels |
 | `Shiny.Net.HttpServer.AzureRelay` | Azure Relay tunnel provider |
@@ -386,7 +385,7 @@ registries. `Shiny.Net.HttpServer.AzureRelay` drags in Azure.Identity, MSAL and 
 live in their own packages precisely so that the trade is yours to make: reference them and you
 accept the weight, skip them and the core server stays a few megabytes of clean AOT.
 
-The other eight hold the line, including all four of the new ones — which is most of why gRPC and
+The other seven hold the line, including all four of the new ones — which is most of why gRPC and
 protobuf ask you for marshalling rather than discovering it. `Shiny.Net.HttpServer.DocumentDb` needs
 Shiny.DocumentDb 13.2.1 or newer, since that is the release carrying the public hosting surface it is
 built on.
@@ -405,7 +404,6 @@ one, not after.
 
 ```bash
 dotnet add package Shiny.Net.HttpServer
-dotnet add package Shiny.Net.HttpServer.SourceGenerators
 ```
 
 Docs are at **[shinylib.net/httpserver](https://shinylib.net/httpserver)**, source at
