@@ -5,10 +5,23 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import { READING_PROGRESS_DOCK, type ReadingProgressDock } from '../consts';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & {
+	readingMinutes?: number;
+	readingProgressDock?: ReadingProgressDock;
+};
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	heroImage,
+	readingMinutes,
+	readingProgressDock = READING_PROGRESS_DOCK,
+} = Astro.props;
 ---
 
 <html lang="en">
@@ -57,6 +70,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 
 	<body>
 		<Header />
+		{readingMinutes && <ReadingProgress minutes={readingMinutes} dock={readingProgressDock} />}
 		<main>
 			<article>
 				<div class="hero-image">
@@ -80,6 +94,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 					<slot />
 				</div>
 			</article>
+			<div class="prose">
+				<slot name="comments" />
+			</div>
 		</main>
 		<Footer />
 	</body>

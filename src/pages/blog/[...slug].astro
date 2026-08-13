@@ -2,6 +2,7 @@
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import Disqus from '../../components/Disqus.astro';
 import BlogPost from '../../layouts/BlogPost.astro';
+import { getReadingTime } from '../../utils/readingTime';
 
 export async function getStaticPaths() {
 	const posts = (await getCollection('blog'))
@@ -15,9 +16,10 @@ type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
 const { Content } = await render(post);
+const readingTime = getReadingTime(post.body);
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} readingMinutes={readingTime.minutes}>
 	<Content />
-    <Disqus postId={post.id} postTitle={post.data.title} />
+	<Disqus slot="comments" postId={post.id} postTitle={post.data.title} />
 </BlogPost>

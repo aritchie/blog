@@ -5,3 +5,8 @@ export const SITE_TITLE = 'Allan Ritchie';
 export const SITE_DESCRIPTION = 'Ramblings of a old Software Engineer';
 
 export const DISQUS_SHORTNAME = 'allan-ritchies-blog';
+
+export type ReadingProgressDock = 'top' | 'bottom';
+
+// Where the blog post reading time / progress bar sits
+export const READING_PROGRESS_DOCK: ReadingProgressDock = 'top';
