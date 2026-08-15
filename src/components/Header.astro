@@ -30,7 +30,9 @@ import shinysoftLogo from '../assets/shinysoft-logo.png'
 				</HeaderLink>
 				<!--<HeaderLink href="https://www.youtube.com/@GoneDotNet" target="_blank">Gone .NET</HeaderLink>-->
 			</div>
-			<SocialLinks />
+			<div class="nav-social">
+				<SocialLinks />
+			</div>
 		</div>
 	</nav>
 </header>
@@ -126,12 +128,25 @@ import shinysoftLogo from '../assets/shinysoft-logo.png'
 	.nav-menu {
 		display: flex;
 		align-items: center;
-		gap: 2em;
+		gap: 1.25em;
 	}
-	
+
 	.internal-links {
 		display: flex;
 		gap: 1em;
+	}
+
+	/* Social cluster: smaller icons, set apart from the nav links */
+	.nav-social {
+		--social-icon-size: 20px;
+		--social-gap: 0.9em;
+		--social-margin-top: 0;
+		display: flex;
+		align-items: center;
+		padding: 0.4em 0 0.4em 1.25em;
+		border-left: 1px solid rgba(var(--gray-light), 80%);
+		/* nav links sit 2px high because of their 4px transparent underline */
+		margin-top: -2px;
 	}
 	
 	.nav-menu a {
@@ -158,13 +173,8 @@ import shinysoftLogo from '../assets/shinysoft-logo.png'
 		height: 32px;
 	}
 	
-	.social-links,
-	.social-links a {
-		display: flex;
-	}
-	
-	/* Mobile Styles */
-	@media (max-width: 768px) {
+	/* Collapse to the menu button before the links + icons run out of room */
+	@media (max-width: 1080px) {
 		header {
 			padding: 0 0.5em;
 		}
@@ -192,7 +202,8 @@ import shinysoftLogo from '../assets/shinysoft-logo.png'
 			top: 100%;
 			left: 0;
 			right: 0;
-			background: rgba(255, 255, 255, 0.92);
+			/* nested backdrop-filters don't blur, so the panel needs to be opaque */
+			background: rgb(255, 255, 255);
 			backdrop-filter: blur(12px);
 			-webkit-backdrop-filter: blur(12px);
 			flex-direction: column;
@@ -232,9 +243,15 @@ import shinysoftLogo from '../assets/shinysoft-logo.png'
 			padding-left: 0.5em;
 		}
 		
-		.social-links {
-			justify-content: center;
+		.nav-social {
+			--social-icon-size: 26px;
+			--social-gap: 1.1em;
 			width: 100%;
+			justify-content: center;
+			flex-wrap: wrap;
+			border-left: none;
+			padding: 0.25em 0 0;
+			margin-top: 0;
 		}
 	}
 	

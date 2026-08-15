@@ -2,6 +2,11 @@
 //import { SITE_TITLE } from '../consts';
 import { Image } from 'astro:assets';
 import shinyicon from '../assets/shinyicon.png';
+
+/*
+	Sizing is driven by CSS custom properties so the parent decides:
+	--social-icon-size, --social-gap, --social-margin-top
+*/
 ---
 <div class="social-links">
     <a href="https://x.com/allanritchie911" target="_blank">
@@ -54,7 +59,7 @@ import shinyicon from '../assets/shinyicon.png';
         >
     </a>
     <a href="https://shinylib.net" target="_blank">
-        <Image src={shinyicon} alt="ShinyLib Logo" width="32" height="32" />
+        <Image src={shinyicon} alt="ShinyLib Logo" width="64" height="64" />
     </a>
     <a href="/rss.xml" target="_blank">
         <span class="sr-only">Subscribe via RSS</span>
@@ -65,28 +70,28 @@ import shinyicon from '../assets/shinyicon.png';
             ></path></svg
         >
     </a>
-    <a href="https://shinysoft.biz" target="_blank">
-        <span class="sr-only">ShinySoft</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true" width="32" height="32" astro-icon="social/shinysoft"
-            ><path
-                fill="currentColor"
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
-            ></path></svg
-        >
-    </a>
 </div>
 <style>
 	.social-links {
 		display: flex;
+		align-items: center;
 		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
+		gap: var(--social-gap, 1em);
+		margin-top: var(--social-margin-top, 1em);
 	}
 	.social-links a {
+		display: flex;
 		text-decoration: none;
 		color: rgb(var(--gray));
+		transition: color 0.2s ease, opacity 0.2s ease;
 	}
 	.social-links a:hover {
 		color: rgb(var(--gray-dark));
+		opacity: 0.85;
+	}
+	.social-links :is(svg, img) {
+		display: block;
+		width: var(--social-icon-size, 32px);
+		height: var(--social-icon-size, 32px);
 	}
 </style>
