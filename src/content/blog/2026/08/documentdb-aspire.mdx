@@ -1,0 +1,229 @@
+---
+title: 'Your Database Choice Should Not Be Source Code'
+description: "DocumentDb runs on ten-odd backends, but picking one used to be a line of C# inside your service. The Aspire integration moves that decision into the AppHost — the consuming code becomes one provider-agnostic line with health checks and OpenTelemetry attached, the admin UI becomes a resource, and an entire Orleans silo points at the same store."
+pubDate: 'Aug 24 2026'
+heroImage: '../../../../assets/documentdb-aspire-hero.svg'
+tags: ['Shiny', '.NET', 'Document DB', 'Aspire', 'Orleans']
+---
+
+Here's a line I've written a hundred times and disliked a hundred times:
+
+```csharp
+options.DatabaseProvider = new PostgreSqlDatabaseProvider(connectionString);
+```
+
+There's nothing wrong with it, exactly. But look at what it is. Dev wants SQLite so nobody needs Docker
+running to debug. CI wants a throwaway container. Production wants managed PostgreSQL. So the one thing that
+differs between every environment I run in is **compiled into my application**, and the usual fix is a
+configuration flag and a switch statement that I write again in every service.
+
+That's a deployment decision wearing a source-code costume. .NET Aspire is very good at deployment decisions,
+so I let it have this one.
+
+```bash
+dotnet add package Shiny.DocumentDb.Aspire.Hosting   # AppHost
+dotnet add package Shiny.DocumentDb.Aspire.Client    # service
+dotnet add package Shiny.DocumentDb.Aspire.Orleans   # silo
+```
+
+## The AppHost picks
+
+```csharp
+var store = builder
+    .AddPostgresDocumentStore("orders")     // provisions Postgres, models the store
+    .WithSeeder(async (ctx, ct) =>
+    {
+        // Runs once, after the DB is ready, before anything that depends on it starts.
+        // ctx => (StoreName, Provider, ConnectionString)
+    });
+
+builder.AddProject<Projects.Api>("api")
+    .WithReference(store);
+```
+
+Changing your mind is one line, and **nothing downstream changes**:
+
+```csharp
+builder.AddSqliteDocumentStore("orders", "orders.db");   // local dev — no container at all
+builder.AddSqlServerDocumentStore("orders");
+builder.AddMySqlDocumentStore("orders");
+```
+
+Already modelling the database yourself? Wrap it. The provider is auto-detected from the resource:
+
+```csharp
+var pg    = builder.AddPostgres("orders-server").AddDatabase("orders-db");
+var store = pg.AsDocumentStore("orders");    // the name has to differ from the DB resource's
+```
+
+CockroachDB and MariaDB are the exception — Aspire has no first-party hosting resource for either, and they
+can't be auto-detected because a plain `AddPostgres` / `AddMySql` resource looks exactly like Postgres /
+MySQL. Model the container yourself and pass `DocumentProviderKind.CockroachDb` or `MariaDb` explicitly to
+get the wire-compatible variant.
+
+## The service stops caring
+
+```csharp
+builder.AddDocumentStore("orders", configureOptions: o =>
+    o.ConfigureDocument<Order>(cfg => cfg.Table = cfg.TypeName));
+```
+
+It's registered keyed by name, so:
+
+```csharp
+public class OrdersService([FromKeyedServices("orders")] IDocumentStore store)
+{
+    public Task<Order?> Get(string id) => store.Get<Order>(id);
+}
+```
+
+That service has no idea which database it's talking to, and — this is the part I cared about — it isn't the
+kind of abstraction that falls apart the second you need something real. `configureOptions` is the whole
+`DocumentStoreOptions` surface. Type maps, JSON contexts, query filters, interceptors, encryption, all of it.
+
+### There's no magic in here
+
+Worth knowing the shape, because you can drive it by hand if you ever need to. The hosting resource implements
+`IResourceWithConnectionString` over its backing database, and `WithReference` hands the consumer **two**
+things:
+
+| Key | Value |
+|---|---|
+| `ConnectionStrings:orders` | the backing database's connection string |
+| `Shiny:DocumentDb:orders:Provider` | the `DocumentProviderKind` name |
+
+The client reads both, maps the kind to an `IDatabaseProvider`, and registers the keyed store. A connection
+string with no matching provider key is ignored — so the Redis reference sitting in the same AppHost doesn't
+turn into a junk document store, which is exactly the kind of thing that would otherwise bite you six months
+later.
+
+Because the client owns that registration, it also attaches the boilerplate you'd write anyway: a `SELECT 1`
+health check, and the `Shiny.DocumentDb` meter and `ActivitySource` into OpenTelemetry. Query metrics and
+trace spans show up in the Aspire dashboard without you doing anything. Turn any of it off if you'd rather:
+
+```csharp
+builder.AddDocumentStore("orders", settings =>
+{
+    settings.MultiTenant         = true;   // shared-table tenancy from a registered ITenantResolver
+    settings.PortableSpatial     = true;   // no PostGIS available? use the dependency-free spatial tier
+    settings.DisableHealthChecks = true;
+});
+```
+
+And when the configuration depends on other registered services — an interceptor with its own dependencies —
+there's a variant that runs with the resolved `IServiceProvider`:
+
+```csharp
+builder.AddDocumentStore(
+    "orders",
+    configureServiceOptions: (sp, o) => o.AddInterceptor(sp.GetRequiredService<AuditInterceptor>()));
+```
+
+If you're on the source-generated typed `DocumentContext`, it's the same idea — `AddDocumentContextProvider`
+returns the `Action<DocumentStoreOptions>` the generated method wants. Each context keys its store by the
+**context type**, so several contexts on different Aspire resources coexist without shadowing each other:
+
+```csharp
+builder.Services.AddOrdersContext(builder.AddDocumentContextProvider("orders"));
+builder.Services.AddInvoicesContext(builder.AddDocumentContextProvider("invoices"));
+```
+
+That's the multi-store story. Two lines.
+
+## An entire Orleans silo, one line
+
+[A few days ago I wrote about](/blog/2026/08/documentdb-orleans-stack/) running the whole Orleans persistence stack
+— membership, grain storage, reminders, grain directory, streams — on `IDocumentStore` instead of five
+different provider packages. Under Aspire, pointing all of it at the provisioned store looks like this:
+
+```csharp
+builder.AddDocumentStore("orleans");
+
+builder.UseOrleans(silo => silo.UseAspireDocumentDb("orleans"));
+```
+
+That's grain storage, reminders, clustering and the grain directory, all sharing the one Aspire-managed store
+— its connection, its health check, its telemetry. On the AppHost the silo is just another consumer:
+
+```csharp
+var store = builder.AddPostgresDocumentStore("orleans");
+builder.AddProject<Projects.Silo>("silo").WithReference(store);
+```
+
+No setup scripts, because DocumentDb is schema-free — the membership and storage tables appear on demand.
+Take a subset with the feature flags if you don't want all four.
+
+Streams are the one thing deliberately left out of `All`:
+
+```csharp
+silo.UseAspireDocumentDb("orleans", DocumentDbOrleansFeatures.All | DocumentDbOrleansFeatures.Streams);
+```
+
+The reason is a failure mode I didn't want to ship. Streams need a backend with row-level pessimistic locking
+and the silo refuses to start without one. If `All` included streams, someone's working SQLite Aspire app
+would stop booting because they took a package update. So it's opt-in, and it will stay opt-in.
+
+## The admin UI is a resource too
+
+The [admin tool](https://shinylib.net/documentdb/admin/) gets modelled like anything else, which means it
+comes up with your app and every store you referenced is already connected — no connection strings pasted
+in by hand:
+
+```csharp
+var store = builder.AddPostgresDocumentStore("orders");
+
+builder.AddDocumentDbAdmin(port: 8085)
+       .WithReference(store)
+       .WaitFor(store);
+```
+
+`WithReference` is the same contract a service uses, so the tool itself needed no special support. Referenced
+stores show up under a **from host** badge and can't be edited or deleted from the UI — they're declared in
+the AppHost, so that's where you change them. The image tag defaults to the hosting package's own version, so
+upgrading the integration brings the matching UI along.
+
+And new in **13.4**: Aspire 13.5 added interactive terminal sessions, which was the piece I'd been waiting
+for. The terminal front end can now be a *process* rather than a container:
+
+```csharp
+#pragma warning disable ASPIRETERMINAL001
+builder.AddDocumentDbAdminTerminal()
+       .WithReference(store)
+       .WithStartupProfile(store)
+       .WaitFor(store);
+```
+
+```bash
+aspire config set features.terminalCommandsEnabled true
+aspire terminal attach documentdb-terminal
+```
+
+`WithStartupProfile` passes `--profile`, so attaching drops you straight onto that database instead of the
+connection list. Locally it replaces the container outright, and it's the only one of the two that can open a
+**file-backed** store — SQLite, SQLCipher, DuckDB — without a bind mount, which for a local dev loop is the
+whole ballgame. It does not deploy: terminal sessions are a dev-loop feature, so the resource is excluded from
+the manifest and anything you publish still wants `AddDocumentDbAdmin`.
+
+That does move the hosting package's Aspire floor to 13.5, since `WithTerminal` doesn't exist before it.
+
+One safety note I'll repeat as often as it takes: both front ends expose a full editor and an open SQL prompt
+over every store you reference. Chain `.WithReadOnly()` for anything beyond a local AppHost, `.WithSecretKey(...)`
+so saved profiles aren't protected by a key generated next to them, and if you're publishing a public demo,
+`.WithoutAi()` — which removes the assistant entirely rather than hiding it, so nobody is ever invited to paste
+their own API key into a database browser they don't control.
+
+## What it deliberately doesn't do
+
+This is a **server-tier** convenience and I want to be clear about that. It does nothing for DocumentDb's
+offline-first side — SQLite on a phone, LiteDB, IndexedDB in the browser — because none of those ever meet an
+AppHost. And it covers the relational providers plus SQLite: PostgreSQL, CockroachDB, SQL Server, MySQL,
+MariaDB, SQLite. MongoDB and Cosmos need different client-registration paths and are a follow-up.
+
+Inside that scope, though, I get the thing I wanted. The backend and the seed strategy live in the AppHost
+where deployment decisions belong, and every service that touches the store is one line that doesn't know or
+care which one got picked.
+
+- [Aspire integration docs](https://shinylib.net/documentdb/aspire/)
+- [Admin UI on Aspire](https://shinylib.net/documentdb/admin/aspire/)
+- [Orleans provider](https://shinylib.net/documentdb/orleans/)
+- [GitHub](https://github.com/shinyorg/DocumentDb)

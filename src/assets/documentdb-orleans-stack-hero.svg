@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accentPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="cylTop" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+    <marker id="down" markerWidth="10" markerHeight="10" refX="3" refY="7" orient="auto">
+      <path d="M0,0 L6,0 L3,7 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <circle cx="180" cy="240" r="220" fill="#8b5cf6" opacity="0.06" filter="url(#softGlow)"/>
+  <circle cx="1020" cy="280" r="220" fill="#06b6d4" opacity="0.05" filter="url(#softGlow)"/>
+  <circle cx="600" cy="420" r="230" fill="#34d399" opacity="0.035" filter="url(#softGlow)"/>
+
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentPurple)"/>
+
+  <!-- Orleans contract cards -->
+  <g transform="translate(88, 96)">
+    <rect width="180" height="24" rx="12" fill="#1e1b4b" stroke="#a78bfa" stroke-width="1"/>
+    <text x="90" y="16" text-anchor="middle" fill="#c4b5fd" font-family="monospace" font-size="11" font-weight="bold">ORLEANS SILO</text>
+  </g>
+
+  <g font-family="monospace" font-size="13" font-weight="bold">
+    <g transform="translate(70, 150)">
+      <rect width="190" height="52" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="1.4"/>
+      <text x="95" y="24" text-anchor="middle" fill="#c4b5fd">Clustering</text>
+      <text x="95" y="41" text-anchor="middle" fill="#64748b" font-size="10" font-weight="normal">IMembershipTable</text>
+    </g>
+    <g transform="translate(280, 150)">
+      <rect width="190" height="52" rx="10" fill="#1e293b" stroke="#06b6d4" stroke-width="1.4"/>
+      <text x="95" y="24" text-anchor="middle" fill="#22d3ee">Grain Storage</text>
+      <text x="95" y="41" text-anchor="middle" fill="#64748b" font-size="10" font-weight="normal">IGrainStorage</text>
+    </g>
+    <g transform="translate(490, 150)">
+      <rect width="190" height="52" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="1.4"/>
+      <text x="95" y="24" text-anchor="middle" fill="#34d399">Reminders</text>
+      <text x="95" y="41" text-anchor="middle" fill="#64748b" font-size="10" font-weight="normal">IReminderTable</text>
+    </g>
+    <g transform="translate(700, 150)">
+      <rect width="200" height="52" rx="10" fill="#1e293b" stroke="#f472b6" stroke-width="1.4"/>
+      <text x="100" y="24" text-anchor="middle" fill="#f472b6">Grain Directory</text>
+      <text x="100" y="41" text-anchor="middle" fill="#64748b" font-size="10" font-weight="normal">IGrainDirectory</text>
+    </g>
+    <g transform="translate(920, 150)">
+      <rect width="210" height="52" rx="10" fill="#1e1b4b" stroke="#eab308" stroke-width="1.8" filter="url(#glow)"/>
+      <text x="105" y="24" text-anchor="middle" fill="#fbbf24">Streams</text>
+      <text x="105" y="41" text-anchor="middle" fill="#64748b" font-size="10" font-weight="normal">IQueueAdapterFactory</text>
+    </g>
+  </g>
+
+  <!-- funnel lines into one store -->
+  <g stroke="#475569" stroke-width="1.2" fill="none" opacity="0.7">
+    <path d="M 165 202 C 165 250, 600 250, 600 300" marker-end="url(#down)"/>
+    <path d="M 375 202 C 375 255, 600 255, 600 300" marker-end="url(#down)"/>
+    <path d="M 585 202 L 600 300" marker-end="url(#down)"/>
+    <path d="M 800 202 C 800 255, 600 255, 600 300" marker-end="url(#down)"/>
+    <path d="M 1025 202 C 1025 250, 600 250, 600 300" marker-end="url(#down)"/>
+  </g>
+
+  <!-- one store -->
+  <g transform="translate(430, 318)">
+    <rect width="340" height="46" rx="23" fill="#0f172a" stroke="url(#cylTop)" stroke-width="2" filter="url(#glow)"/>
+    <text x="170" y="30" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="18" font-weight="bold">IDocumentStore</text>
+  </g>
+
+  <!-- database cylinder -->
+  <g transform="translate(500, 396)">
+    <ellipse cx="100" cy="16" rx="100" ry="20" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect x="0" y="16" width="200" height="72" fill="#1e293b"/>
+    <line x1="0" y1="16" x2="0" y2="88" stroke="#334155" stroke-width="1.5"/>
+    <line x1="200" y1="16" x2="200" y2="88" stroke="#334155" stroke-width="1.5"/>
+    <ellipse cx="100" cy="88" rx="100" ry="20" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <ellipse cx="100" cy="16" rx="100" ry="20" fill="#1e293b" stroke="#06b6d4" stroke-width="1.5" opacity="0.9"/>
+    <ellipse cx="100" cy="52" rx="100" ry="20" fill="none" stroke="#334155" stroke-width="0.8" opacity="0.5"/>
+    <text x="100" y="48" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="12">one connection string</text>
+    <text x="100" y="84" text-anchor="middle" fill="#34d399" font-family="monospace" font-size="12">queryable JSON</text>
+  </g>
+
+  <!-- side notes -->
+  <g font-family="monospace" font-size="12">
+    <text x="120" y="440" fill="#94a3b8">no setup scripts</text>
+    <text x="120" y="464" fill="#94a3b8">no second queue service</text>
+    <text x="120" y="488" fill="#94a3b8">no opaque blobs</text>
+
+    <text x="1080" y="440" text-anchor="end" fill="#94a3b8">query without activating</text>
+    <text x="1080" y="464" text-anchor="end" fill="#94a3b8">durable stream rewind</text>
+    <text x="1080" y="488" text-anchor="end" fill="#94a3b8">a backlog you can open</text>
+  </g>
+
+  <text x="600" y="562" text-anchor="middle" fill="#f8fafc" font-family="monospace" font-size="28" font-weight="bold" filter="url(#glow)">Orleans on One Database</text>
+  <text x="600" y="592" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="13">Shiny.DocumentDb.Orleans — five contracts, one store</text>
+</svg>
