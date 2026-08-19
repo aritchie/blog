@@ -42,17 +42,24 @@ siloBuilder.AddMongoDbGrainStorage("Default", connectionString, databaseName: "o
 siloBuilder.AddCosmosDbGrainStorage("Default", connectionString, databaseName: "orleans");
 ```
 
-## The thing I still can't get over: querying grains that aren't running
+## Reporting over grain state, without activating grains
 
-Orleans grain storage is `Read` / `Write` / `Clear` by grain id. That's it. There is **no query surface**.
+Orleans grain storage is `Read` / `Write` / `Clear` by grain id, and that's a deliberate design, not a gap
+somebody forgot to fill. The grain *is* the consistency boundary: one activation owns its state at a time,
+and every reader goes through it. A query surface on the storage provider would hand out state that walked
+around that boundary, and it would require every provider to understand the shape of what you stored. Keeping
+the contract to three point operations by key is exactly what lets it be implemented over blob storage, a
+table, ADO.NET, Redis or a flat file — which is what you want from a runtime that has to run anywhere.
 
-Which means "show me every shopping cart over $1,000" is a question you simply cannot ask. To answer it you
-have to activate every cart grain — a silo round trip each, placing the grain, deserializing state, running
-`OnActivateAsync` — and since the built-in providers store state as an opaque blob, you can't sneak around
-them and query the database either.
+The trade is that questions spanning many grains have to be answered by grains. "Show me every shopping cart
+over $1,000" means activating every cart — a silo round trip each, placing the grain, deserializing state,
+running `OnActivateAsync` — and since the built-in providers serialize state into an opaque blob, the
+database can't answer it on your behalf either.
 
-This provider writes grain state as structured JSON under `$.state` in an ordinary table. So you point a
-read-only store at that table and just… ask:
+DocumentDb doesn't change that contract; the runtime still reads and writes by key. It just stores what it
+writes as structured JSON under `$.state` in an ordinary table, so those same rows are also readable as
+documents. That gives you a second, out-of-band read path alongside the grain path — point a read-only store
+at the table and ask:
 
 ```csharp
 var opts = new DocumentStoreOptions
@@ -69,8 +76,8 @@ var bigCarts = await readStore.Query<GrainStateRecord>(
     parameters: new { min = 1000 });
 ```
 
-Every reporting, dashboard, admin-tooling and bulk-inspection job that was painful-to-impossible becomes a
-plain document query.
+Reporting, dashboards, admin tooling and bulk inspection — the jobs that don't need a grain's guarantees and
+shouldn't pay for them — become plain document queries.
 
 One honest caveat, and I'd rather say it than have you find it: this is the **last persisted** state. An
 activated grain may be holding newer state it hasn't flushed, since Orleans only writes when the grain calls
