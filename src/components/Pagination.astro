@@ -128,7 +128,7 @@ const urlFor = (n: number) => (n === 1 ? first : `${base}${n}`);
 		line-height: 1;
 		text-decoration: none;
 		color: rgb(var(--gray-dark));
-		background: #fff;
+		background: var(--surface);
 		border: 1px solid rgb(var(--gray-light));
 		border-radius: 8px;
 		transition: border-color 0.15s ease, color 0.15s ease;
@@ -179,7 +179,7 @@ const urlFor = (n: number) => (n === 1 ? first : `${base}${n}`);
 	.numbers a[aria-current='page'] {
 		background: var(--accent);
 		border-color: var(--accent);
-		color: #fff;
+		color: var(--on-accent);
 	}
 	.gap {
 		padding: 0 0.2rem;

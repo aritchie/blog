@@ -25,6 +25,20 @@ import { DISQUS_SHORTNAME } from '../consts';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
 
+    /* Disqus samples the page background when it loads, so a theme flip needs a
+       re-render to stop a white comment box sitting on a dark page. */
+    window.addEventListener('themechange', function () {
+        if (typeof DISQUS === 'undefined') return;
+        DISQUS.reset({
+            reload: true,
+            config: function () {
+                this.page.identifier = postId;
+                this.page.title = postTitle;
+                this.page.url = currentPostUrl;
+            }
+        });
+    });
+
     (function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

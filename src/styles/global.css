@@ -4,17 +4,96 @@
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
 
+/*
+  Theming
+  -------
+  The palette is a set of RGB triplets that get redefined wholesale for dark
+  mode, so every `rgb(var(--black))` / `rgb(var(--gray-light))` in the site
+  flips without being touched. Read them by role, not by name:
+
+    --black       strongest text (headings)
+    --gray-dark   body text
+    --gray        muted text
+    --gray-light  hairlines and subtle fills
+    --shadow      whatever a drop shadow should be cast in
+
+  `--surface` is a card/panel background and `--surface-2` a tinted panel.
+  Theme is chosen by `data-theme` on <html>; with no attribute we follow the
+  OS. See the inline script in BaseHead.astro, which sets it before paint.
+*/
 :root {
+	color-scheme: light;
+
 	--accent: #2337ff;
 	--accent-dark: #000d8a;
+	--accent-soft: rgba(35, 55, 255, 0.12);
+	--on-accent: #ffffff;
+
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
 	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
+	--shadow: 96, 115, 159;
+
+	--page-bg: #ffffff;
+	--surface: #ffffff;
+	--surface-2: #f6f8fc;
+	--glass: rgba(255, 255, 255, 0.72);
+	--glass-edge: rgba(255, 255, 255, 0.55);
+
+	--gray-gradient: rgba(var(--gray-light), 50%), var(--page-bg);
 	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%), 0 16px 32px
-		rgba(var(--gray), 33%);
+		0 2px 6px rgba(var(--shadow), 25%), 0 8px 24px rgba(var(--shadow), 33%), 0 16px 32px
+		rgba(var(--shadow), 33%);
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	/* the brand blue is too dark to read on a dark ground - lift it */
+	--accent: #8b9cff;
+	--accent-dark: #b3bdff;
+	--accent-soft: rgba(139, 156, 255, 0.16);
+	--on-accent: #0d1117;
+
+	--black: 240, 244, 252;
+	--gray: 138, 152, 178;
+	--gray-light: 45, 53, 70;
+	--gray-dark: 203, 212, 228;
+	--shadow: 0, 0, 0;
+
+	--page-bg: #0d1117;
+	--surface: #151a23;
+	--surface-2: #1a202b;
+	--glass: rgba(13, 17, 23, 0.72);
+	--glass-edge: rgba(255, 255, 255, 0.08);
+}
+
+/* Same values again for readers on system dark who haven't picked a theme.
+   CSS can't share one declaration block across a media query, so these two
+   lists have to be kept in step. */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+
+		/* the brand blue is too dark to read on a dark ground - lift it */
+		--accent: #8b9cff;
+		--accent-dark: #b3bdff;
+		--accent-soft: rgba(139, 156, 255, 0.16);
+		--on-accent: #0d1117;
+
+		--black: 240, 244, 252;
+		--gray: 138, 152, 178;
+		--gray-light: 45, 53, 70;
+		--gray-dark: 203, 212, 228;
+		--shadow: 0, 0, 0;
+
+		--page-bg: #0d1117;
+		--surface: #151a23;
+		--surface-2: #1a202b;
+		--glass: rgba(13, 17, 23, 0.72);
+		--glass-edge: rgba(255, 255, 255, 0.08);
+	}
 }
 @font-face {
 	font-family: "Atkinson";
@@ -35,7 +114,9 @@ body {
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
+	background-color: var(--page-bg);
+	background-image: linear-gradient(var(--gray-gradient));
+	background-repeat: no-repeat;
 	background-size: 100% 600px;
 	word-wrap: break-word;
 	overflow-wrap: break-word;

@@ -1,0 +1,122 @@
+---
+/**
+ * Light/dark switch. The stored value is only ever 'light' or 'dark' - clearing
+ * it (or never setting it) means "follow the OS", which the CSS handles via
+ * `prefers-color-scheme`. The attribute is applied before paint by the inline
+ * script in BaseHead.astro; this component only handles clicks afterwards.
+ */
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
+	<span class="sr-only" data-theme-label>Switch to dark theme</span>
+	<svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<circle cx="12" cy="12" r="4.2" fill="currentColor"></circle>
+		<path
+			d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4 17 7M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"></path>
+	</svg>
+	<svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path
+			d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z"
+			fill="currentColor"></path>
+	</svg>
+</button>
+
+<script>
+	const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+	const label = document.querySelector<HTMLElement>('[data-theme-label]');
+
+	const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+	const resolved = () =>
+		document.documentElement.dataset.theme ?? (systemDark.matches ? 'dark' : 'light');
+
+	function sync() {
+		const isDark = resolved() === 'dark';
+		button?.setAttribute('aria-pressed', String(isDark));
+		if (label) label.textContent = `Switch to ${isDark ? 'light' : 'dark'} theme`;
+		document
+			.querySelector('meta[name="theme-color"]')
+			?.setAttribute('content', isDark ? '#0d1117' : '#ffffff');
+		// third-party embeds (Disqus) sample the page colours once, on load
+		window.dispatchEvent(new CustomEvent('themechange', { detail: isDark ? 'dark' : 'light' }));
+	}
+
+	button?.addEventListener('click', () => {
+		const next = resolved() === 'dark' ? 'light' : 'dark';
+		document.documentElement.dataset.theme = next;
+		try {
+			localStorage.setItem('theme', next);
+		} catch {
+			// private browsing - the choice just won't survive the session
+		}
+		sync();
+	});
+
+	// Someone on "follow the OS" should still flip when the OS flips
+	systemDark.addEventListener('change', sync);
+	sync();
+</script>
+
+<style>
+	.theme-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px;
+		height: 34px;
+		padding: 0;
+		color: rgb(var(--gray-dark));
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		cursor: pointer;
+		transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+	}
+	.theme-toggle:hover {
+		color: var(--accent);
+		background: var(--accent-soft);
+		border-color: rgb(var(--gray-light));
+	}
+	.theme-toggle:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+
+	.icon {
+		width: 18px;
+		height: 18px;
+		grid-area: 1 / 1;
+		transition: transform 0.3s ease, opacity 0.2s ease;
+	}
+	.theme-toggle {
+		display: grid;
+		place-items: center;
+	}
+	/* show the destination, not the current state: sun while dark, moon while light */
+	.icon--sun {
+		opacity: 0;
+		transform: rotate(-90deg) scale(0.6);
+	}
+	.icon--moon {
+		opacity: 1;
+		transform: rotate(0) scale(1);
+	}
+	.theme-toggle[aria-pressed='true'] .icon--sun {
+		opacity: 1;
+		transform: rotate(0) scale(1);
+	}
+	.theme-toggle[aria-pressed='true'] .icon--moon {
+		opacity: 0;
+		transform: rotate(90deg) scale(0.6);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.theme-toggle,
+		.icon {
+			transition: none;
+		}
+	}
+</style>

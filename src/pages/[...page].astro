@@ -195,9 +195,11 @@ const description = isFirstPage
 				width: clamp(112px, 16vw, 168px);
 				aspect-ratio: 1;
 				overflow: hidden;
+				/* the portrait is a cut-out on white and blends with multiply, so the
+				   plate behind it stays light in both themes */
 				background:
 					radial-gradient(120% 110% at 50% 0%, rgba(99, 102, 241, 0.3), transparent 62%),
-					rgba(var(--gray-light), 70%);
+					#eef1f7;
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 50%;
 			}
@@ -323,15 +325,15 @@ const description = isFirstPage
 			.btn--primary {
 				background: var(--accent);
 				border-color: var(--accent);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.btn--primary:hover {
 				background: var(--accent-dark);
 				border-color: var(--accent-dark);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.btn--secondary {
-				background: #fff;
+				background: var(--surface);
 				border-color: rgb(var(--gray-light));
 				color: rgb(var(--gray-dark));
 			}

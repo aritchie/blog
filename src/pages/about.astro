@@ -401,9 +401,11 @@ const recognition = [
 				justify-content: center;
 				overflow: hidden;
 				aspect-ratio: 1 / 1;
+				/* the portrait is a cut-out on white and blends with multiply, so the
+				   plate behind it stays light in both themes */
 				background:
 					radial-gradient(120% 100% at 50% 0%, rgba(99, 102, 241, 0.28), transparent 62%),
-					linear-gradient(160deg, rgba(var(--gray-light), 90%), rgba(var(--gray-light), 35%));
+					linear-gradient(160deg, #e8ecf4, #f7f9fc);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 20px;
 			}
@@ -531,7 +533,7 @@ const recognition = [
 				display: flex;
 				flex-direction: column;
 				overflow: hidden;
-				background: #fff;
+				background: var(--surface);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 16px;
 				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -540,7 +542,7 @@ const recognition = [
 				.venture:hover {
 					transform: translateY(-3px);
 					border-color: var(--accent);
-					box-shadow: 0 12px 30px rgba(var(--gray), 20%);
+					box-shadow: 0 12px 30px rgba(var(--shadow), 20%);
 				}
 			}
 			.venture-media {
@@ -560,7 +562,11 @@ const recognition = [
 				margin: 0;
 				border-radius: 0;
 			}
-			/* a wordmark shouldn't be cropped like a photo */
+			/* a wordmark shouldn't be cropped like a photo, and this one needs a
+			   light plate to stay legible in dark mode */
+			.venture-media--pad {
+				background: #f2f5fa;
+			}
 			.venture-media--pad :global(img) {
 				width: auto;
 				max-width: 74%;
@@ -623,7 +629,7 @@ const recognition = [
 				gap: 0.85rem;
 				padding: 1.1rem;
 				text-decoration: none;
-				background: #fff;
+				background: var(--surface);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 12px;
 				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -632,7 +638,7 @@ const recognition = [
 				a.badge:hover {
 					transform: translateY(-3px);
 					border-color: var(--accent);
-					box-shadow: 0 10px 26px rgba(var(--gray), 18%);
+					box-shadow: 0 10px 26px rgba(var(--shadow), 18%);
 				}
 			}
 			.badge-frame {
@@ -742,15 +748,15 @@ const recognition = [
 			.btn--primary {
 				background: var(--accent);
 				border-color: var(--accent);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.btn--primary:hover {
 				background: var(--accent-dark);
 				border-color: var(--accent-dark);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.btn--secondary {
-				background: #fff;
+				background: var(--surface);
 				border-color: rgb(var(--gray-light));
 				color: rgb(var(--gray-dark));
 			}

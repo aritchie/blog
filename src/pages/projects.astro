@@ -368,9 +368,9 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				gap: 0.75rem 1rem;
 				margin: 0 -0.75rem;
 				padding: 0.9rem 0.75rem;
-				background: rgba(255, 255, 255, 0.82);
-				backdrop-filter: blur(12px);
-				-webkit-backdrop-filter: blur(12px);
+				background: var(--glass);
+				backdrop-filter: blur(16px) saturate(180%);
+				-webkit-backdrop-filter: blur(16px) saturate(180%);
 				border-bottom: 1px solid rgb(var(--gray-light));
 			}
 			.search {
@@ -393,7 +393,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				font-family: inherit;
 				font-size: 0.9rem;
 				color: rgb(var(--gray-dark));
-				background: #fff;
+				background: var(--surface);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 999px;
 				transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -401,7 +401,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			.search input:focus {
 				outline: none;
 				border-color: var(--accent);
-				box-shadow: 0 0 0 3px rgba(35, 55, 255, 0.15);
+				box-shadow: 0 0 0 3px var(--accent-soft);
 			}
 			.tag-filters {
 				display: flex;
@@ -415,7 +415,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				font-weight: 700;
 				line-height: 1;
 				color: rgb(var(--gray-dark));
-				background: #fff;
+				background: var(--surface);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 999px;
 				cursor: pointer;
@@ -428,7 +428,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			.tag-filter[aria-pressed='true'] {
 				background: var(--accent);
 				border-color: var(--accent);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.tag-clear {
 				color: rgb(var(--gray));
@@ -539,17 +539,17 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				flex-direction: column;
 				height: 100%;
 				overflow: hidden;
-				background: #fff;
+				background: var(--surface);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 14px;
-				box-shadow: 0 1px 2px rgba(var(--gray), 12%);
+				box-shadow: 0 1px 2px rgba(var(--shadow), 12%);
 				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 			}
 			@media (hover: hover) and (pointer: fine) {
 				.card:hover {
 					transform: translateY(-3px);
 					border-color: var(--accent);
-					box-shadow: 0 10px 30px rgba(var(--gray), 22%);
+					box-shadow: 0 10px 30px rgba(var(--shadow), 22%);
 				}
 			}
 			.card-media {
@@ -652,15 +652,15 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			.btn--primary {
 				background: var(--accent);
 				border-color: var(--accent);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.btn--primary:hover {
 				background: var(--accent-dark);
 				border-color: var(--accent-dark);
-				color: #fff;
+				color: var(--on-accent);
 			}
 			.btn--secondary {
-				background: #fff;
+				background: var(--surface);
 				border-color: rgb(var(--gray-light));
 				color: rgb(var(--gray-dark));
 			}

@@ -1,286 +1,347 @@
 ---
+import { Image } from 'astro:assets';
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 import SocialLinks from './SocialLinks.astro';
-import { Image } from 'astro:assets';
-import logo from '../assets/logo.png'
-import shinysoftLogo from '../assets/shinysoft-logo.png'
+import ThemeToggle from './ThemeToggle.astro';
+import logo from '../assets/logo.png';
+import shinysoftLogo from '../assets/shinysoft-logo.png';
 ---
 
-<header>
+<header data-site-header>
 	<nav>
-		<div class="nav-brand">
-			<h2><a href="/"><Image src={logo} alt="Logo"/><span class="site-title">{SITE_TITLE}</span></a></h2>
-		</div>
-		
-		<button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
-			<span></span>
-			<span></span>
-			<span></span>
-		</button>
-		
-		<div class="nav-menu" id="nav-menu">
-			<div class="internal-links">
-				<HeaderLink href="/">Blog</HeaderLink>
-				<HeaderLink href="/projects">Projects</HeaderLink>
-				<HeaderLink href="/speaking">Speaking</HeaderLink>
-				<HeaderLink href="/about">About</HeaderLink>
-				<HeaderLink href="https://shinysoft.biz" target="_blank" rel="noopener" class="shinysoft-link">
-					<Image src={shinysoftLogo} alt="ShinySoft Technologies" width={320} height={109} loading="eager" />
-				</HeaderLink>
-				<!--<HeaderLink href="https://www.youtube.com/@GoneDotNet" target="_blank">Gone .NET</HeaderLink>-->
+		<a class="brand" href="/">
+			<Image src={logo} alt="" width={64} height={64} loading="eager" />
+			<span class="site-title">{SITE_TITLE}</span>
+		</a>
+
+		<div class="nav-end">
+			<div class="nav-menu" id="nav-menu">
+				<div class="internal-links">
+					<HeaderLink href="/">Blog</HeaderLink>
+					<HeaderLink href="/projects">Projects</HeaderLink>
+					<HeaderLink href="/speaking">Speaking</HeaderLink>
+					<HeaderLink href="/about">About</HeaderLink>
+					<HeaderLink
+						href="https://shinysoft.biz"
+						target="_blank"
+						rel="noopener"
+						class="shinysoft-link"
+					>
+						<Image
+							src={shinysoftLogo}
+							alt="ShinySoft Technologies"
+							width={320}
+							height={109}
+							loading="eager"
+						/>
+					</HeaderLink>
+				</div>
+				<div class="nav-social">
+					<SocialLinks />
+				</div>
 			</div>
-			<div class="nav-social">
-				<SocialLinks />
-			</div>
+
+			<ThemeToggle />
+
+			<button
+				class="mobile-menu-toggle"
+				aria-label="Toggle menu"
+				aria-expanded="false"
+				aria-controls="nav-menu"
+			>
+				<span></span>
+				<span></span>
+				<span></span>
+			</button>
 		</div>
 	</nav>
 </header>
 
 <script>
-	document.addEventListener('DOMContentLoaded', function() {
-		const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-		const navMenu = document.querySelector('.nav-menu');
-		
-		if (mobileMenuToggle && navMenu) {
-			mobileMenuToggle.addEventListener('click', function() {
-				navMenu.classList.toggle('active');
-				mobileMenuToggle.classList.toggle('active');
-			});
-		}
+	const header = document.querySelector<HTMLElement>('[data-site-header]');
+	const toggle = document.querySelector<HTMLButtonElement>('.mobile-menu-toggle');
+	const menu = document.querySelector<HTMLElement>('#nav-menu');
+
+	toggle?.addEventListener('click', () => {
+		const open = menu?.classList.toggle('active') ?? false;
+		toggle.classList.toggle('active', open);
+		toggle.setAttribute('aria-expanded', String(open));
 	});
+
+	// close the menu on navigation or Escape
+	menu?.addEventListener('click', (event) => {
+		if (!(event.target as HTMLElement).closest('a')) return;
+		menu.classList.remove('active');
+		toggle?.classList.remove('active');
+		toggle?.setAttribute('aria-expanded', 'false');
+	});
+	document.addEventListener('keydown', (event) => {
+		if (event.key !== 'Escape' || !menu?.classList.contains('active')) return;
+		menu.classList.remove('active');
+		toggle?.classList.remove('active');
+		toggle?.setAttribute('aria-expanded', 'false');
+		toggle?.focus();
+	});
+
+	// the glass only earns its shadow once there's content behind it
+	const sentinel = document.createElement('div');
+	sentinel.setAttribute('aria-hidden', 'true');
+	sentinel.style.cssText = 'position:absolute;top:0;height:1px;width:1px;';
+	document.body.prepend(sentinel);
+	new IntersectionObserver(
+		([entry]) => header?.classList.toggle('is-scrolled', !entry.isIntersecting),
+		{ threshold: 0 },
+	).observe(sentinel);
 </script>
+
 <style>
 	header {
-		margin: 0;
-		padding: 0 1em;
-		background: rgba(255, 255, 255, 0.65);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-		box-shadow: 0 2px 16px rgba(var(--black), 8%);
 		position: sticky;
 		top: 0;
 		z-index: 1000;
+		margin: 0;
+		padding: 0 1.25em;
+		background: var(--glass);
+		backdrop-filter: blur(18px) saturate(180%);
+		-webkit-backdrop-filter: blur(18px) saturate(180%);
+		border-bottom: 1px solid transparent;
+		transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
 	}
-	
+	/* a hairline of light along the top edge is what sells the glass */
+	header::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 1px;
+		background: var(--glass-edge);
+		pointer-events: none;
+	}
+	header.is-scrolled {
+		border-bottom-color: rgb(var(--gray-light));
+		box-shadow: 0 2px 16px rgba(var(--shadow), 10%);
+	}
+
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 60px;
-	}
-	
-	.nav-brand h2 {
-		margin: 0;
-		font-size: 1em;
+		gap: 1rem;
+		min-height: 62px;
 	}
 
-	.nav-brand h2 a {
-		text-decoration: none;
-		display: flex;
+	.brand {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.5em;
+		gap: 0.55em;
+		text-decoration: none;
+		font-weight: 700;
 	}
-	
-	.nav-brand h2 a img {
-		width: 32px;
-		height: 32px;
-	}
-	
-	.site-title {
-		color: rgb(var(--black));
-	}
-	
-	.mobile-menu-toggle {
-		display: none; /* Hidden on desktop */
-		flex-direction: column;
-		justify-content: space-around;
+	.brand :global(img) {
 		width: 30px;
 		height: 30px;
-		background: transparent;
-		border: none;
-		cursor: pointer;
-		padding: 0;
-		z-index: 1000;
+		border-radius: 8px;
 	}
-	
-	.mobile-menu-toggle span {
-		width: 25px;
-		height: 3px;
-		background-color: rgb(var(--black));
-		transition: all 0.3s ease;
-		transform-origin: center;
+	.site-title {
+		color: rgb(var(--black));
+		font-size: 1.02rem;
+		letter-spacing: -0.01em;
 	}
-	
-	.mobile-menu-toggle.active span:nth-child(1) {
-		transform: rotate(45deg) translate(5px, 5px);
+
+	.nav-end {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
 	}
-	
-	.mobile-menu-toggle.active span:nth-child(2) {
-		opacity: 0;
-	}
-	
-	.mobile-menu-toggle.active span:nth-child(3) {
-		transform: rotate(-45deg) translate(7px, -6px);
-	}
-	
 	.nav-menu {
 		display: flex;
 		align-items: center;
-		gap: 1.25em;
+		gap: 1rem;
 	}
-
 	.internal-links {
 		display: flex;
-		gap: 1em;
+		align-items: center;
+		gap: 0.15rem;
 	}
 
-	/* Social cluster: smaller icons, set apart from the nav links */
+	/* Nav links: a pill on hover, a short accent bar under the current section */
+	.nav-menu :global(a) {
+		position: relative;
+		padding: 0.45em 0.7em;
+		color: rgb(var(--gray-dark));
+		font-size: 0.95rem;
+		text-decoration: none;
+		border-radius: 8px;
+		transition: color 0.2s ease, background-color 0.2s ease;
+	}
+	.nav-menu :global(a:hover) {
+		color: rgb(var(--black));
+		background: rgba(var(--gray-light), 55%);
+	}
+	.nav-menu :global(a.active) {
+		color: var(--accent);
+		font-weight: 700;
+		text-decoration: none;
+	}
+	.nav-menu :global(a.active)::after {
+		content: '';
+		position: absolute;
+		left: 0.7em;
+		right: 0.7em;
+		bottom: 0.1em;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--accent);
+	}
+
+	.nav-menu :global(a.shinysoft-link) {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.4em 0.5em;
+	}
+	.nav-menu :global(a.shinysoft-link img) {
+		width: auto;
+		height: 30px;
+	}
+	.nav-menu :global(a.shinysoft-link)::after {
+		display: none;
+	}
+	/* the wordmark's "TECHNOLOGIES" line is near-black - give it a plate on dark */
+	:global(:root[data-theme='dark']) .nav-menu :global(a.shinysoft-link) {
+		background: rgba(255, 255, 255, 0.92);
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .nav-menu :global(a.shinysoft-link) {
+			background: rgba(255, 255, 255, 0.92);
+		}
+	}
+
 	.nav-social {
-		--social-icon-size: 20px;
-		--social-gap: 0.9em;
+		--social-icon-size: 19px;
+		--social-gap: 0.8em;
 		--social-margin-top: 0;
 		display: flex;
 		align-items: center;
-		padding: 0.4em 0 0.4em 1.25em;
-		border-left: 1px solid rgba(var(--gray-light), 80%);
-		/* nav links sit 2px high because of their 4px transparent underline */
-		margin-top: -2px;
-	}
-	
-	.nav-menu a {
-		padding: 1em 0.5em;
-		color: rgb(var(--black));
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-		transition: border-bottom-color 0.3s ease;
-	}
-	
-	.nav-menu a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
+		padding-left: 1rem;
+		border-left: 1px solid rgb(var(--gray-light));
 	}
 
-	.nav-menu a.shinysoft-link {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.75em 0.5em;
+	.mobile-menu-toggle {
+		display: none;
+		flex-direction: column;
+		justify-content: space-around;
+		width: 34px;
+		height: 34px;
+		padding: 7px 5px;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		cursor: pointer;
+	}
+	.mobile-menu-toggle:hover {
+		border-color: rgb(var(--gray-light));
+	}
+	.mobile-menu-toggle span {
+		width: 100%;
+		height: 2px;
+		border-radius: 2px;
+		background-color: rgb(var(--black));
+		transition: transform 0.25s ease, opacity 0.2s ease;
+		transform-origin: center;
+	}
+	.mobile-menu-toggle.active span:nth-child(1) {
+		transform: translateY(6px) rotate(45deg);
+	}
+	.mobile-menu-toggle.active span:nth-child(2) {
+		opacity: 0;
+	}
+	.mobile-menu-toggle.active span:nth-child(3) {
+		transform: translateY(-6px) rotate(-45deg);
 	}
 
-	.nav-menu a.shinysoft-link img {
-		width: auto;
-		height: 32px;
-	}
-	
-	/* Collapse to the menu button before the links + icons run out of room */
+	/* Collapse before the links + icons run out of room */
 	@media (max-width: 1080px) {
 		header {
-			padding: 0 0.5em;
+			padding: 0 0.85em;
 		}
-		
 		nav {
-			flex-wrap: wrap;
 			position: relative;
+			min-height: 56px;
 		}
-		
-		.nav-brand h2 {
-			font-size: 0.9em;
-		}
-		
-		.nav-brand h2 a img {
-			width: 28px;
-			height: 28px;
-		}
-		
 		.mobile-menu-toggle {
 			display: flex;
 		}
-		
 		.nav-menu {
 			position: absolute;
-			top: 100%;
+			top: calc(100% + 0.85em);
 			left: 0;
 			right: 0;
-			/* nested backdrop-filters don't blur, so the panel needs to be opaque */
-			background: rgb(255, 255, 255);
-			backdrop-filter: blur(12px);
-			-webkit-backdrop-filter: blur(12px);
 			flex-direction: column;
-			padding: 1em;
-			box-shadow: 0 4px 8px rgba(var(--black), 10%);
-			transform: translateY(-100%);
+			align-items: stretch;
+			gap: 0.5rem;
+			padding: 0.75em;
+			/* nested backdrop-filters don't blur, so the panel is opaque */
+			background: var(--surface);
+			border: 1px solid rgb(var(--gray-light));
+			border-radius: 14px;
+			box-shadow: 0 12px 30px rgba(var(--shadow), 18%);
+			transform: translateY(-8px);
 			opacity: 0;
 			visibility: hidden;
-			transition: all 0.3s ease;
+			transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s ease;
 			z-index: 999;
 		}
-		
 		.nav-menu.active {
 			transform: translateY(0);
 			opacity: 1;
 			visibility: visible;
 		}
-		
 		.internal-links {
 			flex-direction: column;
-			gap: 0;
+			align-items: stretch;
+			gap: 0.1rem;
 			width: 100%;
-			margin-bottom: 1em;
 		}
-		
-		.nav-menu a {
-			padding: 0.75em 0;
-			border-bottom: 1px solid rgba(var(--gray-light), 50%);
-			border-left: none;
-			width: 100%;
-			text-align: left;
+		.nav-menu :global(a) {
+			padding: 0.7em 0.75em;
+			border-radius: 10px;
 		}
-		
-		.nav-menu a.active {
-			border-bottom-color: rgba(var(--gray-light), 50%);
-			border-left: 4px solid var(--accent);
-			padding-left: 0.5em;
+		.nav-menu :global(a.active) {
+			background: var(--accent-soft);
 		}
-		
+		.nav-menu :global(a.active)::after {
+			display: none;
+		}
 		.nav-social {
-			--social-icon-size: 26px;
+			--social-icon-size: 24px;
 			--social-gap: 1.1em;
-			width: 100%;
 			justify-content: center;
 			flex-wrap: wrap;
-			border-left: none;
-			padding: 0.25em 0 0;
-			margin-top: 0;
+			padding: 0.5em 0 0.15em;
+			border-left: 0;
+			border-top: 1px solid rgb(var(--gray-light));
 		}
 	}
-	
-	/* Smaller mobile devices */
+
 	@media (max-width: 480px) {
 		header {
-			padding: 0 0.25em;
+			padding: 0 0.6em;
 		}
-		
-		.nav-brand h2 {
-			font-size: 0.8em;
+		.brand :global(img) {
+			width: 26px;
+			height: 26px;
 		}
-		
-		.nav-brand h2 a img {
-			width: 24px;
-			height: 24px;
-		}
-		
 		.site-title {
-			font-size: 0.9em;
+			font-size: 0.92rem;
 		}
-		
-		.mobile-menu-toggle {
-			width: 28px;
-			height: 28px;
-		}
-		
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		header,
+		.nav-menu,
+		.nav-menu :global(a),
 		.mobile-menu-toggle span {
-			width: 22px;
+			transition: none;
 		}
 	}
 </style>

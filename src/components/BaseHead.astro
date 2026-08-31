@@ -20,6 +20,30 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="theme-color" content="#ffffff" />
+
+<!--
+  Applies the saved theme before first paint so a dark-mode reader never gets a
+  white flash. Inline and synchronous on purpose - deferring it defeats it.
+  Only 'light'/'dark' are stored; anything else means "follow the OS".
+-->
+<script is:inline>
+	(() => {
+		try {
+			const saved = localStorage.getItem('theme');
+			if (saved === 'light' || saved === 'dark') {
+				document.documentElement.dataset.theme = saved;
+			}
+		} catch {}
+		const dark =
+			document.documentElement.dataset.theme === 'dark' ||
+			(!document.documentElement.dataset.theme &&
+				window.matchMedia('(prefers-color-scheme: dark)').matches);
+		if (dark) {
+			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0d1117');
+		}
+	})();
+</script>
 <link rel="icon" type="image/svg+xml" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
