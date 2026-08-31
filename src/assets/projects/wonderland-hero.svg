@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Wonderland Ride Times">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#f472b6" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#f472b6" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#f472b6" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#f472b6" opacity="0.85"/>
+
+	<g>
+		<rect x="330" y="130" width="300" height="290" rx="18" fill="#111a33" stroke="#f472b6" stroke-opacity="0.4"/>
+		<rect x="356" y="168" width="248" height="34" rx="8" fill="#f472b6" opacity="0.5"/>
+		<rect x="356" y="224" width="178" height="34" rx="8" fill="#f472b6" opacity="0.41000000000000003"/>
+		<rect x="356" y="280" width="248" height="34" rx="8" fill="#f472b6" opacity="0.32"/>
+		<rect x="356" y="336" width="178" height="34" rx="8" fill="#f472b6" opacity="0.22999999999999998"/>
+		<rect x="670" y="150" width="200" height="270" rx="26" fill="#0d1428" stroke="#f472b6" stroke-width="2"/>
+		<rect x="742" y="164" width="56" height="8" rx="4" fill="#f472b6" opacity="0.6"/>
+		<rect x="694" y="200 " width="152" height="46" rx="10" fill="#f472b6" opacity="0.42"/>
+		<rect x="694" y="262 " width="152" height="46" rx="10" fill="#f472b6" opacity="0.31999999999999995"/>
+		<rect x="694" y="324 " width="152" height="46" rx="10" fill="#f472b6" opacity="0.21999999999999997"/>
+	</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Wonderland Ride Times</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#f472b6" opacity="0.95">Live wait times, background jobs</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/wonderland</text>
+</svg>

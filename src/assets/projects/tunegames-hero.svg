@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="TUNE Games">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#c084fc" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#c084fc" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#c084fc" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#c084fc" opacity="0.85"/>
+
+	<g><rect x="348" y="350" width="26" height="40" rx="13" fill="#c084fc" opacity="0.35"/>
+		<rect x="394" y="180.67060158832726" width="26" height="209.32939841167274" rx="13" fill="#c084fc" opacity="0.57"/>
+		<rect x="440" y="196.38568327427788" width="26" height="193.61431672572212" rx="13" fill="#c084fc" opacity="0.79"/>
+		<rect x="486" y="320.02831811278276" width="26" height="69.97168188721724" rx="13" fill="#c084fc" opacity="0.35"/>
+		<rect x="532" y="169.19560596099194" width="26" height="220.80439403900806" rx="13" fill="#c084fc" opacity="0.57"/>
+		<rect x="578" y="215.94733814162552" width="26" height="174.05266185837448" rx="13" fill="#c084fc" opacity="0.79"/>
+		<rect x="624" y="290.8071409324581" width="26" height="99.19285906754195" rx="13" fill="#c084fc" opacity="0.35"/>
+		<rect x="670" y="162.2480355633699" width="26" height="227.7519644366301" rx="13" fill="#c084fc" opacity="0.57"/>
+		<rect x="716" y="238.86573335056528" width="26" height="151.13426664943472" rx="13" fill="#c084fc" opacity="0.79"/></g>
+	<g transform="translate(806 168)">
+		<path d="M0 152V26l128-26v126" fill="none" stroke="#c084fc" stroke-width="9" stroke-linecap="round"/>
+		<circle cx="-22" cy="152" r="26" fill="#c084fc"/>
+		<circle cx="106" cy="126" r="26" fill="#c084fc"/>
+	</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">TUNE Games</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#c084fc" opacity="0.95">Name that tune, from your own library</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">aritchie/tunegames</text>
+</svg>

@@ -1,0 +1,220 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings: MarkdownHeading[];
+	/** Don't bother rendering a contents list for a short post */
+	minimum?: number;
+}
+
+const { headings, minimum = 3 } = Astro.props;
+
+// h1 is the post title, and h4+ is more detail than a contents list needs
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const show = items.length >= minimum;
+---
+
+{
+	show && (
+		<details class="toc" data-toc>
+			<summary>
+				<span class="toc-label">On this page</span>
+				<svg class="toc-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path
+						d="m6 9 6 6 6-6"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+			</summary>
+			<nav aria-label="Table of contents">
+				<ol>
+					{items.map((h) => (
+						<li data-depth={h.depth}>
+							<a href={`#${h.slug}`} data-toc-link={h.slug}>
+								{h.text}
+							</a>
+						</li>
+					))}
+				</ol>
+			</nav>
+		</details>
+	)
+}
+
+<script>
+	const toc = document.querySelector<HTMLDetailsElement>('[data-toc]');
+	if (toc) {
+		const links = new Map<string, HTMLAnchorElement>();
+		for (const link of toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')) {
+			links.set(link.dataset.tocLink!, link);
+		}
+
+		// The rail has room to stay open; the inline version starts collapsed.
+		const rail = window.matchMedia('(min-width: 1240px)');
+		const syncOpen = () => {
+			toc.open = rail.matches;
+		};
+		syncOpen();
+		rail.addEventListener('change', syncOpen);
+
+		// Collapse the inline version once a link is followed
+		toc.addEventListener('click', (event) => {
+			if (!rail.matches && (event.target as HTMLElement).closest('a')) toc.open = false;
+		});
+
+		const targets = [...links.keys()]
+			.map((id) => document.getElementById(id))
+			.filter((el): el is HTMLElement => el !== null);
+
+		if (targets.length > 0) {
+			let active: HTMLAnchorElement | null = null;
+			const setActive = (id: string) => {
+				const link = links.get(id);
+				if (!link || link === active) return;
+				active?.removeAttribute('aria-current');
+				link.setAttribute('aria-current', 'true');
+				active = link;
+				// keep the marker visible when the list is taller than the rail
+				const nav = toc.querySelector('nav');
+				if (nav && nav.scrollHeight > nav.clientHeight) {
+					link.scrollIntoView({ block: 'nearest' });
+				}
+			};
+
+			// Highlight the last heading that has scrolled past the top of the viewport
+			const seen = new Map<string, boolean>();
+			const observer = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						seen.set(entry.target.id, entry.boundingClientRect.top < 120);
+					}
+					const passed = targets.filter((t) => seen.get(t.id));
+					setActive((passed.at(-1) ?? targets[0]).id);
+				},
+				{ rootMargin: '-110px 0px -70% 0px', threshold: 0 },
+			);
+			for (const target of targets) observer.observe(target);
+		}
+	}
+</script>
+
+<style>
+	.toc {
+		margin: 0 0 2.5em;
+		padding: 0.9rem 1.1rem;
+		font-size: 0.9rem;
+		background: rgba(var(--gray-light), 35%);
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 12px;
+	}
+
+	summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		cursor: pointer;
+		list-style: none;
+		color: rgb(var(--black));
+	}
+	summary::-webkit-details-marker {
+		display: none;
+	}
+	.toc-label {
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: rgb(var(--gray));
+	}
+	.toc-chevron {
+		width: 1.1rem;
+		height: 1.1rem;
+		flex: 0 0 auto;
+		color: rgb(var(--gray));
+		transition: transform 0.2s ease;
+	}
+	.toc[open] .toc-chevron {
+		transform: rotate(180deg);
+	}
+
+	nav {
+		margin-top: 0.75rem;
+	}
+	ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		margin: 0;
+	}
+	li[data-depth='3'] a {
+		padding-left: 1.4rem;
+		font-size: 0.82rem;
+	}
+	.toc a {
+		display: block;
+		padding: 0.3rem 0 0.3rem 0.7rem;
+		line-height: 1.35;
+		color: rgb(var(--gray-dark));
+		text-decoration: none;
+		border-left: 2px solid rgb(var(--gray-light));
+		transition: color 0.15s ease, border-color 0.15s ease;
+	}
+	.toc a:hover {
+		color: var(--accent);
+		border-left-color: var(--accent);
+	}
+	.toc a[aria-current='true'] {
+		color: var(--accent);
+		font-weight: 700;
+		border-left-color: var(--accent);
+	}
+
+	/*
+	 * Wide screens have dead space either side of the 720px prose column, so the
+	 * contents move out of the flow and into a rail beside the article.
+	 */
+	@media (min-width: 1240px) {
+		.toc {
+			position: fixed;
+			top: 120px;
+			/* half the viewport, back off the prose column, then the rail's own width */
+			left: calc(50% - 360px - 2rem - 232px);
+			width: 232px;
+			max-height: calc(100vh - 200px);
+			margin: 0;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			background: transparent;
+			border: 0;
+			border-left: 1px solid rgb(var(--gray-light));
+			border-radius: 0;
+			padding: 0 0 0 1rem;
+		}
+		summary {
+			cursor: default;
+			pointer-events: none;
+		}
+		.toc-chevron {
+			display: none;
+		}
+		nav {
+			overflow-y: auto;
+			overscroll-behavior: contain;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.toc-chevron,
+		.toc a {
+			transition: none;
+		}
+	}
+</style>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Where Are You">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#34d399" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#34d399" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#34d399" opacity="0.85"/>
+
+	<g opacity="0.5">
+		<path d="M300 150h600" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M300 208h600" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M300 266h600" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M300 324h600" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M300 382h600" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M310 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M406 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M502 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M598 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M694 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M790 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+		<path d="M886 140v250" stroke="#34d399" stroke-opacity="0.16" stroke-width="1.5"/>
+	</g>
+	<path d="M320 350c90-40 130 20 210-30s150-120 240-70 120 30 110 30" fill="none" stroke="#34d399" stroke-width="3" stroke-dasharray="10 10" opacity="0.7"/>
+	
+		<g transform="translate(430 330) scale(1)">
+			<path d="M0 0c0-26-20-40-20-58a20 20 0 0 1 40 0C20-40 0-26 0 0Z" fill="#34d399" opacity="0.92"/>
+			<circle cx="0" cy="-58" r="8" fill="#0b1020"/>
+		</g>
+	
+		<g transform="translate(640 268) scale(1.25)">
+			<path d="M0 0c0-26-20-40-20-58a20 20 0 0 1 40 0C20-40 0-26 0 0Z" fill="#34d399" opacity="0.92"/>
+			<circle cx="0" cy="-58" r="8" fill="#0b1020"/>
+		</g>
+	
+		<g transform="translate(860 320) scale(0.9)">
+			<path d="M0 0c0-26-20-40-20-58a20 20 0 0 1 40 0C20-40 0-26 0 0Z" fill="#34d399" opacity="0.92"/>
+			<circle cx="0" cy="-58" r="8" fill="#0b1020"/>
+		</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Where Are You</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#34d399" opacity="0.95">Background GPS into .NET Orleans</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">GoneDotNet/whereareyou</text>
+</svg>

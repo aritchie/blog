@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Localization Generator">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#22d3ee" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#22d3ee" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#22d3ee" opacity="0.85"/>
+
+	<g>
+		<circle cx="600" cy="270" r="150" fill="#0d1428" stroke="#22d3ee" stroke-opacity="0.55" stroke-width="2"/>
+		<circle cx="600" cy="270" r="150" fill="#22d3ee" fill-opacity="0.07"/>
+		<ellipse cx="600" cy="270" rx="48" ry="150" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="1.5"/>
+		<ellipse cx="600" cy="270" rx="99" ry="150" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="1.5"/>
+		<ellipse cx="600" cy="270" rx="150" ry="150" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="1.5"/>
+		<path d="M480 180h240" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1.5"/>
+		<path d="M456.90911978745817 225h286.18176042508367" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1.5"/>
+		<path d="M450 270h300" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1.5"/>
+		<path d="M456.90911978745817 315h286.18176042508367" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1.5"/>
+		<path d="M480 360h240" stroke="#22d3ee" stroke-opacity="0.3" stroke-width="1.5"/>
+		<circle cx="540" cy="208" r="9" fill="#22d3ee" filter="url(#glow)"/>
+		<circle cx="664" cy="244" r="9" fill="#22d3ee" filter="url(#glow)"/>
+		<circle cx="576" cy="318" r="9" fill="#22d3ee" filter="url(#glow)"/>
+		<circle cx="688" cy="330" r="9" fill="#22d3ee" filter="url(#glow)"/>
+	</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Localization Generator</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#22d3ee" opacity="0.95">Type-safe .resx, at compile time</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/localizegen</text>
+</svg>

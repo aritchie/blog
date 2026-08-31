@@ -1,0 +1,260 @@
+---
+import { getContributions, toWeeks } from '../utils/github';
+
+interface Props {
+	/** GitHub username */
+	user: string;
+}
+
+const { user } = Astro.props;
+const calendar = await getContributions(user);
+
+// Geometry, in SVG user units. The whole thing scales to its container.
+const CELL = 11;
+const GAP = 3;
+const PITCH = CELL + GAP;
+const LABEL_W = 26;
+const LABEL_H = 16;
+
+const weeks = calendar ? toWeeks(calendar.days) : [];
+const width = LABEL_W + weeks.length * PITCH - GAP;
+const height = LABEL_H + 7 * PITCH - GAP;
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** One label per month, over the first week that lands in it. */
+const monthLabels: { x: number; label: string }[] = [];
+let lastLabelled = -Infinity;
+weeks.forEach((week, i) => {
+	const first = week.find((d) => d !== null);
+	if (!first) return;
+	const date = new Date(`${first.date}T00:00:00Z`);
+	const prev = weeks[i - 1]?.find((d) => d !== null);
+	const prevMonth = prev ? new Date(`${prev.date}T00:00:00Z`).getUTCMonth() : -1;
+	if (date.getUTCMonth() === prevMonth) return;
+	// the calendar starts mid-month, so its first column rarely deserves a label
+	if (i === 0 && date.getUTCDate() > 7) return;
+	// keep labels from colliding, and off the clipped right edge
+	if (i - lastLabelled < 3 || i > weeks.length - 3) return;
+	lastLabelled = i;
+	monthLabels.push({ x: LABEL_W + i * PITCH, label: MONTHS[date.getUTCMonth()] });
+});
+
+const activeDays = calendar?.days.filter((d) => d.count > 0).length ?? 0;
+const busiest = calendar?.days.reduce((a, b) => (b.count > a.count ? b : a));
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+const longDate = (iso: string) =>
+	new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric',
+		timeZone: 'UTC',
+	});
+---
+
+{
+	calendar && (
+		<figure class="contrib">
+			<figcaption>
+				<div class="contrib-heading">
+					<strong>{fmt(calendar.total)} contributions</strong>
+					<span>in the last year</span>
+				</div>
+				<a href={`https://github.com/${user}`} target="_blank" rel="noopener noreferrer">
+					@{user}
+				</a>
+			</figcaption>
+
+			<div class="contrib-scroll">
+				<svg
+					viewBox={`0 0 ${width} ${height}`}
+					width={width}
+					height={height}
+					role="img"
+					aria-label={`GitHub contribution graph: ${fmt(calendar.total)} contributions between ${longDate(calendar.from)} and ${longDate(calendar.to)}`}
+				>
+					{monthLabels.map((m) => (
+						<text class="contrib-label" x={m.x} y={LABEL_H - 5}>
+							{m.label}
+						</text>
+					))}
+					{['Mon', 'Wed', 'Fri'].map((day, i) => (
+						<text
+							class="contrib-label"
+							x={0}
+							y={LABEL_H + (i * 2 + 1) * PITCH + CELL - 2}
+						>
+							{day}
+						</text>
+					))}
+					{weeks.map((week, x) =>
+						week.map((day, y) =>
+							day ? (
+								<rect
+									class="contrib-day"
+									data-level={day.level}
+									x={LABEL_W + x * PITCH}
+									y={LABEL_H + y * PITCH}
+									width={CELL}
+									height={CELL}
+									rx="2"
+								>
+									<title>
+										{day.count === 0
+											? `No contributions on ${longDate(day.date)}`
+											: `${fmt(day.count)} contribution${day.count === 1 ? '' : 's'} on ${longDate(day.date)}`}
+									</title>
+								</rect>
+							) : null,
+						),
+					)}
+				</svg>
+			</div>
+
+			<div class="contrib-footer">
+				<p class="contrib-facts">
+					{fmt(activeDays)} active days
+					{busiest && busiest.count > 0 && <> · busiest was {fmt(busiest.count)} on {longDate(busiest.date)}</>}
+				</p>
+				<p class="contrib-legend" aria-hidden="true">
+					<span>Less</span>
+					{[0, 1, 2, 3, 4].map((level) => (
+						<i class="contrib-swatch" data-level={level} />
+					))}
+					<span>More</span>
+				</p>
+			</div>
+		</figure>
+	)
+}
+
+<style>
+	.contrib {
+		--contrib-0: #ebedf0;
+		--contrib-1: #9be9a8;
+		--contrib-2: #40c463;
+		--contrib-3: #30a14e;
+		--contrib-4: #216e39;
+
+		margin: 2em 0;
+		padding: 1.1rem 1.25rem 1rem;
+		background: #fff;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 12px;
+	}
+
+	figcaption {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1rem;
+		margin-bottom: 0.85rem;
+		font-size: 0.9rem;
+		line-height: 1.3;
+	}
+	.contrib-heading {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.4rem;
+	}
+	.contrib-heading strong {
+		font-size: 1.05rem;
+		color: rgb(var(--black));
+	}
+	.contrib-heading span {
+		color: rgb(var(--gray));
+	}
+	figcaption a {
+		font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+		font-size: 0.8rem;
+		text-decoration: none;
+	}
+	figcaption a:hover {
+		text-decoration: underline;
+	}
+
+	/* the calendar is a fixed 53 weeks wide - let narrow screens pan it */
+	.contrib-scroll {
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		padding-bottom: 0.25rem;
+	}
+	.contrib-scroll svg {
+		display: block;
+		width: 100%;
+		min-width: 620px;
+		height: auto;
+	}
+
+	.contrib-label {
+		fill: rgb(var(--gray));
+		font-size: 9px;
+		font-family: inherit;
+	}
+	.contrib-day {
+		fill: var(--contrib-0);
+		stroke: rgba(27, 31, 35, 0.06);
+		stroke-width: 1px;
+		shape-rendering: geometricPrecision;
+	}
+	.contrib-day[data-level='1'] {
+		fill: var(--contrib-1);
+	}
+	.contrib-day[data-level='2'] {
+		fill: var(--contrib-2);
+	}
+	.contrib-day[data-level='3'] {
+		fill: var(--contrib-3);
+	}
+	.contrib-day[data-level='4'] {
+		fill: var(--contrib-4);
+	}
+
+	.contrib-footer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem 1rem;
+		margin-top: 0.6rem;
+	}
+	.contrib-facts,
+	.contrib-legend {
+		margin: 0;
+		font-size: 0.75rem;
+		color: rgb(var(--gray));
+	}
+	.contrib-legend {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+	.contrib-swatch {
+		width: 11px;
+		height: 11px;
+		border-radius: 2px;
+		background: var(--contrib-0);
+		box-shadow: inset 0 0 0 1px rgba(27, 31, 35, 0.06);
+	}
+	.contrib-swatch[data-level='1'] {
+		background: var(--contrib-1);
+	}
+	.contrib-swatch[data-level='2'] {
+		background: var(--contrib-2);
+	}
+	.contrib-swatch[data-level='3'] {
+		background: var(--contrib-3);
+	}
+	.contrib-swatch[data-level='4'] {
+		background: var(--contrib-4);
+	}
+
+	@media (max-width: 520px) {
+		.contrib-footer {
+			justify-content: flex-start;
+		}
+	}
+</style>

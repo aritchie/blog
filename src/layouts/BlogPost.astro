@@ -1,4 +1,5 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
@@ -6,11 +7,13 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import { READING_PROGRESS_DOCK, type ReadingProgressDock } from '../consts';
 
 type Props = CollectionEntry<'blog'>['data'] & {
 	readingMinutes?: number;
 	readingProgressDock?: ReadingProgressDock;
+	headings?: MarkdownHeading[];
 };
 
 const {
@@ -21,6 +24,7 @@ const {
 	heroImage,
 	readingMinutes,
 	readingProgressDock = READING_PROGRESS_DOCK,
+	headings = [],
 } = Astro.props;
 ---
 
@@ -91,6 +95,7 @@ const {
 						<h1>{title}</h1>
 						<hr />
 					</div>
+					<TableOfContents headings={headings} />
 					<slot />
 				</div>
 			</article>

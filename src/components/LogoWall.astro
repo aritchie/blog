@@ -1,0 +1,134 @@
+---
+import { Image } from 'astro:assets';
+import gonedotnet from '../assets/gonedotnet.jpg';
+import mvp from '../assets/msft_mvp.png';
+import shiny from '../assets/shiny.png';
+import shinysoft from '../assets/shinysoft-logo.png';
+
+/**
+ * The badges that used to sit at the bottom of the About page as a column of
+ * loose images separated by `<br />`s. Same links, presented as a grid of
+ * equal tiles so they read as one set.
+ */
+const tiles = [
+	{
+		image: shinysoft,
+		alt: 'ShinySoft Technologies',
+		href: 'https://shinysoft.biz',
+		label: 'ShinySoft Technologies',
+		caption: 'My consultancy',
+	},
+	{
+		image: gonedotnet,
+		alt: 'Gone .NET',
+		href: 'https://www.youtube.com/@GoneDotNet',
+		label: 'Gone .NET',
+		caption: 'Weekly livestream',
+	},
+	{
+		image: shiny,
+		alt: 'Shiny',
+		href: 'https://shinylib.net',
+		label: 'Shiny',
+		caption: 'Open source libraries',
+	},
+	{
+		image: mvp,
+		alt: 'Microsoft Most Valuable Professional',
+		href: 'https://mvp.microsoft.com/en-US/mvp/profile/501ddb3a-4d15-e711-810b-3863bb36edf8',
+		label: 'Microsoft MVP',
+		caption: 'Ten consecutive years',
+	},
+];
+---
+
+<ul class="logo-wall" role="list">
+	{
+		tiles.map((tile) => (
+			<li>
+				<a href={tile.href} target="_blank" rel="noopener noreferrer">
+					<span class="logo-frame">
+						<Image src={tile.image} alt={tile.alt} width={420} densities={[1, 2]} />
+					</span>
+					<span class="logo-copy">
+						<strong>{tile.label}</strong>
+						<span>{tile.caption}</span>
+					</span>
+				</a>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.logo-wall {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 1rem;
+		margin: 2em 0;
+		padding: 0;
+	}
+	.logo-wall li {
+		list-style: none;
+		margin: 0;
+	}
+	.logo-wall a {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		gap: 0.85rem;
+		padding: 1.1rem;
+		text-decoration: none;
+		background: #fff;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 12px;
+		transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+	@media (hover: hover) and (pointer: fine) {
+		.logo-wall a:hover {
+			transform: translateY(-3px);
+			border-color: var(--accent);
+			box-shadow: 0 10px 26px rgba(var(--gray), 20%);
+		}
+	}
+	.logo-frame {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 96px;
+		padding: 0.5rem;
+		background: rgba(var(--gray-light), 40%);
+		border-radius: 8px;
+	}
+	.logo-frame :global(img) {
+		width: auto;
+		max-width: 100%;
+		max-height: 80px;
+		object-fit: contain;
+		border-radius: 4px;
+		margin: 0;
+	}
+	.logo-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		line-height: 1.3;
+	}
+	.logo-copy strong {
+		font-size: 0.95rem;
+		color: rgb(var(--black));
+	}
+	.logo-copy span {
+		font-size: 0.8rem;
+		color: rgb(var(--gray));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.logo-wall a {
+			transition: none;
+		}
+		.logo-wall a:hover {
+			transform: none;
+		}
+	}
+</style>
