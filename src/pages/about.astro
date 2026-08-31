@@ -1,0 +1,775 @@
+---
+import { Image } from 'astro:assets';
+import BaseHead from '../components/BaseHead.astro';
+import ContributionGraph from '../components/ContributionGraph.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import gonedotnet from '../assets/gonedotnet.jpg';
+import me from '../assets/me.jpg';
+import mvp from '../assets/msft_mvp.png';
+import shiny from '../assets/shiny.png';
+import shinysoft from '../assets/shinysoft-logo.png';
+import toronto from '../assets/toronto_pan.jpg';
+import xammvp from '../assets/xammvp.png';
+import { TOTAL_PROJECTS } from '../data/projects';
+
+const title = 'About';
+const description =
+	'Allan Ritchie — software engineer, architect, consultant and open source maintainer. 25 years of shipping software, 40M+ NuGet downloads, Microsoft MVP since 2017.';
+
+const recognition = [
+	{
+		image: mvp,
+		alt: 'Microsoft Most Valuable Professional',
+		label: 'Microsoft MVP',
+		detail: 'Since 2017 — ten consecutive years',
+		href: 'https://mvp.microsoft.com/en-US/mvp/profile/501ddb3a-4d15-e711-810b-3863bb36edf8',
+	},
+	{
+		image: xammvp,
+		alt: 'Xamarin MVP',
+		label: 'Xamarin MVP',
+		detail: 'Awarded for cross-platform mobile work',
+	},
+	{
+		image: shiny,
+		alt: 'Shiny',
+		label: 'Shiny',
+		detail: 'The libraries behind most of it',
+		href: 'https://shinylib.net',
+	},
+];
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="hero">
+				<div class="hero-copy">
+					<p class="eyebrow">About</p>
+					<h1>Hi, I'm Allan Ritchie</h1>
+					<p class="lede">
+						A software engineer, architect, consultant and open source maintainer, with experience
+						spanning web, mobile, and everything in between — from startups to large enterprises.
+					</p>
+					<ul class="facts" role="list">
+						<li>
+							<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path
+									d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linejoin="round"></path>
+								<circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="2"
+								></circle>
+							</svg>
+							Toronto, Canada
+						</li>
+						<li>
+							<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path
+									d="m12 3 2.6 5.6 6.4.8-4.7 4.3 1.3 6.3L12 17l-5.6 3 1.3-6.3L3 9.4l6.4-.8Z"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linejoin="round"></path>
+							</svg>
+							Microsoft MVP since 2017
+						</li>
+						<li>
+							<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<path
+									d="M4 7h16M4 12h16M4 17h10"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"></path>
+							</svg>
+							Founder, ShinySoft Technologies
+						</li>
+					</ul>
+					<div class="hero-actions">
+						<a class="btn btn--primary" href="mailto:allan@shinysoft.biz">
+							<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+								<rect
+									x="3"
+									y="5"
+									width="18"
+									height="14"
+									rx="2"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"></rect>
+								<path
+									d="m3.5 7 8.5 6 8.5-6"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"></path>
+							</svg>
+							<span>Get in touch</span>
+						</a>
+						<a class="btn btn--secondary" href="/projects"><span>See the projects</span></a>
+					</div>
+				</div>
+
+				<div class="hero-portrait">
+					<Image src={me} alt="Allan Ritchie" width={720} densities={[1, 2]} loading="eager" />
+				</div>
+			</section>
+
+			<dl class="stats">
+				<div><dt>Years shipping software</dt><dd>25</dd></div>
+				<div><dt>NuGet downloads</dt><dd>40M+</dd></div>
+				<div><dt>Open source projects</dt><dd>{TOTAL_PROJECTS}</dd></div>
+				<div><dt>Years as an MVP</dt><dd>10</dd></div>
+			</dl>
+
+			<section class="story" aria-labelledby="story-title">
+				<h2 id="story-title" class="section-title">The long version</h2>
+				<div class="story-copy">
+					<p>
+						Over a 25-year career I've shipped software across industries including commercial real
+						estate, healthcare, and logistics. Starting with Perl, PHP, Java, C++, and classic ASP,
+						I've since worked across the full modern stack. For the past seven years I've run my own
+						consultancy, <a href="https://shinysoft.biz" target="_blank" rel="noopener noreferrer"
+							>ShinySoft Technologies</a
+						>, helping companies deliver mobile apps, web applications, backend services, and cloud
+						infrastructure.
+					</p>
+					<p>
+						I'm also a dedicated open source contributor. Over the past 15 years I've authored and
+						maintained numerous .NET libraries — beginning with contributions to NHibernate and other
+						established projects before creating my own. Collectively, my libraries have surpassed 40
+						million downloads.
+					</p>
+					<p>
+						I'm passionate about sharing knowledge through <a href="/speaking">public speaking</a> and
+						livestreaming. My contributions have been recognized with the Xamarin MVP award and, since
+						2017, the <a
+							href="https://mvp.microsoft.com/en-US/mvp/profile/501ddb3a-4d15-e711-810b-3863bb36edf8"
+							target="_blank"
+							rel="noopener noreferrer">Microsoft MVP</a
+						> award — an honour I've held for ten consecutive years.
+					</p>
+				</div>
+			</section>
+
+			<section class="activity" aria-labelledby="activity-title">
+				<h2 id="activity-title" class="section-title">Still shipping</h2>
+				<p class="section-lede">
+					Most days end with a commit somewhere. Here's the last year on GitHub — every green square
+					is work on one of the <a href="/projects">projects</a>.
+				</p>
+				<ContributionGraph user="aritchie" />
+			</section>
+
+			<section class="skyline" aria-label="Toronto">
+				<Image src={toronto} alt="" width={2458} densities={[1, 2]} loading="lazy" />
+				<p><span>Built from</span> Toronto, Canada</p>
+			</section>
+
+			<section class="ventures" aria-labelledby="ventures-title">
+				<h2 id="ventures-title" class="section-title">What I'm doing now</h2>
+				<div class="venture-grid">
+					<article class="venture">
+						<a
+							class="venture-media venture-media--pad"
+							href="https://shinysoft.biz"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<Image src={shinysoft} alt="ShinySoft Technologies" width={800} densities={[1, 2]} />
+						</a>
+						<div class="venture-copy">
+							<p class="flag">Consultancy</p>
+							<h3>ShinySoft Technologies</h3>
+							<p>
+								My consultancy. We build mobile apps, web applications, backend services, and the
+								cloud infrastructure behind them — for startups and enterprises alike.
+							</p>
+							<div class="venture-links">
+								<a
+									class="btn btn--primary"
+									href="https://shinysoft.biz"
+									target="_blank"
+									rel="noopener noreferrer"><span>shinysoft.biz</span></a
+								>
+							</div>
+						</div>
+					</article>
+
+					<article class="venture">
+						<a
+							class="venture-media"
+							href="https://www.youtube.com/@GoneDotNet"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<Image src={gonedotnet} alt="Gone .NET" width={800} densities={[1, 2]} />
+						</a>
+						<div class="venture-copy">
+							<p class="flag">Weekly livestream</p>
+							<h3>Gone .NET</h3>
+							<p>
+								I co-host a weekly YouTube livestream with <a
+									href="https://x.com/redth"
+									target="_blank"
+									rel="noopener noreferrer">Jonathan Dick</a
+								>, where we go beyond the basics — building real-world .NET samples and exploring the
+								ecosystem in depth.
+							</p>
+							<div class="venture-links">
+								<a
+									class="btn btn--primary"
+									href="https://www.youtube.com/@GoneDotNet"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+										<path
+											d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8M10 15V9l5.2 3Z"
+											fill="currentColor"></path>
+									</svg>
+									<span>YouTube</span>
+								</a>
+								<a
+									class="btn btn--secondary"
+									href="https://www.gonedotnet.io"
+									target="_blank"
+									rel="noopener noreferrer"><span>www.gonedotnet.io</span></a
+								>
+							</div>
+						</div>
+					</article>
+				</div>
+			</section>
+
+			<section class="recognition" aria-labelledby="recognition-title">
+				<h2 id="recognition-title" class="section-title">Recognition</h2>
+				<ul class="badge-grid" role="list">
+					{
+						recognition.map((item) => {
+							const Tag = item.href ? 'a' : 'div';
+							return (
+								<li>
+									<Tag
+										class="badge"
+										href={item.href}
+										target={item.href ? '_blank' : undefined}
+										rel={item.href ? 'noopener noreferrer' : undefined}
+									>
+										<span class="badge-frame">
+											<Image src={item.image} alt={item.alt} width={420} densities={[1, 2]} />
+										</span>
+										<span class="badge-copy">
+											<strong>{item.label}</strong>
+											<span>{item.detail}</span>
+										</span>
+									</Tag>
+								</li>
+							);
+						})
+					}
+				</ul>
+			</section>
+
+			<section class="contact" aria-labelledby="contact-title">
+				<h2 id="contact-title">Let's build something</h2>
+				<p>
+					I'm driven by helping teams turn ideas into products. If you're looking for guidance on
+					your next project, I'd love to hear from you.
+				</p>
+				<div class="contact-actions">
+					<a class="btn btn--primary" href="mailto:allan@shinysoft.biz">
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<rect
+								x="3"
+								y="5"
+								width="18"
+								height="14"
+								rx="2"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"></rect>
+							<path
+								d="m3.5 7 8.5 6 8.5-6"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"></path>
+						</svg>
+						<span>allan@shinysoft.biz</span>
+					</a>
+					<a
+						class="btn btn--secondary"
+						href="https://shinysoft.biz"
+						target="_blank"
+						rel="noopener noreferrer"><span>What ShinySoft can do</span></a
+					>
+				</div>
+			</section>
+		</main>
+		<Footer />
+
+		<style>
+			main {
+				width: min(1080px, calc(100% - 2.5rem));
+				max-width: none;
+				margin: 0 auto;
+				padding: 0 0 5rem;
+				/* the full-bleed skyline is 100vw, which overshoots by the scrollbar width */
+				overflow-x: clip;
+			}
+
+			/* ---------- hero ---------- */
+
+			.hero {
+				display: grid;
+				gap: 2rem;
+				align-items: center;
+				padding: 3.5rem 0 2.5rem;
+			}
+			@media (min-width: 880px) {
+				.hero {
+					grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+					gap: 3rem;
+				}
+			}
+			.eyebrow {
+				margin: 0 0 0.5rem;
+				font-size: 0.8rem;
+				font-weight: 700;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--accent);
+			}
+			.hero h1 {
+				margin: 0 0 0.75rem;
+				font-size: clamp(2.3rem, 1.7rem + 2.8vw, 3.8rem);
+				letter-spacing: -0.03em;
+				text-wrap: balance;
+			}
+			.lede {
+				max-width: 46ch;
+				margin: 0;
+				font-size: 1.1rem;
+				line-height: 1.55;
+				color: rgb(var(--gray));
+				text-wrap: pretty;
+			}
+			.facts {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				margin: 1.5rem 0 0;
+				padding: 0;
+			}
+			.facts li {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				list-style: none;
+				font-size: 0.9rem;
+				color: rgb(var(--gray-dark));
+			}
+			.facts svg {
+				flex: 0 0 auto;
+				width: 1.05rem;
+				height: 1.05rem;
+				color: var(--accent);
+			}
+			.hero-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.6rem;
+				margin-top: 1.75rem;
+			}
+
+			/* the portrait is a cut-out on white, so it needs a frame to sit in */
+			.hero-portrait {
+				position: relative;
+				display: flex;
+				align-items: flex-end;
+				justify-content: center;
+				overflow: hidden;
+				aspect-ratio: 1 / 1;
+				background:
+					radial-gradient(120% 100% at 50% 0%, rgba(99, 102, 241, 0.28), transparent 62%),
+					linear-gradient(160deg, rgba(var(--gray-light), 90%), rgba(var(--gray-light), 35%));
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 20px;
+			}
+			.hero-portrait :global(img) {
+				width: 92%;
+				height: auto;
+				margin: 0;
+				border-radius: 0;
+				mix-blend-mode: multiply;
+			}
+
+			/* ---------- stats ---------- */
+
+			.stats {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+				gap: 1.5rem 2rem;
+				margin: 0;
+				padding: 1.75rem 0;
+				border-top: 1px solid rgb(var(--gray-light));
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.stats dt {
+				font-size: 0.72rem;
+				font-weight: 700;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: rgb(var(--gray));
+			}
+			.stats dd {
+				margin: 0.2rem 0 0;
+				font-size: 2rem;
+				font-weight: 700;
+				line-height: 1;
+				color: rgb(var(--black));
+				letter-spacing: -0.02em;
+			}
+
+			/* ---------- shared section furniture ---------- */
+
+			.section-title {
+				margin: 0 0 0.6rem;
+				font-size: clamp(1.7rem, 1.4rem + 1.2vw, 2.4rem);
+				letter-spacing: -0.03em;
+			}
+			.section-lede {
+				max-width: 60ch;
+				margin: 0 0 1.25rem;
+				color: rgb(var(--gray));
+				text-wrap: pretty;
+			}
+
+			.story,
+			.activity,
+			.ventures,
+			.recognition {
+				margin-top: clamp(3rem, 5vw, 4.5rem);
+			}
+
+			.story-copy {
+				max-width: 66ch;
+			}
+			.story-copy p {
+				margin: 0 0 1.1rem;
+				font-size: 1.02rem;
+				line-height: 1.7;
+				color: rgb(var(--gray-dark));
+				text-wrap: pretty;
+			}
+			.story-copy p:last-child {
+				margin-bottom: 0;
+			}
+
+			/* ---------- skyline band ---------- */
+
+			.skyline {
+				position: relative;
+				width: 100vw;
+				max-width: 100vw;
+				margin: clamp(3rem, 5vw, 4.5rem) 0 0 calc(50% - 50vw);
+				overflow: hidden;
+			}
+			.skyline :global(img) {
+				display: block;
+				width: 100%;
+				height: clamp(160px, 22vw, 280px);
+				object-fit: cover;
+				object-position: center 40%;
+				margin: 0;
+				border-radius: 0;
+			}
+			.skyline p {
+				position: absolute;
+				inset: auto 0 clamp(1rem, 3vw, 2rem);
+				margin: 0;
+				text-align: center;
+				font-size: clamp(1.1rem, 0.9rem + 1vw, 1.8rem);
+				font-weight: 700;
+				letter-spacing: -0.02em;
+				color: #fff;
+				text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
+			}
+			.skyline p span {
+				display: block;
+				font-size: 0.7rem;
+				font-weight: 700;
+				letter-spacing: 0.18em;
+				text-transform: uppercase;
+				opacity: 0.8;
+			}
+
+			/* ---------- ventures ---------- */
+
+			.venture-grid {
+				display: grid;
+				gap: 1.25rem;
+				margin-top: 1.5rem;
+			}
+			@media (min-width: 820px) {
+				.venture-grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+			.venture {
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				background: #fff;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 16px;
+				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+			}
+			@media (hover: hover) and (pointer: fine) {
+				.venture:hover {
+					transform: translateY(-3px);
+					border-color: var(--accent);
+					box-shadow: 0 12px 30px rgba(var(--gray), 20%);
+				}
+			}
+			.venture-media {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				aspect-ratio: 16 / 9;
+				overflow: hidden;
+				background: rgba(var(--gray-light), 45%);
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.venture-media :global(img) {
+				display: block;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				margin: 0;
+				border-radius: 0;
+			}
+			/* a wordmark shouldn't be cropped like a photo */
+			.venture-media--pad :global(img) {
+				width: auto;
+				max-width: 74%;
+				height: auto;
+				max-height: 62%;
+				object-fit: contain;
+			}
+			.venture-copy {
+				display: flex;
+				flex: 1;
+				flex-direction: column;
+				gap: 0.5rem;
+				padding: clamp(1.1rem, 2vw, 1.5rem);
+			}
+			.flag {
+				margin: 0;
+				font-size: 0.7rem;
+				font-weight: 700;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--accent);
+			}
+			.venture-copy h3 {
+				margin: 0;
+				font-size: 1.45rem;
+				letter-spacing: -0.02em;
+			}
+			.venture-copy p {
+				margin: 0;
+				font-size: 0.92rem;
+				line-height: 1.55;
+				color: rgb(var(--gray-dark));
+				text-wrap: pretty;
+			}
+			.venture-links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-top: auto;
+				padding-top: 0.9rem;
+			}
+
+			/* ---------- recognition ---------- */
+
+			.badge-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+				gap: 1rem;
+				margin: 1.5rem 0 0;
+				padding: 0;
+			}
+			.badge-grid li {
+				list-style: none;
+				margin: 0;
+			}
+			.badge {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				gap: 0.85rem;
+				padding: 1.1rem;
+				text-decoration: none;
+				background: #fff;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+			}
+			@media (hover: hover) and (pointer: fine) {
+				a.badge:hover {
+					transform: translateY(-3px);
+					border-color: var(--accent);
+					box-shadow: 0 10px 26px rgba(var(--gray), 18%);
+				}
+			}
+			.badge-frame {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 92px;
+				padding: 0.5rem;
+				background: rgba(var(--gray-light), 40%);
+				border-radius: 8px;
+			}
+			.badge-frame :global(img) {
+				width: auto;
+				max-width: 100%;
+				max-height: 76px;
+				object-fit: contain;
+				margin: 0;
+				border-radius: 4px;
+			}
+			.badge-copy {
+				display: flex;
+				flex-direction: column;
+				gap: 0.1rem;
+				line-height: 1.35;
+			}
+			.badge-copy strong {
+				font-size: 0.95rem;
+				color: rgb(var(--black));
+			}
+			.badge-copy span {
+				font-size: 0.8rem;
+				color: rgb(var(--gray));
+			}
+
+			/* ---------- contact ---------- */
+
+			.contact {
+				margin-top: clamp(3.5rem, 6vw, 5rem);
+				padding: clamp(1.75rem, 4vw, 2.75rem);
+				color: #f8fafc;
+				background:
+					radial-gradient(120% 120% at 0% 0%, rgba(99, 102, 241, 0.55), transparent 60%),
+					linear-gradient(135deg, #0b1020, #161c3d 55%, #0b1020);
+				border-radius: 18px;
+			}
+			.contact h2 {
+				margin: 0 0 0.6rem;
+				font-size: clamp(1.8rem, 1.4rem + 1.5vw, 2.6rem);
+				letter-spacing: -0.03em;
+				color: #fff;
+				text-wrap: balance;
+			}
+			.contact p {
+				max-width: 52ch;
+				margin: 0;
+				line-height: 1.6;
+				color: rgba(248, 250, 252, 0.84);
+				text-wrap: pretty;
+			}
+			.contact-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.6rem;
+				margin-top: 1.6rem;
+			}
+			.contact .btn--primary {
+				background: #fff;
+				border-color: #fff;
+				color: #0b1020;
+			}
+			.contact .btn--primary:hover {
+				background: rgba(255, 255, 255, 0.86);
+				border-color: rgba(255, 255, 255, 0.86);
+				color: #0b1020;
+			}
+			.contact .btn--secondary {
+				background: transparent;
+				border-color: rgba(255, 255, 255, 0.34);
+				color: #f8fafc;
+			}
+			.contact .btn--secondary:hover {
+				border-color: #fff;
+				background: rgba(255, 255, 255, 0.08);
+				color: #fff;
+			}
+
+			/* ---------- buttons ---------- */
+
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.4rem;
+				padding: 0.55rem 0.9rem;
+				font-size: 0.85rem;
+				font-weight: 700;
+				line-height: 1;
+				text-decoration: none;
+				border: 1px solid transparent;
+				border-radius: 8px;
+				transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+			}
+			.btn svg {
+				flex: 0 0 auto;
+				width: 1rem;
+				height: 1rem;
+			}
+			.btn--primary {
+				background: var(--accent);
+				border-color: var(--accent);
+				color: #fff;
+			}
+			.btn--primary:hover {
+				background: var(--accent-dark);
+				border-color: var(--accent-dark);
+				color: #fff;
+			}
+			.btn--secondary {
+				background: #fff;
+				border-color: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+			}
+			.btn--secondary:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.btn,
+				.venture,
+				.badge {
+					transition: none;
+				}
+				.venture:hover,
+				a.badge:hover {
+					transform: none;
+				}
+			}
+		</style>
+	</body>
+</html>

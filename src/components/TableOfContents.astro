@@ -16,7 +16,7 @@ const show = items.length >= minimum;
 
 {
 	show && (
-		<details class="toc" data-toc>
+		<details class="toc is-stowed" data-toc>
 			<summary>
 				<span class="toc-label">On this page</span>
 				<svg class="toc-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -54,12 +54,29 @@ const show = items.length >= minimum;
 		}
 
 		// The rail has room to stay open; the inline version starts collapsed.
-		const rail = window.matchMedia('(min-width: 1240px)');
+		const rail = window.matchMedia('(min-width: 1280px)');
 		const syncOpen = () => {
 			toc.open = rail.matches;
 		};
 		syncOpen();
 		rail.addEventListener('change', syncOpen);
+
+		/*
+		 * The hero image is wider than the prose column and runs under the rail, so
+		 * the two collide at the top of a post. Keep the rail stowed until the hero
+		 * has scrolled away. Posts without a hero show it straight away.
+		 */
+		const hero = document.querySelector('.hero-image img');
+		if (hero) {
+			const heroObserver = new IntersectionObserver(
+				([entry]) => toc.classList.toggle('is-stowed', entry.isIntersecting),
+				// the rail starts 120px down, so that's the line the hero has to clear
+				{ rootMargin: '-120px 0px 0px 0px', threshold: 0 },
+			);
+			heroObserver.observe(hero);
+		} else {
+			toc.classList.remove('is-stowed');
+		}
 
 		// Collapse the inline version once a link is followed
 		toc.addEventListener('click', (event) => {
@@ -178,9 +195,10 @@ const show = items.length >= minimum;
 
 	/*
 	 * Wide screens have dead space either side of the 720px prose column, so the
-	 * contents move out of the flow and into a rail beside the article.
+	 * contents move out of the flow and into a rail beside the article. The rail
+	 * needs 1248px (720 + 2 x (32 + 232)) before it stops being clipped.
 	 */
-	@media (min-width: 1240px) {
+	@media (min-width: 1280px) {
 		.toc {
 			position: fixed;
 			top: 120px;
@@ -197,6 +215,12 @@ const show = items.length >= minimum;
 			border-left: 1px solid rgb(var(--gray-light));
 			border-radius: 0;
 			padding: 0 0 0 1rem;
+			transition: opacity 0.25s ease, visibility 0.25s ease;
+		}
+		/* stowed while the hero image occupies the same space - see the script */
+		.toc.is-stowed {
+			opacity: 0;
+			visibility: hidden;
 		}
 		summary {
 			cursor: default;
