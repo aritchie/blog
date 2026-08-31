@@ -2,7 +2,7 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 export const SITE_TITLE = 'Allan Ritchie';
-export const SITE_DESCRIPTION = 'Ramblings of a old Software Engineer';
+export const SITE_DESCRIPTION = 'Ramblings of an old software engineer';
 
 export const DISQUS_SHORTNAME = 'allan-ritchies-blog';
 

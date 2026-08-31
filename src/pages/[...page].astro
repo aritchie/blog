@@ -1,0 +1,356 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Pagination from '../components/Pagination.astro';
+import PostCard from '../components/PostCard.astro';
+import TagCloud from '../components/TagCloud.astro';
+import me from '../assets/me.jpg';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getPublishedPosts } from '../utils/posts';
+import { getReadingTime } from '../utils/readingTime';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	// Astro hoists getStaticPaths into its own scope, so this can't live outside it
+	const PAGE_SIZE = 12;
+	const posts = await getPublishedPosts();
+
+	// Reading time comes from the raw body, which isn't available in the template
+	const minutes = new Map(posts.map((p) => [p.id, getReadingTime(p.body).minutes]));
+
+	const tagCounts = new Map<string, number>();
+	for (const post of posts) {
+		for (const tag of post.data.tags ?? []) {
+			tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+		}
+	}
+
+	return paginate(posts, {
+		pageSize: PAGE_SIZE,
+		props: { minutes, tagCounts, total: posts.length },
+	});
+}) satisfies GetStaticPaths;
+
+type Props = {
+	page: Page<CollectionEntry<'blog'>>;
+	minutes: Map<string, number>;
+	tagCounts: Map<string, number>;
+	total: number;
+};
+
+const { page, minutes, tagCounts, total } = Astro.props;
+
+const isFirstPage = page.currentPage === 1;
+// The newest post gets the wide treatment; the rest fill the grid
+const featured = isFirstPage ? page.data[0] : undefined;
+const rest = isFirstPage ? page.data.slice(1) : page.data;
+
+// BaseHead prefixes the site title, so pass only the distinguishing part
+const title = isFirstPage ? SITE_TITLE : `Page ${page.currentPage}`;
+const description = isFirstPage
+	? SITE_DESCRIPTION
+	: `Page ${page.currentPage} of posts by Allan Ritchie.`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		{page.url.prev && <link rel="prev" href={page.url.prev} />}
+		{page.url.next && <link rel="next" href={page.url.next} />}
+	</head>
+	<body>
+		<Header />
+		<main>
+			{
+				isFirstPage ? (
+					<section class="intro">
+						<div class="intro-avatar">
+							<Image src={me} alt="Allan Ritchie" width={320} densities={[1, 2]} loading="eager" />
+						</div>
+						<div class="intro-copy">
+							<p class="eyebrow">Allan Ritchie</p>
+							<h1>Ramblings of an old software engineer</h1>
+							<p class="lede">
+								Notes from 25 years of shipping software — .NET, mobile, and the open source
+								libraries I maintain when I should probably be sleeping.
+							</p>
+							<div class="intro-actions">
+								<a class="btn btn--primary" href="/about/"><span>About me</span></a>
+								<a class="btn btn--secondary" href="/projects/"><span>Projects</span></a>
+								<a class="btn btn--secondary" href="/speaking/"><span>Speaking</span></a>
+								<a class="btn btn--ghost" href="/rss.xml">
+									<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+										<circle cx="6.2" cy="17.8" r="2.2" fill="currentColor" />
+										<path
+											d="M4 10.5a9.5 9.5 0 0 1 9.5 9.5M4 4a16 16 0 0 1 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.4"
+											stroke-linecap="round"
+										/>
+									</svg>
+									<span>RSS</span>
+								</a>
+							</div>
+						</div>
+					</section>
+				) : (
+					<header class="archive-head">
+						<p class="eyebrow">Archive</p>
+						<h1>
+							Page {page.currentPage} of {page.lastPage}
+						</h1>
+						<p class="lede">Older posts, newest first.</p>
+					</header>
+				)
+			}
+
+			<section class="listing" aria-label={isFirstPage ? 'Latest posts' : 'Posts'}>
+				<div class="listing-head">
+					<h2>{isFirstPage ? 'Latest' : 'Posts'}</h2>
+					<span class="listing-count">
+						{page.start + 1}–{page.end + 1} of {total}
+					</span>
+				</div>
+
+				{
+					featured && (
+						<div class="featured">
+							<PostCard post={featured} minutes={minutes.get(featured.id)} variant="featured" eager />
+						</div>
+					)
+				}
+
+				<ul class="grid" role="list">
+					{
+						rest.map((post, i) => (
+							<li>
+								<PostCard post={post} minutes={minutes.get(post.id)} eager={!isFirstPage && i < 3} />
+							</li>
+						))
+					}
+				</ul>
+
+				<Pagination page={page} />
+			</section>
+
+			{
+				isFirstPage && (
+					<section class="topics" aria-labelledby="topics-title">
+						<h2 id="topics-title">Browse by topic</h2>
+						<TagCloud tags={tagCounts} />
+					</section>
+				)
+			}
+		</main>
+		<Footer />
+
+		<style>
+			main {
+				width: min(1160px, calc(100% - 2.5rem));
+				max-width: none;
+				margin: 0 auto;
+				padding: 0 0 5rem;
+			}
+
+			.eyebrow {
+				margin: 0 0 0.5rem;
+				font-size: 0.8rem;
+				font-weight: 700;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--accent);
+			}
+			.lede {
+				max-width: 54ch;
+				margin: 0;
+				font-size: 1.05rem;
+				line-height: 1.55;
+				color: rgb(var(--gray));
+				text-wrap: pretty;
+			}
+
+			/* ---------- intro ---------- */
+
+			.intro {
+				display: grid;
+				gap: 1.5rem;
+				align-items: center;
+				padding: 3rem 0 2.5rem;
+			}
+			@media (min-width: 720px) {
+				.intro {
+					grid-template-columns: auto minmax(0, 1fr);
+					gap: 2.25rem;
+				}
+			}
+			.intro-avatar {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: clamp(112px, 16vw, 168px);
+				aspect-ratio: 1;
+				overflow: hidden;
+				background:
+					radial-gradient(120% 110% at 50% 0%, rgba(99, 102, 241, 0.3), transparent 62%),
+					rgba(var(--gray-light), 70%);
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 50%;
+			}
+			.intro-avatar :global(img) {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				object-position: center 18%;
+				margin: 0;
+				border-radius: 0;
+				mix-blend-mode: multiply;
+			}
+			.intro h1 {
+				margin: 0 0 0.7rem;
+				font-size: clamp(2.1rem, 1.6rem + 2.4vw, 3.4rem);
+				letter-spacing: -0.03em;
+				line-height: 1.05;
+				text-wrap: balance;
+			}
+			.intro-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.55rem;
+				margin-top: 1.5rem;
+			}
+
+			.archive-head {
+				padding: 3rem 0 2rem;
+			}
+			.archive-head h1 {
+				margin: 0 0 0.5rem;
+				font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
+				letter-spacing: -0.03em;
+			}
+
+			/* ---------- listing ---------- */
+
+			.listing {
+				padding-top: 0.5rem;
+			}
+			.listing-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.listing-head h2 {
+				margin: 0;
+				font-size: clamp(1.6rem, 1.35rem + 1vw, 2.1rem);
+				letter-spacing: -0.03em;
+			}
+			.listing-count {
+				flex: 0 0 auto;
+				font-size: 0.75rem;
+				font-weight: 700;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: rgb(var(--gray));
+				white-space: nowrap;
+			}
+
+			.featured {
+				margin-top: 1.5rem;
+			}
+			.grid {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				gap: 1.25rem;
+				margin: 1.25rem 0 0;
+				padding: 0;
+			}
+			.grid li {
+				min-width: 0;
+				list-style: none;
+			}
+			@media (min-width: 640px) {
+				.grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+			@media (min-width: 1000px) {
+				.grid {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+			}
+
+			/* ---------- topics ---------- */
+
+			.topics {
+				margin-top: clamp(3rem, 5vw, 4.5rem);
+				padding-top: clamp(2rem, 4vw, 3rem);
+				border-top: 1px solid rgb(var(--gray-light));
+				text-align: center;
+			}
+			.topics h2 {
+				margin: 0 0 1rem;
+				font-size: clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+				letter-spacing: -0.03em;
+			}
+
+			/* ---------- buttons ---------- */
+
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.4rem;
+				padding: 0.55rem 0.9rem;
+				font-size: 0.85rem;
+				font-weight: 700;
+				line-height: 1;
+				text-decoration: none;
+				border: 1px solid transparent;
+				border-radius: 8px;
+				transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+			}
+			.btn svg {
+				flex: 0 0 auto;
+				width: 1rem;
+				height: 1rem;
+			}
+			.btn--primary {
+				background: var(--accent);
+				border-color: var(--accent);
+				color: #fff;
+			}
+			.btn--primary:hover {
+				background: var(--accent-dark);
+				border-color: var(--accent-dark);
+				color: #fff;
+			}
+			.btn--secondary {
+				background: #fff;
+				border-color: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+			}
+			.btn--secondary:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+			.btn--ghost {
+				color: rgb(var(--gray));
+			}
+			.btn--ghost:hover {
+				color: var(--accent);
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.btn {
+					transition: none;
+				}
+			}
+		</style>
+	</body>
+</html>

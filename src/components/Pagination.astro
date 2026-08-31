@@ -1,0 +1,204 @@
+---
+import type { Page } from 'astro';
+
+interface Props {
+	page: Page<unknown>;
+	/** Accessible name, e.g. "Posts" or "Posts tagged MAUI" */
+	label?: string;
+}
+
+const { page, label = 'Posts' } = Astro.props;
+
+/**
+ * Page numbers with ellipses: always the first and last page, plus a window
+ * around the current one, so the control stays a fixed width as posts pile up.
+ */
+function pageNumbers(current: number, total: number): (number | 'gap')[] {
+	if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+	const window = new Set([1, total, current, current - 1, current + 1]);
+	if (current <= 3) [2, 3, 4].forEach((n) => window.add(n));
+	if (current >= total - 2) [total - 3, total - 2, total - 1].forEach((n) => window.add(n));
+
+	const shown = [...window].filter((n) => n >= 1 && n <= total).sort((a, b) => a - b);
+
+	const out: (number | 'gap')[] = [];
+	let previous = 0;
+	for (const n of shown) {
+		if (previous && n - previous > 1) out.push('gap');
+		out.push(n);
+		previous = n;
+	}
+	return out;
+}
+
+const numbers = pageNumbers(page.currentPage, page.lastPage);
+
+const first = page.url.first ?? page.url.current;
+// `first` comes back without a trailing slash (`/tags/Shiny`), so add one before
+// appending the page number - otherwise page 2 becomes `/tags/Shiny2`
+const base = first.endsWith('/') ? first : `${first}/`;
+/** Page 1 lives at the bare route; the rest hang off it, matching page.url.next */
+const urlFor = (n: number) => (n === 1 ? first : `${base}${n}`);
+---
+
+{
+	page.lastPage > 1 && (
+		<nav class="pagination" aria-label={`${label} pagination`}>
+			<a
+				class:list={['step', !page.url.prev && 'is-disabled']}
+				href={page.url.prev}
+				aria-disabled={page.url.prev ? undefined : 'true'}
+				tabindex={page.url.prev ? undefined : -1}
+			>
+				<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path
+						d="m14 6-6 6 6 6"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+				<span>Newer</span>
+			</a>
+
+			<ol class="numbers" role="list">
+				{numbers.map((n) =>
+					n === 'gap' ? (
+						<li class="gap" aria-hidden="true">
+							…
+						</li>
+					) : (
+						<li>
+							<a
+								href={urlFor(n)}
+								aria-current={n === page.currentPage ? 'page' : undefined}
+								aria-label={`Page ${n}`}
+							>
+								{n}
+							</a>
+						</li>
+					),
+				)}
+			</ol>
+
+			<a
+				class:list={['step', !page.url.next && 'is-disabled']}
+				href={page.url.next}
+				aria-disabled={page.url.next ? undefined : 'true'}
+				tabindex={page.url.next ? undefined : -1}
+			>
+				<span>Older</span>
+				<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+					<path
+						d="m10 6 6 6-6 6"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+			</a>
+		</nav>
+	)
+}
+
+<style>
+	.pagination {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem 1rem;
+		margin-top: clamp(2.5rem, 5vw, 4rem);
+		padding-top: 1.5rem;
+		border-top: 1px solid rgb(var(--gray-light));
+	}
+
+	.step {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.55rem 0.9rem;
+		font-size: 0.85rem;
+		font-weight: 700;
+		line-height: 1;
+		text-decoration: none;
+		color: rgb(var(--gray-dark));
+		background: #fff;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+		transition: border-color 0.15s ease, color 0.15s ease;
+	}
+	.step:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+	.step svg {
+		width: 1rem;
+		height: 1rem;
+	}
+	.step.is-disabled {
+		opacity: 0.4;
+		pointer-events: none;
+	}
+
+	.numbers {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.3rem;
+		margin: 0;
+		padding: 0;
+	}
+	.numbers li {
+		list-style: none;
+	}
+	.numbers a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 2.1rem;
+		height: 2.1rem;
+		padding: 0 0.45rem;
+		font-size: 0.85rem;
+		font-weight: 700;
+		text-decoration: none;
+		color: rgb(var(--gray-dark));
+		border: 1px solid transparent;
+		border-radius: 8px;
+		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+	}
+	.numbers a:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+	.numbers a[aria-current='page'] {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #fff;
+	}
+	.gap {
+		padding: 0 0.2rem;
+		color: rgb(var(--gray));
+	}
+
+	/* the number strip is the first thing to go when space is tight */
+	@media (max-width: 560px) {
+		.numbers {
+			order: 3;
+			width: 100%;
+			justify-content: center;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.step,
+		.numbers a {
+			transition: none;
+		}
+	}
+</style>
