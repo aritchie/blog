@@ -25,7 +25,17 @@ const {
 	readingMinutes,
 	readingProgressDock = READING_PROGRESS_DOCK,
 	headings = [],
+	tags = [],
 } = Astro.props;
+
+// Metadata carried into the Pagefind index alongside the post body.
+const searchDate = pubDate.toLocaleDateString('en-us', {
+	year: 'numeric',
+	month: 'short',
+	day: 'numeric',
+});
+// Empty elements carry the values: a comma-joined attribute would be read as a
+// single filter, and empty ones contribute no text to the indexed excerpt.
 ---
 
 <html lang="en">
@@ -80,9 +90,15 @@ const {
 				<div class="hero-image">
 					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
 				</div>
-				<div class="prose">
+				<div
+					class="prose"
+					data-pagefind-body
+					data-pagefind-meta={`date:${searchDate}`}
+				>
+					{heroImage && <span data-pagefind-meta="image[data-value]" data-value={heroImage.src} />}
+					{tags.map((tag) => <span data-pagefind-filter="tag[data-value]" data-value={tag} />)}
 					<div class="title">
-						<div class="date">
+						<div class="date" data-pagefind-ignore>
 							<FormattedDate date={pubDate} />
 							{
 								updatedDate && (
@@ -95,11 +111,13 @@ const {
 						<h1>{title}</h1>
 						<hr />
 					</div>
-					<TableOfContents headings={headings} />
+					<div data-pagefind-ignore>
+						<TableOfContents headings={headings} />
+					</div>
 					<slot />
 				</div>
 			</article>
-			<div class="prose">
+			<div class="prose" data-pagefind-ignore>
 				<slot name="comments" />
 			</div>
 		</main>

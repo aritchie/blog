@@ -110,6 +110,23 @@ And hit-testing works against the stroke's **path**, not its bounding box. A str
 mostly empty air; treat it as solid and one flourish swallows every click in that corner of the page,
 and lassoing one word of a handwritten line takes the whole line.
 
+Here it is on Blazor — the whole thing with its ribbon, section tabs and page list, then the Draw tab
+over a sketch page, then `NotebookEditor` on its own with no chrome at all:
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/notebook/blazor-s1.png" width="260" alt="The notebook with its ribbon, section tabs and page list on Blazor" />
+  <img src="https://www.shinylib.net/images/notebook/blazor-s2.png" width="260" alt="The Draw tab over a grid-ruled page of shapes, arrows and a pen stroke on Blazor" />
+  <img src="https://www.shinylib.net/images/notebook/blazor-s3.png" width="260" alt="NotebookEditor with no chrome — a ruled page with highlighted text, an ink annotation and a shape on Blazor" />
+</div>
+
+And the same control on MAUI, on a phone, where the page list is a panel rather than a column:
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/notebook/s1.png" width="200" alt="The notebook with its ribbon, the Kick-off and Research section tabs and the page list open on iOS" />
+  <img src="https://www.shinylib.net/images/notebook/s2.png" width="200" alt="A grid-ruled page carrying shapes and a pen stroke on iOS" />
+  <img src="https://www.shinylib.net/images/notebook/s3.png" width="200" alt="The Draw tab with the pointer, lasso, hand, pen, highlighter and eraser on iOS" />
+</div>
+
 Files are `.shinynote` — a zip holding `notebook.json`, one JSON file per page under `pages/`, and the
 pictures as files under `media/`. Pages are separate entries because a notebook is the one Office-shaped
 thing here that genuinely grows without bound, and a manifest you have to parse in full to open the page
@@ -136,6 +153,23 @@ never move:
 | **Document Editor** | Home (Font · Paragraph · Proofing) · Layout (Page Setup · Insert · Zoom) · Shapes |
 | **Slide Editor** | Home (Slide · Font · Paragraph) · Insert · Shapes |
 | **Image Editor** | Home (Tools · Shapes · Image) · View · contextual *Drawing / Shape / Text Tools* |
+
+Here's the bar itself on Blazor — the Home tab in named groups, the Insert tab, and the same bar in a
+window too narrow for all of it, with the lowest-priority groups folded into buttons:
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/ribbon/blazor-s1.png" width="260" alt="The Home tab with Clipboard, Font, Paragraph and Editing groups" />
+  <img src="https://www.shinylib.net/images/ribbon/blazor-s2.png" width="260" alt="The Insert tab with the Tables and Illustrations groups" />
+  <img src="https://www.shinylib.net/images/ribbon/blazor-s3.png" width="260" alt="The same bar in a narrow window with low-priority groups folded into buttons" />
+</div>
+
+And on MAUI at phone width, where every group is a single button, plus a contextual tab that only
+exists while a picture is selected:
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/ribbon/s1.png" width="200" alt="Every group collapsed to a single button on a phone-width window" />
+  <img src="https://www.shinylib.net/images/ribbon/s2.png" width="200" alt="The Format tab appearing once a picture is selected" />
+</div>
 
 The split is by **what a command changes**, not by how often you reach it. On the spreadsheet, *Home*
 changes how a cell looks and *Data* changes the shape of the sheet under it. That split is what let the
@@ -215,6 +249,13 @@ something.
 
 `SlideView` had one job: show a deck to the person holding the device. It has a second one now — show
 it to a room.
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/document-viewer/blazor-s2.png" width="420" alt="SlideView showing a .pptx slide inline on Blazor, fitted inside a bordered dark surround" />
+</div>
+
+That's the inline viewer. Presenting takes the border off, blacks the surround out, and fits the slide
+edge to edge with the auto-hiding bar over it.
 
 ```csharp
 this.Viewer.StartPresenting();       // MAUI
@@ -418,6 +459,20 @@ taller the content gets.
 It is **not virtualized** on either host, and that's the deliberate trade: rows of wildly differing
 height are exactly what a recycling list is worst at.
 
+Blazor first, then MAUI — the default, `AllActive`, and the rail moved to the right:
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/timeline/blazor-s1.png" width="260" alt="Timestamps opposite the rail, two nodes complete and the third current on Blazor" />
+  <img src="https://www.shinylib.net/images/timeline/blazor-s2.png" width="260" alt="Every node filled with AllActive on Blazor" />
+  <img src="https://www.shinylib.net/images/timeline/blazor-s3.png" width="260" alt="The rail on the right with the content on the left on Blazor" />
+</div>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/timeline/s1.png" width="200" alt="Timestamps opposite the rail, two nodes complete and the third current on iOS" />
+  <img src="https://www.shinylib.net/images/timeline/s2.png" width="200" alt="Every node filled with AllActive on iOS" />
+  <img src="https://www.shinylib.net/images/timeline/s3.png" width="200" alt="The rail on the right with the content on the left on iOS" />
+</div>
+
 → [Timeline docs](https://shinylib.net/controls/timeline/)
 
 ---
@@ -437,6 +492,22 @@ The one bit I'd call out: **directional icons are matched sets.** Every arrow tr
 and pulls its shaft in behind the head; every chevron bounces once in its own direction. Swap
 `arrow-right` for `arrow-left` in an RTL layout and you get the mirrored motion for free, rather than an
 icon that points left while animating right.
+
+Stills of things that only make sense moving, MAUI first and then Blazor — the
+[playground](https://shinyorg.github.io/controls/) is the honest version:
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/motion-icons/s1.png" width="200" alt="Trigger, code-driven and preset demos on MAUI" />
+  <img src="https://www.shinylib.net/images/motion-icons/s2.png" width="200" alt="Presets applied to any icon, and progress scrubbing" />
+  <img src="https://www.shinylib.net/images/motion-icons/s3.png" width="200" alt="Browsing the built-in icon set on MAUI" />
+</div>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="https://www.shinylib.net/images/motion-icons/blazor-s1.png" width="200" alt="Loop, hover, press and appear triggers on Blazor" />
+  <img src="https://www.shinylib.net/images/motion-icons/blazor-s2.png" width="200" alt="IsPlaying bound to a busy flag on Blazor" />
+  <img src="https://www.shinylib.net/images/motion-icons/blazor-s3.png" width="200" alt="Colour and accent colour on Blazor" />
+  <img src="https://www.shinylib.net/images/motion-icons/blazor-s4.png" width="200" alt="Motion presets applied to any icon on Blazor" />
+</div>
 
 → [The icon set](https://shinylib.net/controls/motion-icons/icons/)
 

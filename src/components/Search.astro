@@ -1,0 +1,409 @@
+---
+/*
+  Pagefind-backed search. The index is generated into `dist/pagefind/` by the
+  build script, so there's nothing to search during `astro dev` - the dialog
+  says so rather than failing silently.
+*/
+---
+
+<button class="search-trigger" data-search-open aria-label="Search" aria-keyshortcuts="Meta+K">
+	<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+		<circle cx="11" cy="11" r="7"></circle>
+		<line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+	</svg>
+	<span class="search-trigger-label">Search</span>
+	<kbd>⌘K</kbd>
+</button>
+
+<dialog class="search-dialog" data-search-dialog aria-label="Search posts">
+	<form method="dialog" class="search-field">
+		<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+			<circle cx="11" cy="11" r="7"></circle>
+			<line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+		</svg>
+		<input
+			type="search"
+			data-search-input
+			placeholder="Search posts…"
+			autocomplete="off"
+			autocorrect="off"
+			autocapitalize="off"
+			spellcheck="false"
+			enterkeyhint="search"
+			aria-label="Search posts"
+			aria-controls="search-results"
+		/>
+		<button type="submit" class="search-close" aria-label="Close search">Esc</button>
+	</form>
+
+	<p class="search-status" data-search-status role="status" aria-live="polite">
+		Type to search across every post.
+	</p>
+	<div class="search-results" id="search-results" data-search-results></div>
+</dialog>
+
+<script>
+	type PagefindSubResult = { title: string; url: string; excerpt: string };
+	type PagefindResultData = {
+		url: string;
+		excerpt: string;
+		meta: Record<string, string>;
+		sub_results?: PagefindSubResult[];
+	};
+	type PagefindResult = { id: string; data: () => Promise<PagefindResultData> };
+	type Pagefind = {
+		init: () => Promise<void>;
+		search: (term: string) => Promise<{ results: PagefindResult[] }>;
+		debouncedSearch: (
+			term: string,
+			options?: unknown,
+			delay?: number,
+		) => Promise<{ results: PagefindResult[] } | null>;
+	};
+
+	const MAX_RESULTS = 8;
+
+	const trigger = document.querySelector<HTMLButtonElement>('[data-search-open]');
+	const dialog = document.querySelector<HTMLDialogElement>('[data-search-dialog]');
+	const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+	const list = document.querySelector<HTMLElement>('[data-search-results]');
+	const status = document.querySelector<HTMLElement>('[data-search-status]');
+
+	if (trigger && dialog && input && list && status) {
+		let pagefind: Pagefind | null = null;
+		let loading: Promise<Pagefind | null> | null = null;
+		let queryToken = 0;
+
+		// Marked external in astro.config.mjs - the bundle this points at doesn't
+		// exist until pagefind indexes dist/, after `astro build`.
+		const loadPagefind = () => {
+			loading ??= (async () => {
+				try {
+					const module = (await import('/pagefind/pagefind.js')) as unknown as Pagefind;
+					await module.init();
+					pagefind = module;
+					return module;
+				} catch {
+					return null;
+				}
+			})();
+			return loading;
+		};
+
+		const setStatus = (text: string) => {
+			status.textContent = text;
+		};
+
+		const escape = (value: string) =>
+			value.replace(
+				/[&<>"']/g,
+				(char) =>
+					({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char,
+			);
+
+		const render = (results: PagefindResultData[], term: string, total: number) => {
+			list.innerHTML = '';
+			if (!results.length) {
+				setStatus(`No posts match “${term}”.`);
+				return;
+			}
+			// `total` is every match; `results` is only the slice we render.
+			setStatus(
+				total > results.length
+					? `Showing ${results.length} of ${total} matching posts`
+					: `${total} matching post${total === 1 ? '' : 's'}`,
+			);
+			for (const result of results) {
+				const item = document.createElement('a');
+				item.className = 'search-result';
+				item.href = result.url;
+				// Titles and excerpts come from our own posts; the excerpt carries
+				// pagefind's <mark> highlights, so it goes in as markup.
+				item.innerHTML = `
+					<span class="search-result-title">${escape(result.meta.title ?? result.url)}</span>
+					${result.meta.date ? `<span class="search-result-date">${escape(result.meta.date)}</span>` : ''}
+					<span class="search-result-excerpt">${result.excerpt}</span>
+				`;
+				list.append(item);
+			}
+		};
+
+		const run = async (term: string) => {
+			const token = ++queryToken;
+			if (!term.trim()) {
+				list.innerHTML = '';
+				setStatus('Type to search across every post.');
+				return;
+			}
+
+			const module = pagefind ?? (await loadPagefind());
+			if (token !== queryToken) return;
+			if (!module) {
+				list.innerHTML = '';
+				setStatus('Search index unavailable - it is only built by `npm run build`.');
+				return;
+			}
+
+			const search = await module.debouncedSearch(term, undefined, 200);
+			// A null response means a newer keystroke superseded this one.
+			if (search === null || token !== queryToken) return;
+
+			const data = await Promise.all(
+				search.results.slice(0, MAX_RESULTS).map((result) => result.data()),
+			);
+			if (token !== queryToken) return;
+			render(data, term.trim(), search.results.length);
+		};
+
+		const open = () => {
+			if (dialog.open) return;
+			dialog.showModal();
+			loadPagefind();
+			input.focus();
+		};
+
+		trigger.addEventListener('click', open);
+		input.addEventListener('input', () => run(input.value));
+
+		// Warm the index on intent, so the first keystroke has it ready.
+		trigger.addEventListener('pointerenter', loadPagefind, { once: true });
+
+		dialog.addEventListener('close', () => {
+			input.value = '';
+			list.innerHTML = '';
+			setStatus('Type to search across every post.');
+		});
+
+		// Clicking the backdrop (outside the panel) dismisses it.
+		dialog.addEventListener('click', (event) => {
+			if (event.target === dialog) dialog.close();
+		});
+
+		document.addEventListener('keydown', (event) => {
+			const target = event.target as HTMLElement | null;
+			const typing =
+				target?.isContentEditable ||
+				['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName ?? '');
+
+			if ((event.key === 'k' || event.key === 'K') && (event.metaKey || event.ctrlKey)) {
+				event.preventDefault();
+				dialog.open ? dialog.close() : open();
+				return;
+			}
+			if (event.key === '/' && !typing && !dialog.open) {
+				event.preventDefault();
+				open();
+				return;
+			}
+			if (!dialog.open) return;
+
+			// Arrow keys walk the results without leaving the input.
+			if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+			const items = [...list.querySelectorAll<HTMLAnchorElement>('.search-result')];
+			if (!items.length) return;
+			event.preventDefault();
+			const current = items.indexOf(document.activeElement as HTMLAnchorElement);
+			const step = event.key === 'ArrowDown' ? 1 : -1;
+			const next = current === -1 ? (step === 1 ? 0 : items.length - 1) : current + step;
+
+			if (next < 0 || next >= items.length) {
+				input.focus();
+				return;
+			}
+			items[next].focus();
+		});
+	}
+</script>
+
+<style>
+	.search-trigger {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		height: 34px;
+		padding: 0 0.7em;
+		color: rgb(var(--gray));
+		font: inherit;
+		font-size: 0.85rem;
+		background: rgba(var(--gray-light), 45%);
+		border: 1px solid transparent;
+		border-radius: 999px;
+		cursor: pointer;
+		transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+	}
+	.search-trigger:hover {
+		color: rgb(var(--black));
+		border-color: rgb(var(--gray-light));
+	}
+	.search-trigger svg {
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		flex-shrink: 0;
+	}
+	.search-trigger kbd {
+		padding: 0.1em 0.4em;
+		color: rgb(var(--gray));
+		font-family: inherit;
+		font-size: 0.75rem;
+		background: var(--surface);
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 5px;
+	}
+
+	/* Below the nav breakpoint the trigger collapses to just the icon. */
+	@media (max-width: 1080px) {
+		.search-trigger {
+			gap: 0;
+			width: 34px;
+			padding: 0;
+			justify-content: center;
+		}
+		.search-trigger-label,
+		.search-trigger kbd {
+			display: none;
+		}
+	}
+
+	.search-dialog {
+		width: 640px;
+		max-width: calc(100% - 2em);
+		max-height: min(70vh, 640px);
+		margin: 12vh auto auto;
+		padding: 0;
+		flex-direction: column;
+		overflow: hidden;
+		color: rgb(var(--gray-dark));
+		background: var(--surface);
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 16px;
+		box-shadow: 0 24px 60px rgba(var(--shadow), 28%);
+	}
+	/* Only when open - a bare `display: flex` would beat the UA's
+	   `dialog:not([open]) { display: none }` and leave the panel on screen. */
+	.search-dialog[open] {
+		display: flex;
+	}
+	.search-dialog::backdrop {
+		background: rgba(var(--shadow), 35%);
+		backdrop-filter: blur(3px);
+		-webkit-backdrop-filter: blur(3px);
+	}
+
+	.search-field {
+		display: flex;
+		align-items: center;
+		gap: 0.65em;
+		padding: 0.85em 1em;
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.search-field svg {
+		fill: none;
+		stroke: rgb(var(--gray));
+		stroke-width: 2;
+		stroke-linecap: round;
+		flex-shrink: 0;
+	}
+	.search-field input {
+		flex: 1;
+		min-width: 0;
+		padding: 0;
+		color: rgb(var(--black));
+		font: inherit;
+		font-size: 1.05rem;
+		background: transparent;
+		border: 0;
+		outline: none;
+		appearance: none;
+	}
+	.search-field input::-webkit-search-cancel-button {
+		display: none;
+	}
+	.search-close {
+		flex-shrink: 0;
+		padding: 0.25em 0.55em;
+		color: rgb(var(--gray));
+		font: inherit;
+		font-size: 0.75rem;
+		background: var(--surface-2);
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 6px;
+		cursor: pointer;
+	}
+	.search-close:hover {
+		color: rgb(var(--black));
+	}
+
+	.search-results {
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+	.search-results:empty {
+		display: none;
+	}
+
+	/* Results are built by the script, so they never carry Astro's scoping
+	   attribute - :global() under the scoped container is what reaches them. */
+	.search-results :global(.search-result) {
+		display: block;
+		padding: 0.8em 1.1em;
+		color: inherit;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(var(--gray-light), 60%);
+	}
+	.search-results :global(.search-result:last-child) {
+		border-bottom: 0;
+	}
+	.search-results :global(.search-result:hover),
+	.search-results :global(.search-result:focus-visible) {
+		background: var(--accent-soft);
+		outline: none;
+	}
+	.search-results :global(.search-result-title) {
+		display: block;
+		color: rgb(var(--black));
+		font-weight: 700;
+		font-size: 1rem;
+		line-height: 1.3;
+	}
+	.search-results :global(.search-result-date) {
+		display: block;
+		margin-top: 0.15em;
+		color: rgb(var(--gray));
+		font-size: 0.8rem;
+	}
+	.search-results :global(.search-result-excerpt) {
+		display: block;
+		margin-top: 0.35em;
+		color: rgb(var(--gray-dark));
+		font-size: 0.88rem;
+		line-height: 1.5;
+	}
+	.search-results :global(mark) {
+		padding: 0 0.1em;
+		color: var(--accent-dark);
+		font-weight: 700;
+		background: var(--accent-soft);
+		border-radius: 3px;
+	}
+
+	.search-status {
+		flex-shrink: 0;
+		margin: 0;
+		padding: 0.7em 1.1em;
+		color: rgb(var(--gray));
+		font-size: 0.82rem;
+	}
+	/* Only a divider once there are results beneath it to divide from. */
+	.search-results:not(:empty) {
+		border-top: 1px solid rgb(var(--gray-light));
+	}
+
+	@media (max-width: 480px) {
+		.search-dialog {
+			margin-top: 6vh;
+			max-height: 80vh;
+		}
+	}
+</style>

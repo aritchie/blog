@@ -7,6 +7,22 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'https://allanritchie.com',
 	integrations: [mdx(), sitemap()],
+	vite: {
+		plugins: [
+			{
+				// Pagefind writes this bundle into dist/ only after Astro finishes, so
+				// Vite can never resolve it from source. Marking it external here
+				// covers dev too - a build-only `rollupOptions.external` still leaves
+				// the dev server throwing "Failed to resolve import" on the module.
+				// In dev the request simply 404s and the search UI says so.
+				name: 'pagefind-external',
+				enforce: 'pre',
+				resolveId(id) {
+					return id === '/pagefind/pagefind.js' ? { id, external: true } : null;
+				},
+			},
+		],
+	},
 	redirects: {
 		// Feb 2026
 		'/blog/shinymediator-gettingstarted/': '/blog/2026/02/shinymediator-gettingstarted/',
