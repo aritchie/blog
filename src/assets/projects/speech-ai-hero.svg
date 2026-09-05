@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Speech, Audio and AI Conversation">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="36%" r="62%">
+			<stop offset="0%" stop-color="#38bdf8" stop-opacity="0.28"/>
+			<stop offset="60%" stop-color="#38bdf8" stop-opacity="0.06"/>
+			<stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+		</radialGradient>
+		<radialGradient id="orb" cx="38%" cy="32%" r="78%">
+			<stop offset="0%" stop-color="#c4b5fd"/>
+			<stop offset="55%" stop-color="#8b5cf6"/>
+			<stop offset="100%" stop-color="#4c1d95"/>
+		</radialGradient>
+		<linearGradient id="card" x1="0%" y1="0%" x2="0%" y2="100%">
+			<stop offset="0%" stop-color="#1b2440" stop-opacity="0.95"/>
+			<stop offset="100%" stop-color="#101736" stop-opacity="0.95"/>
+		</linearGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#38bdf8" opacity="0.85"/>
+
+	<!-- signal path: mic -> speech-to-text -> conversation -> text-to-speech -> playback -->
+	<g stroke="#38bdf8" stroke-width="2" stroke-dasharray="7 7" opacity="0.45">
+		<line x1="154" y1="225" x2="222" y2="225"/>
+		<line x1="448" y1="225" x2="528" y2="225"/>
+		<line x1="672" y1="225" x2="752" y2="225"/>
+		<line x1="978" y1="225" x2="1038" y2="225"/>
+	</g>
+
+	<!-- capture -->
+	<g>
+		<g fill="#38bdf8">
+			<rect x="44" y="215" width="6" height="20" rx="3" opacity="0.35"/>
+			<rect x="56" y="208" width="6" height="34" rx="3" opacity="0.5"/>
+			<rect x="68" y="201" width="6" height="48" rx="3" opacity="0.7"/>
+			<rect x="80" y="210" width="6" height="30" rx="3" opacity="0.5"/>
+		</g>
+		<g fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round">
+			<rect x="106" y="183" width="24" height="46" rx="12"/>
+			<path d="M92 220v4a26 26 0 0 0 52 0v-4"/>
+			<path d="M118 250v16M100 266h36"/>
+		</g>
+		<text x="118" y="296" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#94a3b8" opacity="0.8">capture</text>
+	</g>
+
+	<!-- speech to text -->
+	<g>
+		<rect x="230" y="150" width="218" height="150" rx="16" fill="url(#card)" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="1.5"/>
+		<text x="339" y="184" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="600" fill="#7dd3fc">Speech-to-Text</text>
+		<rect x="256" y="206" width="128" height="11" rx="5.5" fill="#334155"/>
+		<rect x="256" y="227" width="166" height="11" rx="5.5" fill="#334155"/>
+		<rect x="256" y="248" width="92" height="11" rx="5.5" fill="#38bdf8" opacity="0.55"/>
+		<text x="339" y="285" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#64748b">partial → final</text>
+	</g>
+
+	<!-- conversation loop -->
+	<g>
+		<circle cx="600" cy="225" r="80" fill="#8b5cf6" opacity="0.12" filter="url(#glow)"/>
+		<circle cx="600" cy="225" r="64" fill="url(#orb)" opacity="0.9"/>
+		<circle cx="600" cy="225" r="64" fill="none" stroke="#c4b5fd" stroke-opacity="0.5" stroke-width="1.5"/>
+		<text x="600" y="238" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="700" fill="#f8fafc">AI</text>
+		<text x="600" y="316" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="19" font-weight="600" fill="#a78bfa">wake word · turns · history</text>
+	</g>
+
+	<!-- text to speech -->
+	<g>
+		<rect x="752" y="150" width="218" height="150" rx="16" fill="url(#card)" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="1.5"/>
+		<text x="861" y="184" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="600" fill="#7dd3fc">Text-to-Speech</text>
+		<g fill="#38bdf8" opacity="0.8">
+			<rect x="784" y="226" width="8" height="16" rx="4"/>
+			<rect x="798" y="219" width="8" height="30" rx="4"/>
+			<rect x="812" y="211" width="8" height="46" rx="4"/>
+			<rect x="826" y="205" width="8" height="58" rx="4"/>
+			<rect x="840" y="198" width="8" height="72" rx="4"/>
+			<rect x="854" y="209" width="8" height="50" rx="4"/>
+			<rect x="868" y="201" width="8" height="66" rx="4"/>
+			<rect x="882" y="214" width="8" height="40" rx="4"/>
+			<rect x="896" y="207" width="8" height="54" rx="4"/>
+			<rect x="910" y="219" width="8" height="30" rx="4"/>
+			<rect x="924" y="223" width="8" height="22" rx="4"/>
+			<rect x="938" y="227" width="8" height="14" rx="4"/>
+		</g>
+		<text x="861" y="285" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#64748b">voices · tone · emotion</text>
+	</g>
+
+	<!-- playback -->
+	<g>
+		<path d="M1046 213h14l22-18v60l-22-18h-14z" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linejoin="round"/>
+		<g fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round">
+			<path d="M1094 209a24 24 0 0 1 0 32" opacity="0.8"/>
+			<path d="M1108 197a40 40 0 0 1 0 56" opacity="0.45"/>
+		</g>
+		<text x="1076" y="296" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#94a3b8" opacity="0.8">playback</text>
+	</g>
+
+	<!-- pluggable providers -->
+	<g font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#cbd5e1">
+		<rect x="169" y="352" width="172" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+		<text x="255" y="374" text-anchor="middle">Azure AI Speech</text>
+		<rect x="355" y="352" width="124" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+		<text x="417" y="374" text-anchor="middle">ElevenLabs</text>
+		<rect x="493" y="352" width="105" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+		<text x="545" y="374" text-anchor="middle">Typecast</text>
+		<rect x="612" y="352" width="86" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+		<text x="655" y="374" text-anchor="middle">OpenAI</text>
+		<rect x="712" y="352" width="191" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+		<text x="807" y="374" text-anchor="middle">Whisper offline</text>
+		<rect x="917" y="352" width="114" height="34" rx="17" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+		<text x="974" y="374" text-anchor="middle">Native OS</text>
+	</g>
+
+	<text x="600" y="420" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#94a3b8" opacity="0.75">iOS · Android · Windows · Browser · Linux · Raspberry Pi</text>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="58" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Speech &amp; AI Conversation</text>
+	<text x="600" y="552" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="500" fill="#38bdf8" opacity="0.95">Capture, recognize, speak — native, cloud or offline</text>
+	<text x="600" y="596" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/speech</text>
+</svg>
