@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Face Intelligence">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#a78bfa" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#a78bfa" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#a78bfa" opacity="0.85"/>
+
+	<g fill="none" stroke="#a78bfa" stroke-width="6" stroke-linecap="round" opacity="0.85">
+		<path d="M438 170V112h58"/>
+		<path d="M704 112h58v58"/>
+		<path d="M762 378V436h-58"/>
+		<path d="M496 436h-58v-58"/>
+	</g>
+	<ellipse cx="600" cy="274" rx="96" ry="120" fill="none" stroke="#a78bfa" stroke-width="4" opacity="0.6"/>
+	<g stroke="#a78bfa" stroke-width="1.5" opacity="0.35">
+		<line x1="566" y1="244" x2="634" y2="244"/>
+		<line x1="566" y1="244" x2="600" y2="286"/>
+		<line x1="634" y1="244" x2="600" y2="286"/>
+		<line x1="600" y1="286" x2="572" y2="330"/>
+		<line x1="600" y1="286" x2="628" y2="330"/>
+		<line x1="572" y1="330" x2="628" y2="330"/>
+		<line x1="572" y1="330" x2="600" y2="352"/>
+		<line x1="628" y1="330" x2="600" y2="352"/>
+		<line x1="516" y1="238" x2="566" y2="244"/>
+		<line x1="684" y1="238" x2="634" y2="244"/>
+		<line x1="516" y1="238" x2="600" y2="166"/>
+		<line x1="684" y1="238" x2="600" y2="166"/>
+		<line x1="534" y1="336" x2="572" y2="330"/>
+		<line x1="666" y1="336" x2="628" y2="330"/>
+		<line x1="534" y1="336" x2="600" y2="352"/>
+		<line x1="666" y1="336" x2="600" y2="352"/>
+	</g>
+	<g fill="#a78bfa" filter="url(#glow)">
+		<circle cx="566" cy="244" r="6"/>
+		<circle cx="634" cy="244" r="6"/>
+		<circle cx="600" cy="286" r="6"/>
+		<circle cx="572" cy="330" r="6"/>
+		<circle cx="628" cy="330" r="6"/>
+		<circle cx="600" cy="352" r="6"/>
+		<circle cx="516" cy="238" r="6"/>
+		<circle cx="684" cy="238" r="6"/>
+		<circle cx="534" cy="336" r="6"/>
+		<circle cx="666" cy="336" r="6"/>
+		<circle cx="600" cy="166" r="6"/>
+	</g>
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Face Intelligence</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#a78bfa" opacity="0.95">On-device face enrollment &amp; recognition</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/recogintelligence</text>
+</svg>

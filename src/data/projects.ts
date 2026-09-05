@@ -82,8 +82,9 @@ export const GROUPS: ProjectGroup[] = [
 				docs: 'https://shinylib.net/documentdb/',
 				hero: 'documentdb-v13-hero.svg',
 				tagline:
-					'A database-agnostic document store for .NET — keep object graphs as schema-free JSON on whichever engine you already run.',
+					'A database-agnostic document store for .NET — keep object graphs as schema-free JSON on whichever engine you already run, fully AOT and trim clean.',
 				highlights: [
+					'Completely AOT & trim clean — verified by a real ILC publish in CI',
 					'SQLite, Postgres, Mongo, Cosmos, SQL Server & 8 more',
 					'LINQ fluent query builder',
 					'JSON indexes, up to 30× faster queries',
@@ -102,15 +103,18 @@ export const GROUPS: ProjectGroup[] = [
 				docs: 'https://shinylib.net/controls/',
 				hero: 'shiny-controls-1-0-hero.svg',
 				tagline:
-					'A native, MVVM-friendly control library for .NET MAUI and Blazor — the screens every app needs, without building them twice.',
+					'A native, MVVM-friendly control library for Blazor and every .NET MAUI platform — iOS, Android, macOS, Windows and Linux — the screens every app needs, without building them twice.',
 				highlights: [
+					'Blazor plus all MAUI targets: iOS, Android, macOS, Windows & Linux',
 					'TableView, DataGrid, TreeView & virtualized grids',
 					'Scheduling, calendar and agenda views',
-					'ImageViewer, ImageEditor & CameraView',
+					'CameraView: photo, video & live effects',
+					'Frame analyzers: barcode, face, OCR & documents',
+					'ImageViewer, ImageEditor & media picking',
 					'FloatingPanel, Fab menus and overlays',
 					'ChatView, Wizard flows & Walkthroughs',
 					'42 motion icons and keyframe animation',
-					'Markdown, Mermaid, barcode & QR',
+					'Markdown, Mermaid & barcode rendering',
 					'Desktop tray, docking and global hotkeys',
 				],
 				tags: ['MAUI', 'Blazor', 'UI', 'AOT'],
@@ -226,6 +230,51 @@ export const GROUPS: ProjectGroup[] = [
 					'Source-generated JSON serialization',
 				],
 				tags: ['Tooling', 'AOT', 'MAUI', 'Blazor'],
+			},
+			{
+				name: 'Face Intelligence',
+				repo: 'shinyorg/recogintelligence',
+				hero: 'projects/faceintelligence-hero.svg',
+				docs: 'https://shinylib.net/faceintelligence/',
+				tagline:
+					'On-device face enrollment and recognition for .NET — ArcFace embeddings, vector search, and live MAUI camera controls.',
+				highlights: [
+					'ArcFace ONNX embeddings, entirely on-device',
+					'sqlite-vec nearest-neighbour matching',
+					'Enrollment & recognition camera views',
+					'No cloud API, no per-face billing',
+				],
+				tags: ['AI', 'MAUI', 'Data'],
+			},
+			{
+				name: 'Voice Intelligence',
+				repo: 'shinyorg/recogintelligence',
+				hero: 'projects/voiceintelligence-hero.svg',
+				docs: 'https://shinylib.net/voiceintelligence/',
+				tagline:
+					'Speaker recognition on-device — ECAPA voiceprints, vector search, and a guided enrollment wizard.',
+				highlights: [
+					'ECAPA voiceprints from any PCM buffer',
+					'Text-independent speaker matching',
+					'Guided enrollment sessions',
+					'SQLite or DocumentDb vector stores',
+				],
+				tags: ['AI', 'MAUI', 'Data'],
+			},
+			{
+				name: 'Document Intelligence',
+				repo: 'shinyorg/recogintelligence',
+				hero: 'projects/documentintelligence-hero.svg',
+				docs: 'https://shinylib.net/documentintelligence/',
+				tagline:
+					'Native document scanning plus on-device extraction of receipts, invoices, licenses, passports and payment cards.',
+				highlights: [
+					'VisionKit & ML Kit document cameras',
+					'Typed receipt and invoice extraction',
+					'AAMVA licenses, MRZ passports & cards',
+					'On-device OCR and barcode reading',
+				],
+				tags: ['AI', 'MAUI'],
 			},
 			{
 				name: 'Health',

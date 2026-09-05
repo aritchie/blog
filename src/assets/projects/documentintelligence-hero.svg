@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Document Intelligence">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#fbbf24" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#fbbf24" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#fbbf24" opacity="0.85"/>
+
+	<g fill="none" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" opacity="0.85">
+		<path d="M432 164V106h58"/>
+		<path d="M710 106h58v58"/>
+		<path d="M768 384V442h-58"/>
+		<path d="M490 442h-58v-58"/>
+	</g>
+	<rect x="474" y="140" width="252" height="268" rx="14" fill="#111a33" stroke="#fbbf24" stroke-opacity="0.55" stroke-width="3"/>
+	<g fill="#334155">
+		<rect x="502" y="176" width="120" height="12" rx="6"/>
+		<rect x="502" y="206" width="168" height="12" rx="6"/>
+		<rect x="502" y="236" width="142" height="12" rx="6"/>
+		<rect x="502" y="266" width="176" height="12" rx="6"/>
+	</g>
+	<rect x="494" y="304" width="212" height="46" rx="10" fill="#fbbf24" fill-opacity="0.16" stroke="#fbbf24" stroke-width="2.5"/>
+	<rect x="510" y="321" width="86" height="12" rx="6" fill="#fbbf24" opacity="0.85"/>
+	<rect x="618" y="321" width="72" height="12" rx="6" fill="#fbbf24" opacity="0.55"/>
+	<g fill="#334155" opacity="0.7">
+		<rect x="502" y="368" width="150" height="12" rx="6"/>
+	</g>
+	<rect x="452" y="272" width="296" height="5" rx="2.5" fill="#fbbf24" opacity="0.8" filter="url(#glow)"/>
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="60" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Document Intelligence</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#fbbf24" opacity="0.95">Scan &amp; extract, entirely on-device</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/recogintelligence</text>
+</svg>
