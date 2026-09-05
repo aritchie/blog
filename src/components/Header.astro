@@ -219,14 +219,26 @@ import shinysoftLogo from '../assets/shinysoft-logo.png';
 		}
 	}
 
+	/* The icons read as one cluster, not eight separate nav items, so they
+	   opt out of the nav link padding and sit tight inside a shared plate. */
 	.nav-social {
-		--social-icon-size: 19px;
-		--social-gap: 0.8em;
+		--social-icon-size: 17px;
+		--social-gap: 0.1rem;
 		--social-margin-top: 0;
 		display: flex;
 		align-items: center;
-		padding-left: 1rem;
-		border-left: 1px solid rgb(var(--gray-light));
+		margin-left: 0.35rem;
+		padding: 0.2rem 0.3rem;
+		border-radius: 999px;
+		background: rgba(var(--gray-light), 45%);
+	}
+	.nav-social :global(a) {
+		padding: 0.3rem;
+		border-radius: 8px;
+		font-size: 0;
+	}
+	.nav-social :global(a:hover) {
+		background: rgba(var(--gray-light), 90%);
 	}
 
 	.mobile-menu-toggle {
@@ -316,13 +328,19 @@ import shinysoftLogo from '../assets/shinysoft-logo.png';
 			display: none;
 		}
 		.nav-social {
-			--social-icon-size: 24px;
-			--social-gap: 1.1em;
+			--social-icon-size: 20px;
+			--social-gap: 0.15rem;
+			align-self: center;
 			justify-content: center;
 			flex-wrap: wrap;
-			padding: 0.5em 0 0.15em;
-			border-left: 0;
-			border-top: 1px solid rgb(var(--gray-light));
+			width: fit-content;
+			max-width: 100%;
+			margin: 0.35em 0 0.15em;
+			padding: 0.25rem 0.4rem;
+		}
+		.nav-social :global(a) {
+			padding: 0.4rem;
+			border-radius: 10px;
 		}
 	}
 

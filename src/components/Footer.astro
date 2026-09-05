@@ -128,10 +128,24 @@ const columns = [
 		color: rgb(var(--gray));
 		text-wrap: pretty;
 	}
-	.footer-brand {
-		--social-icon-size: 20px;
-		--social-gap: 0.9em;
+	/* Same cluster as the header: one plate, tight gap, a pill per icon on hover */
+	.footer-brand :global(.social-links) {
+		--social-icon-size: 18px;
+		--social-gap: 0.1rem;
 		--social-margin-top: 0;
+		width: fit-content;
+		max-width: 100%;
+		flex-wrap: wrap;
+		padding: 0.25rem 0.35rem;
+		border-radius: 999px;
+		background: rgba(var(--gray-light), 55%);
+	}
+	.footer-brand :global(.social-links a) {
+		padding: 0.35rem;
+		border-radius: 8px;
+	}
+	.footer-brand :global(.social-links a:hover) {
+		background: var(--surface);
 	}
 
 	.footer-nav {
