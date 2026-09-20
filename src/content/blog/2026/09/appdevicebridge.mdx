@@ -63,6 +63,19 @@ The app serves the web app from the device, straight out of a zip, over
 [Shiny.Net.HttpServer](https://shinylib.net/httpserver) on `127.0.0.1`. It works offline, and it's never "a website in
 a wrapper" that falls over when the network does.
 
+None of which is a new idea, and I'm not going to pretend otherwise. Cordova did this, Capacitor does it well, and .NET
+has had a couple of goes at it. What I had that those didn't is [a real HTTP server that runs inside
+MAUI](/blog/2026/08/shiny-httpserver/) — HTTP/1.1, HTTP/2 and HTTP/3, with routing, middleware, DI scopes, auth,
+authorization policies, sessions, WebSockets, Server-Sent Events, range requests, CORS and TLS. The page isn't talking
+to a message channel or a `file://` hack; it's talking to a server on a real origin, and every device bridge is just an
+endpoint on it. That's why you can open one in the network tab or hit it with `curl`.
+
+The other difference is how much of the device is actually there. Twenty-six bridges are in the beta — GPS, geofences,
+motion, Bluetooth LE, Wi-Fi, notifications, push, health, camera, photos, contacts, calendar, speech, jobs, HTTP
+transfers, network discovery, OBD-II, wearables, app links, a desktop tray, and more. I haven't found another hybrid
+stack that covers that much of a phone, let alone one that hands you typed clients for all of it in two languages and
+lets you simulate every one of them without a device.
+
 ## Updating outside the stores' timelines
 
 This is where it started, so let me be specific.
