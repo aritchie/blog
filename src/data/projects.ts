@@ -63,16 +63,19 @@ export const GROUPS: ProjectGroup[] = [
 				docs: 'https://shinylib.net',
 				hero: 'shiny-client-v4-hero.svg',
 				tagline:
-					'Device services and background processing for .NET — one API across iOS, Android, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly.',
+					'Device services and background processing for .NET — one API across iOS, Android, tvOS, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly.',
 				highlights: [
 					'Bluetooth LE client, GATT hosting & L2CAP',
+					'iBeacon & Eddystone ranging and monitoring',
 					'GPS, geofencing & background location',
 					'Local and push notifications',
+					'iOS Live Activities & Android Live Updates',
 					'Background jobs',
 					'Resumable HTTP transfers & data sync',
 					'Contacts and calendar',
 					'Wi-Fi scan, join & hotspot hosting',
 					'mDNS, SSDP/UPnP & WS-Discovery',
+					'Gamepads, wearables & screen recording',
 				],
 				tags: ['MAUI', 'Blazor', 'Hardware'],
 			},
@@ -86,7 +89,7 @@ export const GROUPS: ProjectGroup[] = [
 				highlights: [
 					'Completely AOT & trim clean — verified by a real ILC publish in CI',
 					'SQLite, Postgres, Mongo, Cosmos, SQL Server & 8 more',
-					'LINQ fluent query builder',
+					'LINQ fluent query builder, joins & unique constraints',
 					'JSON indexes, up to 30× faster queries',
 					'Vector/ANN and full-text search',
 					'Spatial geo-queries and geofencing',
@@ -107,13 +110,16 @@ export const GROUPS: ProjectGroup[] = [
 				highlights: [
 					'Blazor plus all MAUI targets: iOS, Android, macOS, Windows & Linux',
 					'TableView, DataGrid, TreeView & virtualized grids',
-					'Scheduling, calendar and agenda views',
+					'Scheduling, calendar, Gantt & Kanban views',
+					'Diagrams, flowcharts & floor plans',
+					'Office editors: .xlsx, .docx & .pptx',
 					'CameraView: photo, video & live effects',
 					'Frame analyzers: barcode, face, OCR & documents',
 					'ImageViewer, ImageEditor & media picking',
 					'FloatingPanel, Fab menus and overlays',
 					'ChatView, Wizard flows & Walkthroughs',
-					'42 motion icons and keyframe animation',
+					'111 motion icons and keyframe animation',
+					'On-screen gamepad layouts',
 					'Markdown, Mermaid & barcode rendering',
 					'Desktop tray, docking and global hotkeys',
 				],
@@ -144,6 +150,7 @@ export const GROUPS: ProjectGroup[] = [
 					'HTTP/1.1, HTTP/2 and HTTP/3 that runs anywhere .NET runs — including inside a .NET MAUI app, where ASP.NET Core cannot.',
 				highlights: [
 					'Routing with ASP.NET-shaped middleware',
+					'Reverse proxy',
 					'Source-generated typed endpoints',
 					'WebSockets and Server-Sent Events',
 					'Static files & Blazor WebAssembly hosting',
@@ -153,6 +160,24 @@ export const GROUPS: ProjectGroup[] = [
 					'MCP, gRPC, WebDAV add-ons',
 				],
 				tags: ['MAUI', 'ASP.NET', 'AOT'],
+			},
+			{
+				name: 'AppDeviceBridge',
+				repo: 'shinyorg/appdevicebridge',
+				docs: 'https://shinylib.net/appdevicebridge/',
+				hero: 'appdevicebridge-hero.svg',
+				tagline:
+					'Ship a web app — Blazor WebAssembly, React, Vue, anything static — inside a .NET MAUI app, served from the device, updated from your own server, and wired to native services.',
+				highlights: [
+					'Served offline from the device over loopback',
+					'Over-the-air updates from your own server',
+					'ECDSA-signed, SHA-256 verified releases',
+					'Native services as same-origin /_bridge endpoints',
+					'Server-Sent Events for native callbacks',
+					'Typed Blazor & TypeScript clients',
+					'Android, iOS, Mac Catalyst, Windows, macOS & Linux',
+				],
+				tags: ['MAUI', 'Blazor', 'ASP.NET', 'Hardware'],
 			},
 			{
 				name: 'SwiftDotNet',
@@ -277,6 +302,35 @@ export const GROUPS: ProjectGroup[] = [
 				tags: ['AI', 'MAUI'],
 			},
 			{
+				name: 'Push Extensions',
+				repo: 'shinyorg/pushextensions',
+				hero: 'projects/pushextensions-hero.svg',
+				docs: 'https://shinylib.net/extensions-push/',
+				tagline:
+					'Server-side push dispatch for .NET — one provider-agnostic API over APNs, FCM, Web Push and WNS, verified under native AOT.',
+				highlights: [
+					'APNs, FCM, Web Push & WNS built in',
+					'Structured targeting and topics',
+					'Dead-token pruning & multi-tenant config',
+					'DocumentDB persistence, metrics & tracing',
+				],
+				tags: ['ASP.NET', 'AOT'],
+			},
+			{
+				name: 'Firebase',
+				repo: 'shinyorg/firebase',
+				hero: 'projects/firebase-hero.svg',
+				docs: 'https://shinylib.net/client/push/firebase-ios/',
+				tagline:
+					'Firebase for .NET MAUI on first-party Shiny bindings — Cloud Messaging push and an offline-first Firestore document store.',
+				highlights: [
+					'FCM push for iOS and Android',
+					'Firestore provider for DocumentDB',
+					'Single slim binding for Firebase iOS 12.x',
+				],
+				tags: ['MAUI', 'Data'],
+			},
+			{
 				name: 'Health',
 				repo: 'shinyorg/health',
 				hero: 'shiny-health-v2-hero.svg',
@@ -325,6 +379,7 @@ export const GROUPS: ProjectGroup[] = [
 					'Orleans ADO.NET schemas, auto-provisioned',
 					'PostgreSQL, SQL Server & MySQL',
 					'Gluetun VPN container routing',
+					'Tunnels: SSH, ngrok, Cloudflare & Azure Relay',
 				],
 				tags: ['ASP.NET', 'Data', 'Tooling'],
 			},
@@ -336,6 +391,15 @@ export const GROUPS: ProjectGroup[] = [
 		blurb: 'Build-time helpers that take a repetitive job off your desk entirely.',
 		layout: 'compact',
 		projects: [
+			{
+				name: 'Shiny AI Skills',
+				repo: 'shinyorg/skills',
+				hero: 'projects/skills-hero.svg',
+				tagline:
+					'One plugin for Claude Code and GitHub Copilot CLI that teaches your coding agent every Shiny library — loaded only when the task needs it.',
+				highlights: ['Claude Code & Copilot CLI plugin', 'A skill per Shiny library', 'Code generation rules & API reference'],
+				tags: ['AI', 'Tooling'],
+			},
 			{
 				name: 'Localization Generator',
 				repo: 'shinyorg/localizegen',
@@ -403,6 +467,14 @@ export const GROUPS: ProjectGroup[] = [
 				tagline:
 					'A BLE client and peripheral hosting sample that syncs scores between devices in real time.',
 				tags: ['MAUI', 'Hardware'],
+			},
+			{
+				name: 'Disney Droids',
+				repo: 'GoneDotNet/disneybots',
+				hero: 'projects/disneybots-hero.svg',
+				tagline:
+					'Drive Droid Depot droids over Bluetooth LE from your phone — or chat with one on macOS while an AI drives, plays sounds and looks through your webcam.',
+				tags: ['MAUI', 'Hardware', 'AI'],
 			},
 			{
 				name: 'KML Recorder',
