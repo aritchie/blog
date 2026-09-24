@@ -58,7 +58,7 @@ export const GROUPS: ProjectGroup[] = [
 		layout: 'media',
 		projects: [
 			{
-				name: 'Shiny Mobile',
+				name: 'Shiny Client',
 				repo: 'shinyorg/shiny',
 				docs: 'https://shinylib.net',
 				hero: 'shiny-client-v4-hero.svg',

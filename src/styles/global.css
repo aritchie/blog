@@ -234,3 +234,56 @@ hr {
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
+
+/*
+  Motion
+  ------
+  Every page load is a cross-document view transition: the header holds still,
+  the page underneath lifts in, and a post's card art morphs into its hero
+  (PostCard and BlogPost share a `view-transition-name` per post). Browsers
+  without support just navigate normally.
+*/
+@view-transition {
+	navigation: auto;
+}
+::view-transition-old(root) {
+	animation: 160ms ease-in both vt-fade-out;
+}
+::view-transition-new(root) {
+	animation: 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both vt-rise-in;
+}
+::view-transition-group(.post-hero) {
+	animation-duration: 420ms;
+	animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* card art and the post hero have different aspect ratios - crop, don't squash */
+::view-transition-old(.post-hero),
+::view-transition-new(.post-hero) {
+	height: 100%;
+	object-fit: cover;
+}
+@keyframes vt-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes vt-rise-in {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+}
+
+/* Shared entrance for anything that should arrive rather than just be there */
+@keyframes rise-in {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	@view-transition {
+		navigation: none;
+	}
+}

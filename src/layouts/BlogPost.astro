@@ -29,6 +29,9 @@ const {
 } = Astro.props;
 
 // Metadata carried into the Pagefind index alongside the post body.
+// Matches the name on this post's PostCard so the card art morphs into the hero
+const heroTransition = `post-${Astro.params.slug?.replace(/[^\w-]/g, '-')}`;
+
 const searchDate = pubDate.toLocaleDateString('en-us', {
 	year: 'numeric',
 	month: 'short',
@@ -55,6 +58,7 @@ const searchDate = pubDate.toLocaleDateString('en-us', {
 				margin: 0 auto;
 				border-radius: 12px;
 				box-shadow: var(--box-shadow);
+				view-transition-class: post-hero;
 			}
 			.prose {
 				width: 720px;
@@ -79,6 +83,27 @@ const searchDate = pubDate.toLocaleDateString('en-us', {
 			.last-updated-on {
 				font-style: italic;
 			}
+			.title > * {
+				animation: rise-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+			}
+			.title h1 {
+				animation-delay: 0.08s;
+			}
+			.title hr {
+				animation-name: rule-draw;
+				animation-delay: 0.2s;
+				transform-origin: center;
+			}
+			@keyframes rule-draw {
+				from {
+					transform: scaleX(0);
+				}
+			}
+			@media (prefers-reduced-motion: reduce) {
+				.title > * {
+					animation: none;
+				}
+			}
 		</style>
 	</head>
 
@@ -88,7 +113,17 @@ const searchDate = pubDate.toLocaleDateString('en-us', {
 		<main>
 			<article>
 				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+					{
+						heroImage && (
+							<Image
+								width={1020}
+								height={510}
+								src={heroImage}
+								alt=""
+								style={`view-transition-name: ${heroTransition}`}
+							/>
+						)
+					}
 				</div>
 				<div
 					class="prose"

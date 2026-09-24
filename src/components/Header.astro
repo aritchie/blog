@@ -110,6 +110,8 @@ import shinysoftLogo from '../assets/shinysoft-logo.png';
 		-webkit-backdrop-filter: blur(18px) saturate(180%);
 		border-bottom: 1px solid transparent;
 		transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+		/* stays put while the page beneath it transitions */
+		view-transition-name: site-header;
 	}
 	/* a hairline of light along the top edge is what sells the glass */
 	header::before {

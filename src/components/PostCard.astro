@@ -16,6 +16,8 @@ interface Props {
 const { post, minutes, variant = 'default', eager = false } = Astro.props;
 const { title, description, pubDate, heroImage, tags } = post.data;
 const href = `/blog/${post.id}/`;
+// BlogPost gives its hero the same name, so the art morphs across the navigation
+const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 ---
 
 <article class:list={['card', `card--${variant}`]}>
@@ -29,6 +31,7 @@ const href = `/blog/${post.id}/`;
 					height={variant === 'featured' ? 630 : 378}
 					loading={eager ? 'eager' : 'lazy'}
 					decoding="async"
+					style={`view-transition-name: ${heroTransition}`}
 				/>
 			)
 		}
@@ -72,6 +75,29 @@ const href = `/blog/${post.id}/`;
 			border-color: var(--accent);
 			box-shadow: 0 10px 30px rgba(var(--shadow), 22%);
 		}
+		.card:hover .card-media :global(img) {
+			transform: scale(1.05);
+		}
+	}
+
+	/* Cards drift up into place as they scroll into view. Scroll-driven, so no
+	   script and nothing is ever hidden where it isn't supported. */
+	@supports (animation-timeline: view()) {
+		@media (prefers-reduced-motion: no-preference) {
+			.card {
+				animation: card-reveal linear both;
+				animation-timeline: view();
+				animation-range: entry 0% entry 55%;
+			}
+		}
+	}
+	/* translate/scale rather than transform, so the hover lift still applies */
+	@keyframes card-reveal {
+		from {
+			opacity: 0;
+			translate: 0 40px;
+			scale: 0.97;
+		}
 	}
 
 	.card-media {
@@ -88,6 +114,8 @@ const href = `/blog/${post.id}/`;
 		object-fit: cover;
 		margin: 0;
 		border-radius: 0;
+		view-transition-class: post-hero;
+		transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
 
 	.card-body {
@@ -203,6 +231,11 @@ const href = `/blog/${post.id}/`;
 			transition: none;
 		}
 		.card:hover {
+			transform: none;
+		}
+		.card-media :global(img),
+		.card:hover .card-media :global(img) {
+			transition: none;
 			transform: none;
 		}
 	}

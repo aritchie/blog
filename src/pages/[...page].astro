@@ -197,11 +197,58 @@ const description = isFirstPage
 				overflow: hidden;
 				/* the portrait is a cut-out on white and blends with multiply, so the
 				   plate behind it stays light in both themes */
+				/* the plate fills the padding box; a conic gradient in the border box
+				   shows through the transparent border as a slowly turning ring */
 				background:
-					radial-gradient(120% 110% at 50% 0%, rgba(99, 102, 241, 0.3), transparent 62%),
-					#eef1f7;
-				border: 1px solid rgb(var(--gray-light));
+					radial-gradient(120% 110% at 50% 0%, rgba(99, 102, 241, 0.3), transparent 62%)
+						padding-box,
+					linear-gradient(#eef1f7, #eef1f7) padding-box,
+					conic-gradient(
+							from var(--ring-angle),
+							var(--accent),
+							#a78bfa,
+							#22d3ee,
+							rgb(var(--gray-light)) 55%,
+							rgb(var(--gray-light)) 80%,
+							var(--accent)
+						)
+						border-box;
+				border: 3px solid transparent;
 				border-radius: 50%;
+				animation: ring-spin 8s linear infinite;
+			}
+			@property --ring-angle {
+				syntax: '<angle>';
+				inherits: false;
+				initial-value: 0deg;
+			}
+			@keyframes ring-spin {
+				to {
+					--ring-angle: 360deg;
+				}
+			}
+
+			/* the intro arrives in reading order */
+			.intro-avatar,
+			.intro-copy > *,
+			.archive-head > * {
+				animation: rise-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+			}
+			.intro-avatar {
+				animation:
+					ring-spin 8s linear infinite,
+					rise-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+			}
+			.intro-copy > :nth-child(2),
+			.archive-head > :nth-child(2) {
+				animation-delay: 0.08s;
+			}
+			.intro-copy > :nth-child(3),
+			.archive-head > :nth-child(3) {
+				animation-delay: 0.16s;
+			}
+			.intro-copy > :nth-child(4) {
+				animation-delay: 0.24s;
 			}
 			.intro-avatar :global(img) {
 				width: 100%;
@@ -332,6 +379,28 @@ const description = isFirstPage
 				border-color: var(--accent-dark);
 				color: var(--on-accent);
 			}
+			/* a streak of light crosses the primary button on hover */
+			.btn--primary {
+				position: relative;
+				overflow: hidden;
+			}
+			.btn--primary::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background: linear-gradient(
+					105deg,
+					transparent 30%,
+					rgba(255, 255, 255, 0.45) 50%,
+					transparent 70%
+				);
+				translate: -120% 0;
+				pointer-events: none;
+			}
+			.btn--primary:hover::after {
+				translate: 120% 0;
+				transition: translate 0.6s ease;
+			}
 			.btn--secondary {
 				background: var(--surface);
 				border-color: rgb(var(--gray-light));
@@ -351,6 +420,14 @@ const description = isFirstPage
 			@media (prefers-reduced-motion: reduce) {
 				.btn {
 					transition: none;
+				}
+				.intro-avatar,
+				.intro-copy > *,
+				.archive-head > * {
+					animation: none;
+				}
+				.btn--primary::after {
+					display: none;
 				}
 			}
 		</style>
