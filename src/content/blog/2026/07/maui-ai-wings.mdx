@@ -311,7 +311,7 @@ Two small pieces of infrastructure, and then everything else in this post is jus
 
 ### The tool pack
 
-Every Shiny "Extensions.AI" package hands you a small bundle object — `HealthAITools`, `ContactAITools`, `MusicAITools`, `NotificationAITools`, `LocationAITools`, `DocumentStoreAITools` — and each one has a `Tools` property that is just `IReadOnlyList<AITool>`. So a capability, from the app's point of view, is a list of tools plus a sentence or two telling the model when to use them:
+Every Shiny "Extensions.AI" package hands you a small bundle object — `HealthAITools`, `ContactAITools`, `MusicAITools`, `NotificationAITools`, `LocationAITools`, `DocumentStoreAITools`, `AppFunctionAITools` — and each one has a `Tools` property that is just `IReadOnlyList<AITool>`. So a capability, from the app's point of view, is a list of tools plus a sentence or two telling the model when to use them:
 
 ```csharp
 public interface IAiToolPack
@@ -967,6 +967,7 @@ If you'd rather not hand-roll persisted history and the wake-word/voice loop, [`
 | [`Shiny.Music`](https://www.nuget.org/packages/Shiny.Music) + [`Shiny.Music.Extensions.AI`](https://www.nuget.org/packages/Shiny.Music.Extensions.AI) | [Music](https://shinylib.net/music) · [AI tools](https://shinylib.net/music/ai-tools) |
 | [`Shiny.DocumentDb.Sqlite`](https://www.nuget.org/packages/Shiny.DocumentDb.Sqlite) + [`Shiny.DocumentDb.Extensions.AI`](https://www.nuget.org/packages/Shiny.DocumentDb.Extensions.AI) | [DocumentDb](https://shinylib.net/documentdb) · [AI tools](https://shinylib.net/documentdb/ai-tools) |
 | [`Shiny.Extensions.DependencyInjection`](https://www.nuget.org/packages/Shiny.Extensions.DependencyInjection) | [DI](https://shinylib.net/di) · [AI tools](https://shinylib.net/di/ai-tools) |
+| [`Shiny.AppFunctions`](https://www.nuget.org/packages/Shiny.AppFunctions) + [`Shiny.AppFunctions.Extensions.AI`](https://www.nuget.org/packages/Shiny.AppFunctions.Extensions.AI) | [App Functions](https://shinylib.net/client/appfunctions/) · [AI tools](https://shinylib.net/client/appfunctions/ai-tools/) — the functions Siri and Gemini call, as tools for your own model |
 
 ---
 

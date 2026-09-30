@@ -29,7 +29,8 @@ I didn't want to write it twice. So I built **Shiny.AppFunctions**.
 <NugetPackages
   title="Where this lives"
   packages={[
-    { id: 'Shiny.AppFunctions', desc: 'The runtime, the source generator and the build step — all in one package.' }
+    { id: 'Shiny.AppFunctions', desc: 'The runtime, the source generator and the build step — all in one package.' },
+    { id: 'Shiny.AppFunctions.Extensions.AI', desc: 'The same functions as tools for your own in-app LLM.' }
   ]}
 />
 
@@ -158,9 +159,19 @@ var outcome = await dispatcher.Execute(
 );
 ```
 
-And every function gives you `GetParametersJsonSchema()`. Point an in-app chat at those as tools, or put an MCP server
-in front of them, and you've got a third assistant calling the same handlers — without declaring anything a third
-time.
+And from there it was one small step to a package: **Shiny.AppFunctions.Extensions.AI** hands the same functions to
+any `IChatClient` as tools.
+
+```csharp
+builder.Services.AddAppFunctionAITools(b => b.AddAllFunctions());
+
+var tools = sp.GetRequiredService<AppFunctionAITools>().Tools;
+```
+
+Now your own in-app assistant is a third caller of the same handlers, without declaring anything a third time. It
+goes through the same delegates, so the sign-in check that stops Siri stops your chat too. And it drops in next to
+Shiny's Calendar, Contacts, Notifications and Locations AI tools, so one conversation can check your calendar, find a
+contact and create an order.
 
 ## Things to know
 

@@ -108,3 +108,20 @@ Which means one sentence can light up all three:
 The capability builders decide what the *agent* can see. They do **not** grant OS permissions. You still call `RequestAccess` (or start a GPS listener) from your app the normal way before you hand the agent the wheel — the tools assume access is already granted and return a tidy error object if it isn't. Keep the model on the allow-list you're comfortable with, request the real permissions yourself, and let it do the rest.
 
 That's the whole idea, really. Don't build an assistant that can only talk. Give it a few hands and watch what people ask it to do.
+
+## Update: the app's own hands
+
+A few months on, there's one more bundle for the pile, and it's the one I wanted most: your app's *own* functions.
+[`Shiny.AppFunctions.Extensions.AI`](https://shinylib.net/client/appfunctions/ai-tools/) takes the functions you've
+declared for Siri and Gemini with [Shiny.AppFunctions](https://shinylib.net/client/appfunctions/) and hands them to your
+in-app model as tools, next to contacts, reminders and location:
+
+```csharp
+builder.Services.AddAppFunctions();
+builder.Services.AddAppFunctionAITools(tools => tools.AddAllFunctions());
+
+tools.AddRange(sp.GetRequiredService<AppFunctionAITools>().Tools);
+```
+
+Same handlers, same sign-in checks, no third copy of anything. "Remind me to follow up with Acme, and create an order
+for them" is now one turn.
