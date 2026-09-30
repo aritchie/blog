@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="siri" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f472b6"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="gemini" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <radialGradient id="glowL" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowR" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <ellipse cx="220" cy="330" rx="260" ry="240" fill="url(#glowL)"/>
+  <ellipse cx="980" cy="330" rx="260" ry="240" fill="url(#glowR)"/>
+
+  <!-- headline -->
+  <text x="600" y="78" text-anchor="middle" fill="url(#title)" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-weight="800" font-size="56" filter="url(#glow)">Shiny.AppFunctions</text>
+  <text x="600" y="116" text-anchor="middle" fill="#cbd5e1" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="22">One C# declaration. Siri and Gemini.</text>
+
+  <!-- ===== the C# record, centre ===== -->
+  <g transform="translate(380, 170)" filter="url(#glow)">
+    <rect x="0" y="0" width="440" height="250" rx="14" fill="url(#chrome)" stroke="#a78bfa" stroke-width="1.5"/>
+    <path d="M0,14 a14,14 0 0 1 14,-14 h412 a14,14 0 0 1 14,14 v20 h-440 z" fill="#0b1220"/>
+    <circle cx="20" cy="17" r="4.5" fill="#ef4444" opacity="0.75"/>
+    <circle cx="36" cy="17" r="4.5" fill="#f59e0b" opacity="0.75"/>
+    <circle cx="52" cy="17" r="4.5" fill="#10b981" opacity="0.75"/>
+    <text x="76" y="21" fill="#64748b" font-family="system-ui" font-size="11">OrderFunctions.cs</text>
+    <g font-family="monospace" font-size="13" xml:space="preserve">
+      <text x="20" y="64"><tspan fill="#94a3b8">[</tspan><tspan fill="#67e8f9">AppFunction</tspan><tspan fill="#94a3b8">(</tspan><tspan fill="#fcd34d">"create_order"</tspan><tspan fill="#94a3b8">)]</tspan></text>
+      <text x="20" y="86"><tspan fill="#94a3b8">[</tspan><tspan fill="#67e8f9">AppShortcut</tspan><tspan fill="#94a3b8">(</tspan><tspan fill="#fcd34d">"Create an order in …"</tspan><tspan fill="#94a3b8">)]</tspan></text>
+      <text x="20" y="112"><tspan fill="#c084fc">public record</tspan><tspan fill="#e2e8f0"> CreateOrder(</tspan></text>
+      <text x="20" y="134"><tspan fill="#34d399">    Customer</tspan><tspan fill="#e2e8f0"> Customer,</tspan></text>
+      <text x="20" y="156"><tspan fill="#c084fc">    int</tspan><tspan fill="#e2e8f0"> Quantity,</tspan></text>
+      <text x="20" y="178"><tspan fill="#34d399">    Priority</tspan><tspan fill="#e2e8f0"> Priority,</tspan></text>
+      <text x="20" y="200"><tspan fill="#c084fc">    string?</tspan><tspan fill="#e2e8f0"> Note</tspan></text>
+      <text x="20" y="222"><tspan fill="#e2e8f0">) : </tspan><tspan fill="#34d399">IAppFunction</tspan><tspan fill="#e2e8f0">&lt;OrderResult&gt;;</tspan></text>
+    </g>
+  </g>
+
+  <!-- flows out -->
+  <g fill="none" stroke-width="1.8" stroke-dasharray="6 6" opacity="0.9">
+    <path d="M380,295 C330,295 320,295 300,295" stroke="#f472b6"/>
+    <path d="M820,295 C870,295 880,295 900,295" stroke="#34d399"/>
+  </g>
+  <polygon points="304,288 304,302 292,295" fill="#f472b6"/>
+  <polygon points="896,288 896,302 908,295" fill="#34d399"/>
+  <text x="340" y="282" text-anchor="middle" fill="#f9a8d4" font-family="monospace" font-size="11">Swift</text>
+  <text x="860" y="282" text-anchor="middle" fill="#6ee7b7" font-family="monospace" font-size="11">schema</text>
+
+  <!-- ===== iOS / Siri, left ===== -->
+  <g transform="translate(90, 170)">
+    <rect x="0" y="0" width="200" height="250" rx="18" fill="url(#chrome)" stroke="#475569" stroke-width="1.5"/>
+    <circle cx="100" cy="78" r="42" fill="url(#siri)" filter="url(#softGlow)" opacity="0.95"/>
+    <circle cx="100" cy="78" r="26" fill="#0f172a" opacity="0.35"/>
+    <text x="100" y="152" text-anchor="middle" fill="#f1f5f9" font-family="system-ui" font-weight="700" font-size="22">Siri</text>
+    <text x="100" y="176" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="12">App Intents · iOS 16+</text>
+    <rect x="16" y="192" width="168" height="42" rx="10" fill="#0b1220" stroke="#334155"/>
+    <text x="100" y="210" text-anchor="middle" fill="#f9a8d4" font-family="system-ui" font-size="10.5">Spotlight · Shortcuts</text>
+    <text x="100" y="225" text-anchor="middle" fill="#f9a8d4" font-family="system-ui" font-size="10.5">Apple Intelligence</text>
+  </g>
+
+  <!-- ===== Android / Gemini, right ===== -->
+  <g transform="translate(910, 170)">
+    <rect x="0" y="0" width="200" height="250" rx="18" fill="url(#chrome)" stroke="#475569" stroke-width="1.5"/>
+    <!-- four-point sparkle -->
+    <path d="M100,34 C104,62 116,74 144,78 C116,82 104,94 100,122 C96,94 84,82 56,78 C84,74 96,62 100,34 Z" fill="url(#gemini)" filter="url(#softGlow)"/>
+    <text x="100" y="152" text-anchor="middle" fill="#f1f5f9" font-family="system-ui" font-weight="700" font-size="22">Gemini</text>
+    <text x="100" y="176" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="12">AppFunctions · Android 16+</text>
+    <rect x="16" y="192" width="168" height="42" rx="10" fill="#0b1220" stroke="#334155"/>
+    <text x="100" y="210" text-anchor="middle" fill="#6ee7b7" font-family="monospace" font-size="10.5">create_order</text>
+    <text x="100" y="225" text-anchor="middle" fill="#6ee7b7" font-family="monospace" font-size="10.5">search_customer</text>
+  </g>
+
+  <!-- footer -->
+  <g font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="15" fill="#94a3b8" text-anchor="middle">
+    <text x="600" y="490">No Swift · No Kotlin · No plist · No manifest</text>
+  </g>
+  <g transform="translate(470, 520)">
+    <rect x="0" y="0" width="260" height="40" rx="20" fill="#0b1220" stroke="#a78bfa" stroke-width="1.2" opacity="0.9"/>
+    <text x="130" y="26" text-anchor="middle" fill="#c4b5fd" font-family="monospace" font-size="14">services.AddAppFunctions()</text>
+  </g>
+</svg>
