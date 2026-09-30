@@ -70,6 +70,7 @@ export const GROUPS: ProjectGroup[] = [
 					'GPS, geofencing & background location',
 					'Local and push notifications',
 					'iOS Live Activities & Android Live Updates',
+					'Siri & Gemini App Functions',
 					'Background jobs',
 					'Resumable HTTP transfers & data sync',
 					'Contacts and calendar',
@@ -225,6 +226,24 @@ export const GROUPS: ProjectGroup[] = [
 			'Focused packages that solve one problem properly — usually a platform API that should have been cross-platform in the first place.',
 		layout: 'compact',
 		projects: [
+			{
+				name: 'App Functions',
+				repo: 'shinyorg/shiny',
+				hero: 'shiny-appfunctions-hero.svg',
+				docs: 'https://shinylib.net/client/appfunctions/',
+				tagline:
+					'Declare what your app can do once in C# — Siri gets App Intents on iOS, Gemini gets AppFunctions on Android, and your own LLM gets tools.',
+				highlights: [
+					'Siri, Spotlight, Shortcuts & Apple Intelligence',
+					'Gemini via Android 16 AppFunctions',
+					'No Swift, Kotlin, plist or manifest',
+					'Entities with pickers & generated search',
+					'Siri phrases with zero user setup',
+					'Delegates gate every call',
+					'Same functions as in-app AI tools',
+				],
+				tags: ['MAUI', 'AI', 'AOT'],
+			},
 			{
 				name: 'MAUI Shell Extensions',
 				repo: 'shinyorg/mauishell',
