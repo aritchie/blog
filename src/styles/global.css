@@ -41,6 +41,11 @@
 	--glass: rgba(255, 255, 255, 0.72);
 	--glass-edge: rgba(255, 255, 255, 0.55);
 
+	/* MotionBackground halftone field */
+	--motion-a: #2337ff;
+	--motion-b: #0ea5b7;
+	--motion-alpha: 0.42;
+
 	--gray-gradient: rgba(var(--gray-light), 50%), var(--page-bg);
 	--box-shadow:
 		0 2px 6px rgba(var(--shadow), 25%), 0 8px 24px rgba(var(--shadow), 33%), 0 16px 32px
@@ -67,6 +72,10 @@
 	--surface-2: #1a202b;
 	--glass: rgba(13, 17, 23, 0.72);
 	--glass-edge: rgba(255, 255, 255, 0.08);
+
+	--motion-a: #6d7dff;
+	--motion-b: #2dd4bf;
+	--motion-alpha: 0.5;
 }
 
 /* Same values again for readers on system dark who haven't picked a theme.
@@ -93,6 +102,10 @@
 		--surface-2: #1a202b;
 		--glass: rgba(13, 17, 23, 0.72);
 		--glass-edge: rgba(255, 255, 255, 0.08);
+
+		--motion-a: #6d7dff;
+		--motion-b: #2dd4bf;
+		--motion-alpha: 0.5;
 	}
 }
 @font-face {

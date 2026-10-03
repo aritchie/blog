@@ -61,7 +61,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'Shiny Client',
 				repo: 'shinyorg/shiny',
 				docs: 'https://shinylib.net',
-				hero: 'shiny-client-v4-hero.svg',
+				hero: 'projects/shiny-client-hero.svg',
 				tagline:
 					'Device services and background processing for .NET — one API across iOS, Android, tvOS, Mac Catalyst, macOS, Windows, Linux, and Blazor WebAssembly.',
 				highlights: [
@@ -84,7 +84,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'DocumentDB',
 				repo: 'shinyorg/documentdb',
 				docs: 'https://shinylib.net/documentdb/',
-				hero: 'documentdb-v13-hero.svg',
+				hero: 'projects/documentdb-hero.svg',
 				tagline:
 					'A database-agnostic document store for .NET — keep object graphs as schema-free JSON on whichever engine you already run, fully AOT and trim clean.',
 				highlights: [
@@ -105,7 +105,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'Shiny Controls',
 				repo: 'shinyorg/controls',
 				docs: 'https://shinylib.net/controls/',
-				hero: 'shiny-controls-1-0-hero.svg',
+				hero: 'projects/shiny-controls-hero.svg',
 				tagline:
 					'A native, MVVM-friendly control library for Blazor and every .NET MAUI platform — iOS, Android, macOS, Windows and Linux — the screens every app needs, without building them twice.',
 				highlights: [
@@ -130,7 +130,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'Shiny Mediator',
 				repo: 'shinyorg/mediator',
 				docs: 'https://shinylib.net/mediator/',
-				hero: 'shinymediator-v6-hero.svg',
+				hero: 'projects/shinymediator-hero.svg',
 				tagline:
 					'The mediator pattern rebuilt for app developers — source-generated contracts and a middleware pipeline that spans MAUI, Blazor, and ASP.NET.',
 				highlights: [
@@ -166,7 +166,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'AppDeviceBridge',
 				repo: 'shinyorg/appdevicebridge',
 				docs: 'https://shinylib.net/appdevicebridge/',
-				hero: 'appdevicebridge-hero.svg',
+				hero: 'projects/appdevicebridge-hero.svg',
 				tagline:
 					'Ship a web app — Blazor WebAssembly, React, Vue, anything static — inside a .NET MAUI app, served from the device, updated from your own server, and wired to native services.',
 				highlights: [
@@ -350,9 +350,44 @@ export const GROUPS: ProjectGroup[] = [
 				tags: ['MAUI', 'Data'],
 			},
 			{
+				name: 'Actors',
+				repo: 'shinyorg/actors',
+				hero: 'projects/actors-hero.svg',
+				docs: 'https://shinylib.net/actors/',
+				tagline:
+					'Orleans-style virtual actors without the ceremony — in one process anywhere .NET runs, including .NET MAUI and Blazor WebAssembly, and callable from other devices over HTTP.',
+				highlights: [
+					'One call at a time — no locks',
+					'Deadlock detection',
+					'ETag-checked state & auto-save',
+					'Event sourcing with snapshots',
+					'Durable streams, timers & reminders',
+					'Reminders as OS notifications',
+					'Remoting over HTTP & mDNS discovery',
+					'Source-generated, AOT & trim clean',
+				],
+				tags: ['MAUI', 'Blazor', 'Data', 'AOT'],
+			},
+			{
+				name: 'BluetoothLE Hubs',
+				repo: 'shinyorg/blehubs',
+				hero: 'projects/blehubs-hero.svg',
+				docs: 'https://shinylib.net/blehubs/',
+				tagline:
+					'SignalR-style hubs over Bluetooth LE — one device hosts a hub, nearby devices call its methods and receive pushes, with no network in sight.',
+				highlights: [
+					'Typed hub methods & events',
+					'Source-generated client proxies',
+					'Groups and targeted pushes',
+					'File transfer over L2CAP',
+					'Reflection-free, AOT & trim safe',
+				],
+				tags: ['MAUI', 'Hardware', 'AOT'],
+			},
+			{
 				name: 'Health',
 				repo: 'shinyorg/health',
-				hero: 'shiny-health-v2-hero.svg',
+				hero: 'projects/shiny-health-hero.svg',
 				docs: 'https://shinylib.net/health/',
 				tagline:
 					'Apple HealthKit and Android Health Connect behind one cross-platform .NET API.',
