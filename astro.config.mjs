@@ -36,7 +36,6 @@ export default defineConfig({
 		'/blog/shiny-sqlitedocumentdb/': '/blog/2026/02/shiny-sqlitedocumentdb/',
 		// Mar 2026
 		'/blog/shiny-music/': '/blog/2026/03/shiny-music/',
-		'/blog/shiny-spatial/': '/blog/2026/03/shiny-spatial/',
 		'/blog/shiny-sqlitedocumentdb-v2/': '/blog/2026/03/shiny-sqlitedocumentdb-v2/',
 		'/blog/shiny-maui-shell/': '/blog/2026/03/shiny-maui-shell/',
 		'/blog/shiny-contactstore/': '/blog/2026/03/shiny-contactstore/',
