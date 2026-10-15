@@ -77,6 +77,9 @@ export const GROUPS: ProjectGroup[] = [
 					'Wi-Fi scan, join & hotspot hosting',
 					'mDNS, SSDP/UPnP & WS-Discovery',
 					'Gamepads, wearables & screen recording',
+					'Thermal & native printing',
+					'In-app purchases, Game Center & App Store',
+					'Call blocking & identification',
 				],
 				tags: ['MAUI', 'Blazor', 'Hardware'],
 			},
@@ -264,7 +267,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'App Extensions',
 				repo: 'shinyorg/extensions',
 				hero: 'projects/extensions-hero.svg',
-				docs: 'https://shinylib.net/extensions/di/',
+				docs: 'https://shinylib.net/di/',
 				tagline:
 					'Source generators and utilities that cut boilerplate and keep your app reflection-free.',
 				highlights: [
@@ -336,6 +339,23 @@ export const GROUPS: ProjectGroup[] = [
 				tags: ['ASP.NET', 'AOT'],
 			},
 			{
+				name: 'ASP.NET Extensions',
+				repo: 'shinyorg/aspnet',
+				docs: 'https://shinylib.net/aspnet/',
+				tagline:
+					'Independent single-package add-ons for ASP.NET Core, registered the ASP.NET way and all trim and Native AOT clean.',
+				highlights: [
+					'Modular startup with IWebModule',
+					'WebDAV, CalDAV & CardDAV servers',
+					'tus resumable uploads & file sync',
+					'Private NuGet and npm feeds',
+					'Automatic ACME / Let\'s Encrypt TLS',
+					'Webhook verification & idempotency keys',
+					'SSH, cloudflared, ngrok & Tailscale tunnels',
+				],
+				tags: ['ASP.NET', 'AOT'],
+			},
+			{
 				name: 'Firebase',
 				repo: 'shinyorg/firebase',
 				hero: 'projects/firebase-hero.svg',
@@ -385,6 +405,21 @@ export const GROUPS: ProjectGroup[] = [
 				tags: ['MAUI', 'Hardware', 'AOT'],
 			},
 			{
+				name: 'Universal Hubs',
+				repo: 'shinyorg/universalhubs',
+				docs: 'https://shinylib.net/universalhubs/',
+				tagline:
+					'BluetoothLE Hubs over Wi-Fi as well as Bluetooth LE — write the hub once, and clients connect over whichever link they can reach.',
+				highlights: [
+					'One hub served over GATT and HTTP',
+					'mDNS advertising per hub',
+					'Discovery merges BLE scans and mDNS',
+					'Prefers Wi-Fi, falls back to BLE',
+					'Files over L2CAP or plain HTTP',
+				],
+				tags: ['MAUI', 'Hardware', 'AOT'],
+			},
+			{
 				name: 'Health',
 				repo: 'shinyorg/health',
 				hero: 'projects/shiny-health-hero.svg',
@@ -426,6 +461,7 @@ export const GROUPS: ProjectGroup[] = [
 			{
 				name: 'Shiny Aspire',
 				repo: 'shinyorg/aspire',
+				docs: 'https://shinylib.net/aspire/orleans/',
 				hero: 'documentdb-aspire-hero.svg',
 				tagline:
 					'Zero-friction .NET Aspire integrations that provision the infrastructure you would otherwise hand-roll.',
@@ -457,6 +493,7 @@ export const GROUPS: ProjectGroup[] = [
 			{
 				name: 'Localization Generator',
 				repo: 'shinyorg/localizegen',
+				docs: 'https://shinylib.net/localizegen/',
 				hero: 'projects/localizegen-hero.svg',
 				tagline:
 					'Turns your .resx files into compile-time safe wrappers around IStringLocalizer.',
@@ -466,6 +503,7 @@ export const GROUPS: ProjectGroup[] = [
 			{
 				name: 'MSBuild Permissions',
 				repo: 'shinyorg/msbuildpermissions',
+				docs: 'https://shinylib.net/permissions/',
 				hero: 'projects/msbuildpermissions-hero.svg',
 				tagline:
 					'Declare .NET MAUI permissions once in your csproj — MSBuild writes the Android manifest and iOS Info.plist entries for you.',
