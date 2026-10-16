@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="ASP.NET Extensions">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0e0a1f"/>
+			<stop offset="50%" stop-color="#1e1442"/>
+			<stop offset="100%" stop-color="#0e0a1f"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="38%" r="62%">
+			<stop offset="0%" stop-color="#7c4dff" stop-opacity="0.32"/>
+			<stop offset="60%" stop-color="#7c4dff" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#7c4dff" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#7c4dff" opacity="0.85"/>
+
+	<!-- connectors from core to modules -->
+	<g stroke="#a78bfa" stroke-width="3" stroke-linecap="round" opacity="0.55">
+		<line x1="600" y1="250" x2="330" y2="140"/>
+		<line x1="600" y1="250" x2="330" y2="250"/>
+		<line x1="600" y1="250" x2="330" y2="360"/>
+		<line x1="600" y1="250" x2="870" y2="140"/>
+		<line x1="600" y1="250" x2="870" y2="250"/>
+		<line x1="600" y1="250" x2="870" y2="360"/>
+	</g>
+
+	<!-- module chips -->
+	<g font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="600" text-anchor="middle">
+		<g fill="#120d2b" stroke-width="2.5">
+			<rect x="230" y="116" width="200" height="48" rx="12" stroke="#22d3ee"/>
+			<rect x="230" y="226" width="200" height="48" rx="12" stroke="#34d399"/>
+			<rect x="230" y="336" width="200" height="48" rx="12" stroke="#f472b6"/>
+			<rect x="770" y="116" width="200" height="48" rx="12" stroke="#fbbf24"/>
+			<rect x="770" y="226" width="200" height="48" rx="12" stroke="#60a5fa"/>
+			<rect x="770" y="336" width="200" height="48" rx="12" stroke="#fb923c"/>
+		</g>
+		<text x="330" y="147" fill="#22d3ee">WebDAV</text>
+		<text x="330" y="257" fill="#34d399">tus uploads</text>
+		<text x="330" y="367" fill="#f472b6">NuGet · npm</text>
+		<text x="870" y="147" fill="#fbbf24">ACME / TLS</text>
+		<text x="870" y="257" fill="#60a5fa">Webhooks</text>
+		<text x="870" y="367" fill="#fb923c">Tunnels</text>
+	</g>
+
+	<!-- core: IWebModule -->
+	<rect x="530" y="190" width="140" height="120" rx="24" fill="#120d2b" stroke="#a78bfa" stroke-width="5" filter="url(#glow)"/>
+	<g fill="#a78bfa">
+		<rect x="562" y="218" width="32" height="28" rx="6"/>
+		<rect x="606" y="218" width="32" height="28" rx="6" opacity="0.7"/>
+		<rect x="562" y="256" width="32" height="28" rx="6" opacity="0.7"/>
+		<rect x="606" y="256" width="32" height="28" rx="6" fill="#22d3ee"/>
+	</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">ASP.NET Extensions</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#a78bfa" opacity="0.95">Single-package add-ons for ASP.NET Core · AOT clean</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/aspnet</text>
+</svg>

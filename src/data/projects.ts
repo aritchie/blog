@@ -341,6 +341,7 @@ export const GROUPS: ProjectGroup[] = [
 			{
 				name: 'ASP.NET Extensions',
 				repo: 'shinyorg/aspnet',
+				hero: 'projects/aspnet-hero.svg',
 				docs: 'https://shinylib.net/aspnet/',
 				tagline:
 					'Independent single-package add-ons for ASP.NET Core, registered the ASP.NET way and all trim and Native AOT clean.',
@@ -407,6 +408,7 @@ export const GROUPS: ProjectGroup[] = [
 			{
 				name: 'Universal Hubs',
 				repo: 'shinyorg/universalhubs',
+				hero: 'projects/universalhubs-hero.svg',
 				docs: 'https://shinylib.net/universalhubs/',
 				tagline:
 					'BluetoothLE Hubs over Wi-Fi as well as Bluetooth LE — write the hub once, and clients connect over whichever link they can reach.',

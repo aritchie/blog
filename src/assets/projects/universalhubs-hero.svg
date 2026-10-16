@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Universal Hubs">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#071a1c"/>
+			<stop offset="50%" stop-color="#0f2a33"/>
+			<stop offset="100%" stop-color="#071a1c"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="38%" r="62%">
+			<stop offset="0%" stop-color="#14b8a6" stop-opacity="0.28"/>
+			<stop offset="60%" stop-color="#14b8a6" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#14b8a6" opacity="0.85"/>
+
+	<!-- radio rings around the hub -->
+	<circle cx="600" cy="250" r="110" fill="none" stroke="#2dd4bf" stroke-opacity="0.22" stroke-width="2"/>
+	<circle cx="600" cy="250" r="160" fill="none" stroke="#2dd4bf" stroke-opacity="0.12" stroke-width="2" stroke-dasharray="6 10"/>
+
+	<!-- Wi-Fi links (left, solid) -->
+	<g stroke="#38bdf8" stroke-width="3" stroke-linecap="round" opacity="0.85">
+		<line x1="600" y1="250" x2="360" y2="150"/>
+		<line x1="600" y1="250" x2="360" y2="350"/>
+	</g>
+	<!-- BLE links (right, dashed) -->
+	<g stroke="#a78bfa" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 10" opacity="0.9">
+		<line x1="600" y1="250" x2="840" y2="150"/>
+		<line x1="600" y1="250" x2="840" y2="350"/>
+	</g>
+
+	<!-- message packets in flight -->
+	<g fill="#38bdf8" filter="url(#glow)">
+		<circle cx="470" cy="196" r="6"/>
+		<circle cx="500" cy="292" r="6"/>
+	</g>
+	<g fill="#a78bfa" filter="url(#glow)">
+		<circle cx="730" cy="304" r="6"/>
+		<circle cx="710" cy="204" r="6"/>
+	</g>
+
+	<!-- client devices -->
+	<g fill="#0a1f26" stroke-width="3">
+		<rect x="330" y="112" width="60" height="76" rx="12" stroke="#38bdf8"/>
+		<rect x="330" y="312" width="60" height="76" rx="12" stroke="#38bdf8"/>
+		<rect x="810" y="112" width="60" height="76" rx="12" stroke="#a78bfa"/>
+		<rect x="810" y="312" width="60" height="76" rx="12" stroke="#a78bfa"/>
+	</g>
+
+	<!-- transport labels -->
+	<g font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="18" text-anchor="middle" opacity="0.85">
+		<text x="250" y="256" fill="#38bdf8">HTTP · mDNS</text>
+		<text x="950" y="256" fill="#a78bfa">GATT · L2CAP</text>
+	</g>
+
+	<!-- hub: wifi arcs + bluetooth rune -->
+	<circle cx="600" cy="250" r="58" fill="#0a1f26" stroke="#2dd4bf" stroke-width="5" filter="url(#glow)"/>
+	<g fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round">
+		<path d="M562 244a30 30 0 0 1 22-14"/>
+		<path d="M570 254a18 18 0 0 1 12-8"/>
+	</g>
+	<circle cx="582" cy="262" r="4" fill="#38bdf8"/>
+	<path d="M598 230l24 24-12 12v-42l12 12-24 24" fill="none" stroke="#f8fafc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Universal Hubs</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#2dd4bf" opacity="0.95">One hub, served over Wi-Fi and Bluetooth LE</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">shinyorg/universalhubs</text>
+</svg>
