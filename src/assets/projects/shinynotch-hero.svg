@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Shiny Notch">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#a78bfa" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#a78bfa" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#a78bfa" opacity="0.85"/>
+
+	<g>
+		<rect x="240" y="120" width="720" height="300" rx="20" fill="#111a33" stroke="#a78bfa" stroke-opacity="0.35"/>
+		<path d="M410 120 H790 V262 a26 26 0 0 1 -26 26 H436 a26 26 0 0 1 -26 -26 Z" fill="#05070f" stroke="#a78bfa" stroke-width="2" filter="url(#glow)"/>
+		<circle cx="600" cy="136" r="5" fill="#a78bfa" opacity="0.7"/>
+		<rect x="438" y="160" width="74" height="74" rx="12" fill="#a78bfa" opacity="0.55"/>
+		<rect x="530" y="200" width="8" height="34" rx="4" fill="#a78bfa" opacity="0.8"/>
+		<rect x="544" y="176" width="8" height="58" rx="4" fill="#a78bfa" opacity="0.8"/>
+		<rect x="558" y="190" width="8" height="44" rx="4" fill="#a78bfa" opacity="0.8"/>
+		<rect x="572" y="164" width="8" height="70" rx="4" fill="#a78bfa" opacity="0.8"/>
+		<rect x="586" y="184" width="8" height="50" rx="4" fill="#a78bfa" opacity="0.8"/>
+		<rect x="616" y="166" width="150" height="14" rx="7" fill="#a78bfa" opacity="0.45"/>
+		<rect x="616" y="192" width="110" height="10" rx="5" fill="#a78bfa" opacity="0.28"/>
+		<rect x="616" y="222" width="150" height="6" rx="3" fill="#a78bfa" opacity="0.2"/>
+		<rect x="616" y="222" width="92" height="6" rx="3" fill="#a78bfa" opacity="0.75"/>
+		<rect x="448" y="252" width="36" height="16" rx="8" fill="#a78bfa" opacity="0.7"/>
+		<rect x="500" y="252" width="36" height="16" rx="8" fill="#a78bfa" opacity="0.22"/>
+		<rect x="552" y="252" width="36" height="16" rx="8" fill="#a78bfa" opacity="0.22"/>
+		<rect x="604" y="252" width="36" height="16" rx="8" fill="#a78bfa" opacity="0.22"/>
+		<rect x="656" y="252" width="36" height="16" rx="8" fill="#a78bfa" opacity="0.22"/>
+		<rect x="708" y="252" width="36" height="16" rx="8" fill="#a78bfa" opacity="0.22"/>
+		<rect x="280" y="318" width="600" height="14" rx="7" fill="#a78bfa" opacity="0.16"/>
+		<rect x="280" y="348" width="470" height="14" rx="7" fill="#a78bfa" opacity="0.12"/>
+		<rect x="280" y="378" width="340" height="14" rx="7" fill="#a78bfa" opacity="0.08"/>
+	</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Shiny Notch</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#a78bfa" opacity="0.95">The MacBook notch, turned into a live panel</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">ShinySoftware/ShinyNotch</text>
+</svg>

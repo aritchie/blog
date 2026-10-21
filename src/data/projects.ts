@@ -531,6 +531,21 @@ export const GROUPS: ProjectGroup[] = [
 		layout: 'compact',
 		projects: [
 			{
+				name: 'Shiny Notch',
+				repo: 'ShinySoftware/ShinyNotch',
+				hero: 'projects/shinynotch-hero.svg',
+				tagline:
+					'A macOS app that turns the MacBook camera notch into a live panel — now playing, weather, calendar, a file tray, a camera mirror and more, built on .NET MAUI for AppKit.',
+				highlights: [
+					'Shiny Controls NotchView & notch window',
+					'Calendar & meeting peek via Shiny.Calendar',
+					'Camera mirror on CameraView',
+					'Voice notes with Shiny.Audio',
+					'Open at login through Shiny.Core',
+				],
+				tags: ['MAUI', 'UI', 'Hardware'],
+			},
+			{
 				name: "Canada's Wonderland Ride Times",
 				repo: 'shinyorg/wonderland',
 				hero: 'projects/wonderland-hero.svg',

@@ -296,6 +296,24 @@ const motifs = {
 		<circle cx="106" cy="126" r="26" fill="${a}"/>
 	</g>`;
 	},
+	/** laptop screen with the camera notch opened into a panel - menu-bar / notch apps */
+	notch(a) {
+		const bars = [34, 58, 44, 70, 50];
+		return `
+	<g>
+		<rect x="240" y="120" width="720" height="300" rx="20" fill="#111a33" stroke="${a}" stroke-opacity="0.35"/>
+		<path d="M410 120 H790 V262 a26 26 0 0 1 -26 26 H436 a26 26 0 0 1 -26 -26 Z" fill="#05070f" stroke="${a}" stroke-width="2" filter="url(#glow)"/>
+		<circle cx="600" cy="136" r="5" fill="${a}" opacity="0.7"/>
+		<rect x="438" y="160" width="74" height="74" rx="12" fill="${a}" opacity="0.55"/>
+		${bars.map((h, i) => `<rect x="${530 + i * 14}" y="${234 - h}" width="8" height="${h}" rx="4" fill="${a}" opacity="0.8"/>`).join('\n\t\t')}
+		<rect x="616" y="166" width="150" height="14" rx="7" fill="${a}" opacity="0.45"/>
+		<rect x="616" y="192" width="110" height="10" rx="5" fill="${a}" opacity="0.28"/>
+		<rect x="616" y="222" width="150" height="6" rx="3" fill="${a}" opacity="0.2"/>
+		<rect x="616" y="222" width="92" height="6" rx="3" fill="${a}" opacity="0.75"/>
+		${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${448 + i * 52}" y="252" width="36" height="16" rx="8" fill="${a}" opacity="${i === 0 ? 0.7 : 0.22}"/>`).join('\n\t\t')}
+		${[0, 1, 2].map((i) => `<rect x="280" y="${318 + i * 30}" width="${600 - i * 130}" height="14" rx="7" fill="${a}" opacity="${0.16 - i * 0.04}"/>`).join('\n\t\t')}
+	</g>`;
+	},
 };
 
 // ---------------------------------------------------------------- template
@@ -358,6 +376,7 @@ const projects = [
 	{ slug: 'tunegames', title: 'TUNE Games', kicker: 'Name that tune, from your own library', repo: 'aritchie/tunegames', accent: '#c084fc', motif: 'music' },
 	{ slug: 'headsup', title: 'Heads Up Clone', kicker: 'Accelerometer party game', repo: 'gonedotnet/headsup', accent: '#fb923c', motif: 'cards' },
 	{ slug: 'mediatorsample', title: 'Mediator Sample', kicker: 'Handlers, events, middleware', repo: 'shinyorg/mediatorsample', accent: '#a3e635', motif: 'pipeline' },
+	{ slug: 'shinynotch', title: 'Shiny Notch', kicker: 'The MacBook notch, turned into a live panel', repo: 'ShinySoftware/ShinyNotch', accent: '#a78bfa', motif: 'notch' },
 ];
 
 mkdirSync(OUT, { recursive: true });
