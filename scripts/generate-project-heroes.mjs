@@ -296,6 +296,41 @@ const motifs = {
 		<circle cx="106" cy="126" r="26" fill="${a}"/>
 	</g>`;
 	},
+	/** folders on a server, fanned out to devices - file servers, feeds */
+	server(a) {
+		const folders = [170, 268, 366];
+		const clients = [
+			[960, 172],
+			[960, 268],
+			[960, 364],
+		];
+		return `
+	<g opacity="0.9">
+		${folders.map((y) => `<line x1="360" y1="${y}" x2="500" y2="268" stroke="${a}" stroke-width="1.5" opacity="0.35" stroke-dasharray="5 6"/>`).join('\n\t\t')}
+		${clients.map(([x, y]) => `<line x1="700" y1="268" x2="${x - 70}" y2="${y}" stroke="${a}" stroke-width="1.5" opacity="0.45"/>`).join('\n\t\t')}
+	</g>
+	<g>
+		${folders
+			.map(
+				(y) => `<path d="M240 ${y - 30} h40 l12 12 h68 a8 8 0 0 1 8 8 v42 a8 8 0 0 1 -8 8 h-112 a8 8 0 0 1 -8 -8 v-54 a8 8 0 0 1 8 -8 Z" fill="#111a33" stroke="${a}" stroke-opacity="0.55"/>
+		<rect x="252" y="${y + 2}" width="${70 - (y % 3) * 10}" height="8" rx="4" fill="${a}" opacity="0.35"/>`,
+			)
+			.join('\n\t\t')}
+	</g>
+	<rect x="500" y="140" width="200" height="256" rx="18" fill="#0d1428" stroke="${a}" stroke-width="2" filter="url(#glow)"/>
+	${[0, 1, 2, 3].map((i) => `<rect x="524" y="${164 + i * 54}" width="152" height="38" rx="8" fill="#111a33" stroke="${a}" stroke-opacity="0.4"/>
+	<circle cx="652" cy="${183 + i * 54}" r="6" fill="${a}" opacity="${i === 1 ? 0.95 : 0.4}"/>
+	<rect x="540" y="${179 + i * 54}" width="70" height="8" rx="4" fill="${a}" opacity="0.3"/>`).join('\n\t')}
+	<g>
+		${clients
+			.map(
+				([x, y], i) => `<rect x="${x - 70}" y="${y - 30}" width="${i === 1 ? 140 : 110}" height="60" rx="10" fill="#111a33" stroke="${a}" stroke-opacity="0.5"/>
+		<rect x="${x - 56}" y="${y - 16}" width="${i === 1 ? 70 : 50}" height="10" rx="5" fill="${a}" opacity="0.55"/>
+		<rect x="${x - 56}" y="${y + 4}" width="${i === 1 ? 100 : 70}" height="8" rx="4" fill="${a}" opacity="0.25"/>`,
+			)
+			.join('\n\t\t')}
+	</g>`;
+	},
 	/** laptop screen with the camera notch opened into a panel - menu-bar / notch apps */
 	notch(a) {
 		const bars = [34, 58, 44, 70, 50];
@@ -377,6 +412,7 @@ const projects = [
 	{ slug: 'headsup', title: 'Heads Up Clone', kicker: 'Accelerometer party game', repo: 'gonedotnet/headsup', accent: '#fb923c', motif: 'cards' },
 	{ slug: 'mediatorsample', title: 'Mediator Sample', kicker: 'Handlers, events, middleware', repo: 'shinyorg/mediatorsample', accent: '#a3e635', motif: 'pipeline' },
 	{ slug: 'shinynotch', title: 'Shiny Notch', kicker: 'The MacBook notch, turned into a live panel', repo: 'ShinySoftware/ShinyNotch', accent: '#a78bfa', motif: 'notch' },
+	{ slug: 'shinyfileserve', title: 'FileServe', kicker: 'A self-hosted file server for a team', repo: 'ShinySoftware/ShinyFileServe', accent: '#2dd4bf', motif: 'server' },
 ];
 
 mkdirSync(OUT, { recursive: true });

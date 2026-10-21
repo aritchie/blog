@@ -546,6 +546,21 @@ export const GROUPS: ProjectGroup[] = [
 				tags: ['MAUI', 'UI', 'Hardware'],
 			},
 			{
+				name: 'FileServe',
+				repo: 'ShinySoftware/ShinyFileServe',
+				hero: 'projects/shinyfileserve-hero.svg',
+				tagline:
+					'A self-hosted file server for a team that lives in the tray on macOS, Windows and Linux and serves a Blazor portal — shares, quotas, audit log, plus a private NuGet feed and npm registry.',
+				highlights: [
+					'Shiny.Net.HttpServer with NuGet & npm feeds',
+					'Shiny.DocumentDb over one SQLite file',
+					'Portal on Shiny Blazor Controls',
+					'Public tunnel via AppDeviceBridge',
+					'Tray icon & desktop notifications',
+				],
+				tags: ['MAUI', 'Blazor', 'Data'],
+			},
+			{
 				name: "Canada's Wonderland Ride Times",
 				repo: 'shinyorg/wonderland',
 				hero: 'projects/wonderland-hero.svg',

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="FileServe">
+	<defs>
+		<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" stop-color="#0b1020"/>
+			<stop offset="50%" stop-color="#161c3d"/>
+			<stop offset="100%" stop-color="#0b1020"/>
+		</linearGradient>
+		<radialGradient id="halo" cx="50%" cy="42%" r="62%">
+			<stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.30"/>
+			<stop offset="60%" stop-color="#2dd4bf" stop-opacity="0.07"/>
+			<stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+		</radialGradient>
+		<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+			<path d="M40 0H0v40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+		</pattern>
+		<filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+			<feGaussianBlur stdDeviation="7" result="b"/>
+			<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+		</filter>
+	</defs>
+
+	<rect width="1200" height="630" fill="url(#bg)"/>
+	<rect width="1200" height="630" fill="url(#grid)"/>
+	<rect width="1200" height="630" fill="url(#halo)"/>
+	<rect x="0" y="0" width="1200" height="6" fill="#2dd4bf" opacity="0.85"/>
+
+	<g opacity="0.9">
+		<line x1="360" y1="170" x2="500" y2="268" stroke="#2dd4bf" stroke-width="1.5" opacity="0.35" stroke-dasharray="5 6"/>
+		<line x1="360" y1="268" x2="500" y2="268" stroke="#2dd4bf" stroke-width="1.5" opacity="0.35" stroke-dasharray="5 6"/>
+		<line x1="360" y1="366" x2="500" y2="268" stroke="#2dd4bf" stroke-width="1.5" opacity="0.35" stroke-dasharray="5 6"/>
+		<line x1="700" y1="268" x2="890" y2="172" stroke="#2dd4bf" stroke-width="1.5" opacity="0.45"/>
+		<line x1="700" y1="268" x2="890" y2="268" stroke="#2dd4bf" stroke-width="1.5" opacity="0.45"/>
+		<line x1="700" y1="268" x2="890" y2="364" stroke="#2dd4bf" stroke-width="1.5" opacity="0.45"/>
+	</g>
+	<g>
+		<path d="M240 140 h40 l12 12 h68 a8 8 0 0 1 8 8 v42 a8 8 0 0 1 -8 8 h-112 a8 8 0 0 1 -8 -8 v-54 a8 8 0 0 1 8 -8 Z" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.55"/>
+		<rect x="252" y="172" width="50" height="8" rx="4" fill="#2dd4bf" opacity="0.35"/>
+		<path d="M240 238 h40 l12 12 h68 a8 8 0 0 1 8 8 v42 a8 8 0 0 1 -8 8 h-112 a8 8 0 0 1 -8 -8 v-54 a8 8 0 0 1 8 -8 Z" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.55"/>
+		<rect x="252" y="270" width="60" height="8" rx="4" fill="#2dd4bf" opacity="0.35"/>
+		<path d="M240 336 h40 l12 12 h68 a8 8 0 0 1 8 8 v42 a8 8 0 0 1 -8 8 h-112 a8 8 0 0 1 -8 -8 v-54 a8 8 0 0 1 8 -8 Z" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.55"/>
+		<rect x="252" y="368" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.35"/>
+	</g>
+	<rect x="500" y="140" width="200" height="256" rx="18" fill="#0d1428" stroke="#2dd4bf" stroke-width="2" filter="url(#glow)"/>
+	<rect x="524" y="164" width="152" height="38" rx="8" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.4"/>
+	<circle cx="652" cy="183" r="6" fill="#2dd4bf" opacity="0.4"/>
+	<rect x="540" y="179" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.3"/>
+	<rect x="524" y="218" width="152" height="38" rx="8" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.4"/>
+	<circle cx="652" cy="237" r="6" fill="#2dd4bf" opacity="0.95"/>
+	<rect x="540" y="233" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.3"/>
+	<rect x="524" y="272" width="152" height="38" rx="8" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.4"/>
+	<circle cx="652" cy="291" r="6" fill="#2dd4bf" opacity="0.4"/>
+	<rect x="540" y="287" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.3"/>
+	<rect x="524" y="326" width="152" height="38" rx="8" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.4"/>
+	<circle cx="652" cy="345" r="6" fill="#2dd4bf" opacity="0.4"/>
+	<rect x="540" y="341" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.3"/>
+	<g>
+		<rect x="890" y="142" width="110" height="60" rx="10" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.5"/>
+		<rect x="904" y="156" width="50" height="10" rx="5" fill="#2dd4bf" opacity="0.55"/>
+		<rect x="904" y="176" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.25"/>
+		<rect x="890" y="238" width="140" height="60" rx="10" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.5"/>
+		<rect x="904" y="252" width="70" height="10" rx="5" fill="#2dd4bf" opacity="0.55"/>
+		<rect x="904" y="272" width="100" height="8" rx="4" fill="#2dd4bf" opacity="0.25"/>
+		<rect x="890" y="334" width="110" height="60" rx="10" fill="#111a33" stroke="#2dd4bf" stroke-opacity="0.5"/>
+		<rect x="904" y="348" width="50" height="10" rx="5" fill="#2dd4bf" opacity="0.55"/>
+		<rect x="904" y="368" width="70" height="8" rx="4" fill="#2dd4bf" opacity="0.25"/>
+	</g>
+
+	<text x="600" y="506" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="66" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">FileServe</text>
+	<text x="600" y="556" text-anchor="middle" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#2dd4bf" opacity="0.95">A self-hosted file server for a team</text>
+	<text x="600" y="598" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="19" fill="#94a3b8" opacity="0.75">ShinySoftware/ShinyFileServe</text>
+</svg>
