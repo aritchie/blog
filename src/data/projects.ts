@@ -594,6 +594,26 @@ export const GROUPS: ProjectGroup[] = [
 				tags: ['MAUI', 'Blazor', 'Data'],
 			},
 			{
+				name: 'ShinyCommander',
+				repo: 'ShinySoftware/Commander',
+				docs: 'https://shinysoftware.github.io/Commander/',
+				hero: 'projects/shinycommander-hero.svg',
+				tagline:
+					'A keyboard-first, dual-pane file manager in the spirit of Total Commander — one .NET MAUI UI on native WinUI, AppKit and GTK4, dressed in Shiny Controls.',
+				highlights: [
+					'Full Total Commander keymap',
+					'Folder tabs, breadcrumbs & folder setups',
+					'Zip, 7z & tar browsed as folders',
+					'Preview panel incl. Office, PDF & media',
+					'Custom columns read from files',
+					'SQLite database editor & EXIF editing',
+					'SFTP, FTP, S3 & Azure Blob',
+					'Background jobs & multi-rename',
+					'Windows, macOS & Linux',
+				],
+				tags: ['MAUI', 'UI', 'Data'],
+			},
+			{
 				name: "Canada's Wonderland Ride Times",
 				repo: 'shinyorg/wonderland',
 				hero: 'projects/wonderland-hero.svg',
