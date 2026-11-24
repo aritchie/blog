@@ -1,0 +1,214 @@
+---
+title: 'Three Desktop Apps, One Stack: Shiny Commander, Notcho and FileServe'
+description: 'Samples lie, so I built real apps. A tour of three shipping desktop apps on .NET MAUI, maui-labs and Shiny: Shiny Commander, a dual-pane file manager; Notcho, which turns the MacBook camera notch into a live panel; and FileServe, a self-hosted team file server with NuGet and npm feeds. Native AppKit on macOS, GTK4 on Linux, WinUI on Windows.'
+pubDate: 'Nov 24 2026'
+tags: ['Shiny', '.NET', '.NET MAUI', 'macOS', 'Linux', 'Controls', 'Showcase']
+---
+import NugetPackages from '../../../../components/NugetPackages.astro';
+
+I've been writing libraries for .NET mobile and desktop for a long time, and I've learned one thing the hard way: a library is only as good as the apps built on it. Samples lie. They show the happy path and nothing else. Real apps find the gaps.
+
+So for most of this year I've been building three real desktop apps on top of <a href="https://www.shinylib.net" target="_blank" rel="noopener noreferrer">Shiny</a> and <a href="https://github.com/dotnet/maui-labs" target="_blank" rel="noopener noreferrer">.NET MAUI Labs</a>, shipping them with signed installers and auto-updates, and fixing every gap the libraries showed along the way. This post is the tour: what each app does, which parts of the stack it uses, and links to everything.
+
+| App | What it is | Website | Source | Download |
+|---|---|---|---|---|
+| **Shiny Commander** | A keyboard-first, dual-pane file manager | <a href="https://shinysoftware.github.io/Commander/" target="_blank" rel="noopener noreferrer">Website</a> | <a href="https://github.com/ShinySoftware/Commander" target="_blank" rel="noopener noreferrer">GitHub</a> | <a href="https://github.com/ShinySoftware/Commander/releases/latest" target="_blank" rel="noopener noreferrer">Releases</a> |
+| **Notcho** | Turns the MacBook camera notch into a live panel | <a href="https://shinysoftware.github.io/Notcho/" target="_blank" rel="noopener noreferrer">Website (live demo)</a> | <a href="https://github.com/ShinySoftware/Notcho" target="_blank" rel="noopener noreferrer">GitHub</a> | <a href="https://github.com/ShinySoftware/Notcho/releases/latest" target="_blank" rel="noopener noreferrer">Releases</a> |
+| **FileServe** | A self-hosted file server for a team, with NuGet and npm feeds | <a href="https://shinysoftware.github.io/ShinyFileServe/" target="_blank" rel="noopener noreferrer">Website</a> | <a href="https://github.com/ShinySoftware/ShinyFileServe" target="_blank" rel="noopener noreferrer">GitHub</a> | <a href="https://github.com/ShinySoftware/ShinyFileServe/releases/latest" target="_blank" rel="noopener noreferrer">Releases</a> |
+
+All three are desktop apps, and all three build from **one shared .NET MAUI codebase per app** that runs on three native heads:
+
+- **macOS** on native **AppKit** (<a href="https://github.com/dotnet/maui-labs#macos-appkit-backend" target="_blank" rel="noopener noreferrer">`Microsoft.Maui.Platforms.MacOS`</a>), not Mac Catalyst
+- **Linux** on **GTK4** (<a href="https://github.com/dotnet/maui-labs/tree/main/platforms/Linux.Gtk4" target="_blank" rel="noopener noreferrer">`Microsoft.Maui.Platforms.Linux.Gtk4`</a>)
+- **Windows** on the standard **WinUI** head
+
+The source for all three is public on GitHub, so you can see exactly how each Shiny library is wired in. Notcho and FileServe are *source-available*: read them and learn from them, but don't repackage them. The Shiny libraries underneath are MIT, like always.
+
+## The shared stack
+
+Before the individual apps, here's what they have in common, and which app uses what.
+
+| | Commander | Notcho | FileServe |
+|---|:-:|:-:|:-:|
+| <a href="https://github.com/dotnet/maui-labs#macos-appkit-backend" target="_blank" rel="noopener noreferrer">maui-labs AppKit head</a> | ✅ | ✅ | ✅ |
+| <a href="https://github.com/dotnet/maui-labs/tree/main/platforms/Linux.Gtk4" target="_blank" rel="noopener noreferrer">maui-labs GTK4 head</a> | ✅ | ✅ | ✅ |
+| <a href="https://github.com/dotnet/maui-labs#devflow" target="_blank" rel="noopener noreferrer">MAUI DevFlow</a> | ✅ UI test suite | ✅ | ✅ |
+| <a href="https://www.shinylib.net/controls/" target="_blank" rel="noopener noreferrer">Shiny.Maui.Controls</a> | ✅ | ✅ | ✅ |
+| <a href="https://www.shinylib.net/controls/keyboard-shortcuts/" target="_blank" rel="noopener noreferrer">Shiny.Maui.Controls.Desktop</a> | ✅ | ✅ | ✅ |
+| <a href="https://www.shinylib.net/controls/" target="_blank" rel="noopener noreferrer">Shiny.Blazor.Controls</a> | | | ✅ |
+| <a href="https://www.shinylib.net/client/core/" target="_blank" rel="noopener noreferrer">Shiny.Core</a> | | ✅ | ✅ |
+| <a href="https://www.shinylib.net/di/" target="_blank" rel="noopener noreferrer">Shiny.Extensions.DependencyInjection</a> | ✅ | ✅ | |
+| <a href="https://www.shinylib.net/stores/" target="_blank" rel="noopener noreferrer">Shiny.Extensions.Stores</a> | ✅ | ✅ | |
+| <a href="https://www.shinylib.net/localizegen/" target="_blank" rel="noopener noreferrer">Shiny.Extensions.Localization.Generator</a> | ✅ | | |
+| <a href="https://www.shinylib.net/mauishell/" target="_blank" rel="noopener noreferrer">Shiny.Maui.Shell</a> | ✅ | | |
+| <a href="https://www.shinylib.net/mediator/" target="_blank" rel="noopener noreferrer">Shiny.Mediator</a> | ✅ | | |
+| <a href="https://www.shinylib.net/httpserver/" target="_blank" rel="noopener noreferrer">Shiny.Net.HttpServer</a> | ✅ | | ✅ |
+| <a href="https://www.shinylib.net/client/discovery/" target="_blank" rel="noopener noreferrer">Shiny.Net.Discovery</a> | ✅ | | |
+| <a href="https://www.shinylib.net/appdevicebridge/" target="_blank" rel="noopener noreferrer">Shiny.AppDeviceBridge</a> | | | ✅ |
+| <a href="https://www.shinylib.net/documentdb/" target="_blank" rel="noopener noreferrer">Shiny.DocumentDb</a> | | | ✅ |
+| <a href="https://www.shinylib.net/client/notifications/" target="_blank" rel="noopener noreferrer">Shiny.Notifications</a> | | | ✅ |
+| <a href="https://www.shinylib.net/client/calendarstore/" target="_blank" rel="noopener noreferrer">Shiny.Calendar</a> | | ✅ | |
+| <a href="https://www.shinylib.net/audio/" target="_blank" rel="noopener noreferrer">Shiny.Audio</a> | | ✅ | |
+
+### .NET MAUI Labs
+
+<a href="https://github.com/dotnet/maui-labs" target="_blank" rel="noopener noreferrer">dotnet/maui-labs</a> is where the experimental MAUI work lives, and these apps use three parts of it:
+
+- **The AppKit backend.** A MAUI app as a real macOS app: `NSWindow`, native menus, real AppKit controls, `WKWebView` for Blazor. No Catalyst. That matters for apps like Notcho, which needs a borderless agent window that sits over the menu bar, and for FileServe, which lives in the menu bar as an `NSStatusItem`.
+- **The GTK4 backend.** The same MAUI XAML running on Linux, packaged as `.deb` and `.rpm`.
+- **<a href="https://github.com/dotnet/maui-labs#devflow" target="_blank" rel="noopener noreferrer">DevFlow</a>.** An in-app agent plus the `maui devflow` CLI and an MCP server. It inspects the visual tree, taps, types and takes screenshots of a running app. Commander's whole UI test suite drives the real macOS app through it, and the same run regenerates its README and website screenshots.
+
+There's no Linux TFM, so a GTK4 head is a plain `net10.0`/`net11.0` project. Commander shares its UI as linked source that each head compiles (so each head runs its own XAML compiler and source generators); FileServe keeps its UI in a plain `net10.0` project every head can reference. Notcho puts the views and services in `Notcho.Core` and gives each head a handful of platform interfaces to implement.
+
+<NugetPackages
+  title="From .NET MAUI Labs"
+  packages={[
+    { id: 'Microsoft.Maui.Platforms.MacOS', desc: 'The native AppKit backend for .NET MAUI. A real macOS app, not Mac Catalyst.' },
+    { id: 'Microsoft.Maui.Platforms.Linux.Gtk4', desc: 'The GTK4 backend for .NET MAUI on Linux.' },
+    { id: 'Microsoft.Maui.DevFlow.Agent', desc: 'The in-app agent DevFlow inspects and drives the app through.' }
+  ]}
+/>
+
+### Shiny Controls everywhere
+
+Every one of these apps is dressed in <a href="https://www.shinylib.net/controls/" target="_blank" rel="noopener noreferrer">Shiny Controls</a>. Desktop apps need things the MAUI box doesn't have: a ribbon, keyboard shortcuts that work on all three desktops, a tray icon, a notch window, data grids, diagrams. Those came out of building these apps, and now they're controls anyone can use.
+
+<NugetPackages
+  title="Shiny Controls"
+  packages={[
+    { id: 'Shiny.Maui.Controls', desc: 'The core control set for .NET MAUI: ribbon, data grid, table view, notch view, keyboard shortcuts, dialogs, toasts and more.' },
+    { id: 'Shiny.Maui.Controls.Desktop', desc: 'Desktop extras: AppKit and GTK keyboard sources, tray icon, notch window, file drop and quick entry.' },
+    { id: 'Shiny.Blazor.Controls', desc: 'The same controls as Razor components, used for FileServe\'s portal.' }
+  ]}
+/>
+
+## Shiny Commander
+
+![Shiny Commander on macOS](https://raw.githubusercontent.com/ShinySoftware/Commander/main/docs/screenshots/main.png)
+
+**<a href="https://shinysoftware.github.io/Commander/" target="_blank" rel="noopener noreferrer">Website</a> · <a href="https://github.com/ShinySoftware/Commander" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/ShinySoftware/Commander/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>**
+
+A modern, keyboard-first, dual-pane file manager in the spirit of Total Commander, for Windows, macOS and Linux. It's the biggest of the three and the one that pushes the most Shiny libraries.
+
+**What it does**
+
+- **Dual panels**, side by side or stacked, with **folder tabs** you can lock, rename, colour and give an icon, and **breadcrumbs** where each crumb drops down its subfolders
+- **The full Total Commander keymap**: F2–F8, Insert/Space marking, Alt+F7, Ctrl+B/R/H/T/W/U/D and the rest
+- **Archives as folders**: zip, 7z and tar (gz, bz2, zst) opened with Enter and *changed in place*, including editing a file inside one with F4. 7z is written by a built-in writer
+- **Background jobs** for copy, move, delete, pack and unpack, with live progress, and the computer kept awake while they run
+- **A preview panel** for images, Markdown, HTML, PDF, SQLite tables, audio and video, and Word, Excel and PowerPoint files
+- **F4 editors by file type**: text, Markdown with live preview, a **SQLite database editor** with a table designer and schema diagram, and a **lossless EXIF editor** for photos
+- **Custom columns** read from inside the files: camera, lens and GPS for photos; artist, album and bitrate for music; page counts for documents
+- **Remote connections**: SFTP, FTP/FTPS, Amazon S3 (and MinIO, R2, Wasabi, B2) and Azure Blob storage
+- **Serve a folder**: share the folder under the cursor over HTTP and WebDAV to your network, or to the internet through a public tunnel, with keys, expiry, speed limits, resumable uploads and a QR code
+- Multi-rename with live preview, directory sync, find files, and English, French and Spanish
+
+**How Shiny builds it**
+
+- **<a href="https://www.shinylib.net/controls/ribbon/" target="_blank" rel="noopener noreferrer">Ribbon</a>**, **<a href="https://www.shinylib.net/controls/motion-icons/" target="_blank" rel="noopener noreferrer">MotionIconView</a>**, **<a href="https://www.shinylib.net/controls/datagrid/" target="_blank" rel="noopener noreferrer">DataGrid</a>**, **<a href="https://www.shinylib.net/controls/tableview/" target="_blank" rel="noopener noreferrer">TableView</a>**, **<a href="https://www.shinylib.net/controls/imageeditor/" target="_blank" rel="noopener noreferrer">ImageEditor</a>**, **<a href="https://www.shinylib.net/controls/dialogs/" target="_blank" rel="noopener noreferrer">dialogs</a>**, **<a href="https://www.shinylib.net/controls/toast/" target="_blank" rel="noopener noreferrer">toasts</a>**, **<a href="https://www.shinylib.net/controls/pillview/" target="_blank" rel="noopener noreferrer">pills</a>** and **<a href="https://www.shinylib.net/controls/badge/" target="_blank" rel="noopener noreferrer">badges</a>** from `Shiny.Maui.Controls` make up most of the UI.
+- **<a href="https://www.shinylib.net/controls/keyboard-shortcuts/" target="_blank" rel="noopener noreferrer">Keyboard Shortcuts</a>** declare the whole TC keymap once. `Primary` means ⌘ on a Mac and Ctrl elsewhere, `Shiny.Maui.Controls.Desktop` supplies the AppKit and GTK keyboard sources, and F1 help is generated from the live shortcut registry.
+- **<a href="https://www.shinylib.net/controls/markdown/" target="_blank" rel="noopener noreferrer">MarkdownView and MarkdownEditor</a>** in the lister, F1 help and the Markdown editor.
+- **<a href="https://www.shinylib.net/controls/diagram/" target="_blank" rel="noopener noreferrer">Diagram</a>** draws the database editor's schema; dragging between two tables adds a foreign key.
+- **<a href="https://www.shinylib.net/controls/mediaelement/" target="_blank" rel="noopener noreferrer">MediaElement</a>** plays audio and video in the preview panel, and the **<a href="https://www.shinylib.net/controls/document-viewer/" target="_blank" rel="noopener noreferrer">Office viewers</a>** render Word, Excel and PowerPoint.
+- **<a href="https://www.shinylib.net/httpserver/" target="_blank" rel="noopener noreferrer">Shiny.Net.HttpServer</a>** is the folder server: <a href="https://www.shinylib.net/httpserver/webdav" target="_blank" rel="noopener noreferrer">WebDAV</a>, <a href="https://www.shinylib.net/httpserver/tus" target="_blank" rel="noopener noreferrer">tus resumable uploads</a>, the <a href="https://www.shinylib.net/httpserver/ssh" target="_blank" rel="noopener noreferrer">SSH tunnel</a> for a public address and the <a href="https://www.shinylib.net/httpserver/discovery" target="_blank" rel="noopener noreferrer">mDNS listing</a>. The page a share opens in is a Blazor WebAssembly app embedded in the server assembly.
+- **<a href="https://www.shinylib.net/client/discovery/browsing" target="_blank" rel="noopener noreferrer">Shiny.Net.Discovery</a>** finds SMB, SFTP, WebDAV and FTP servers on the network.
+- **<a href="https://www.shinylib.net/mauishell/" target="_blank" rel="noopener noreferrer">Shiny.Maui.Shell</a>** for ViewModel-first navigation with source-generated routes, **<a href="https://www.shinylib.net/mediator/events" target="_blank" rel="noopener noreferrer">Shiny.Mediator</a>** events between panels, **<a href="https://www.shinylib.net/stores/" target="_blank" rel="noopener noreferrer">Stores</a>** for `[Bind]` settings, **<a href="https://www.shinylib.net/di/" target="_blank" rel="noopener noreferrer">DI</a>** for `[Singleton]` registration and the **<a href="https://www.shinylib.net/localizegen/" target="_blank" rel="noopener noreferrer">Localization Generator</a>** for strongly typed strings from the `.resx` files.
+
+Commander is also the app with the most serious test setup: xUnit v3 for the core, and a UI suite that drives the real macOS app through **DevFlow** without ever touching your desktop or your settings.
+
+## Notcho
+
+<p align="center"><img src="https://raw.githubusercontent.com/ShinySoftware/Notcho/main/docs/screenshots/peek.png" width="388" alt="The collapsed notch: album art left of the camera, the weather right of it" /></p>
+
+**<a href="https://shinysoftware.github.io/Notcho/" target="_blank" rel="noopener noreferrer">Website (try it in your browser)</a> · <a href="https://github.com/ShinySoftware/Notcho" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/ShinySoftware/Notcho/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>**
+
+*Notcho Notcho Man! We got all the "fixins".* (Formerly Shiny Notch; old installs update and rename themselves.)
+
+Notcho turns the MacBook camera notch into a live panel. Hover the notch and it opens; move away and it folds back into the camera. While closed, it peeks out either side of the camera with what's playing, your system readings, a running timer, the next meeting or the weather.
+
+**What it does**
+
+- **Now Playing** for Apple Music and Spotify, tinted with the artwork's colour
+- **Weather** like the iOS widget: now, the next twelve hours and the week (from <a href="https://open-meteo.com" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, no API key)
+- **File Tray**: drop files on the notch to shelve them, then copy, AirDrop or open them
+- **System** and **Processes**: CPU, GPU, memory, network and disk, and the busiest processes with force quit
+- **Mirror**: your camera, with looks (Mono, Noir, Sepia, Vivid…), photos, and a QR reader that offers to open links it sees
+- **Voice Notes**, **Tasks**, **Clipboard history**, **Calendar**, **Timer**, **Calculator** and a **Teleprompter** that scrolls your script right under the lens
+- **Keep Awake**, like Amphetamine or Caffeine
+- Volume and brightness **HUD**, and notch styles in black, a colour, a gradient or **frosted glass**
+- **Capture** shortcuts into <a href="https://macshot.io" target="_blank" rel="noopener noreferrer">macshot</a>
+
+![Notcho weather tab](https://raw.githubusercontent.com/ShinySoftware/Notcho/main/docs/screenshots/weather.png)
+
+**How Shiny builds it**
+
+- **<a href="https://www.shinylib.net/controls/notch/" target="_blank" rel="noopener noreferrer">NotchView</a>** is the black surface that grows out of the camera housing and morphs between the peek, the panel and the HUD. `INotchWindowService` in `Shiny.Maui.Controls.Desktop` provides the borderless window, hover tracking and the camera cut-out's size.
+- **<a href="https://www.shinylib.net/controls/file-drop/" target="_blank" rel="noopener noreferrer">File drop</a>** feeds the tray, and **<a href="https://www.shinylib.net/controls/quick-entry/" target="_blank" rel="noopener noreferrer">Quick Entry</a>** is the popup tasks are typed into, because the notch window can never take keyboard focus.
+- **<a href="https://www.shinylib.net/controls/cameraview/" target="_blank" rel="noopener noreferrer">CameraView</a>** runs the mirror, and its **<a href="https://www.shinylib.net/controls/cameraview/analyzers" target="_blank" rel="noopener noreferrer">barcode analyzer</a>** spots the QR codes.
+- **<a href="https://www.shinylib.net/controls/motion-icons/" target="_blank" rel="noopener noreferrer">MotionIconView</a>** draws the music bars, and **<a href="https://www.shinylib.net/controls/tableview/" target="_blank" rel="noopener noreferrer">TableView</a>** is the Settings page.
+- **<a href="https://www.shinylib.net/audio/recording" target="_blank" rel="noopener noreferrer">Shiny.Audio</a>** records voice notes from the microphone you pick, and plays them back.
+- **<a href="https://www.shinylib.net/client/calendarstore/" target="_blank" rel="noopener noreferrer">Shiny.Calendar</a>** reads every calendar for the Calendar tab and the "meeting soon" peek, with permissions through Shiny.Core.
+- **<a href="https://www.shinylib.net/client/core/app-startup-installer" target="_blank" rel="noopener noreferrer">Shiny.Core</a>**'s `IAppStartupInstaller` handles open at login as an `SMAppService` login item, including the "needs approval" and "turned off in System Settings" states.
+- **<a href="https://www.shinylib.net/stores/" target="_blank" rel="noopener noreferrer">Stores</a>** keeps settings in `NSUserDefaults`, and **<a href="https://www.shinylib.net/di/" target="_blank" rel="noopener noreferrer">DI</a>** registers each head's platform services.
+
+Notcho is also a lesson in low power: nothing polls while nothing changes. Music and Spotify announce track changes, CoreAudio reports volume, and the clock only ticks every second while something on screen counts seconds.
+
+## FileServe
+
+![Browsing a share in the FileServe portal](https://raw.githubusercontent.com/ShinySoftware/ShinyFileServe/main/docs/screenshots/browse.png)
+
+**<a href="https://shinysoftware.github.io/ShinyFileServe/" target="_blank" rel="noopener noreferrer">Website</a> · <a href="https://github.com/ShinySoftware/ShinyFileServe" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/ShinySoftware/ShinyFileServe/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>**
+
+A self-hosted file server for a team. It sits in the system tray on macOS, Windows or Linux and serves a browser portal, so nobody has to install a client. The desktop app has **no screens of its own**: it's a window onto its own server, so every form exists once.
+
+**What it does**
+
+- **Shares** publish folders on the machine to **groups** with explicit permissions: list, download, upload, delete and new folder
+- **Metered quotas** per group per share and per account, over a day, week, month or in total
+- An **audit log** of every sign-in, transfer and refusal, a **Right now** screen of who is signed in and what's moving, and a **Bandwidth** report by account
+- **Share links** for anyone with the address or for particular accounts, with expiry and a photo gallery for folders
+- **Virus scanning** before an upload is published: AMSI (Defender) on Windows, ClamAV everywhere
+- A private **NuGet feed** and **npm registry** with personal access tokens, governed by the same groups
+- An optional **public tunnel** for people off the LAN, password policies, account lockout and expiry, anonymous accounts, desktop notifications, and backup and restore
+
+```
+Desktop app (.NET MAUI)          tray icon · console window
+├── Shiny.Net.HttpServer  ───────  HTTP on every interface
+│     ├── .NuGet / .Npm   ───────  /nuget feed, /npm registry
+│     ├── AppDeviceBridge ───────  serves the Blazor portal
+├── Shiny.DocumentDb      ───────  one SQLite file: users, groups,
+│                                  shares, quotas, log, bandwidth
+├── AppDeviceBridge.Tunnel ──────  optional public https
+├── Shiny.Notifications   ───────  desktop notification per event
+└── Shiny.Core            ───────  start at login, per platform
+```
+
+**How Shiny builds it**
+
+- **<a href="https://www.shinylib.net/httpserver/" target="_blank" rel="noopener noreferrer">Shiny.Net.HttpServer</a>** is the whole server, running *inside* the MAUI app with no ASP.NET Core: routing, middleware, cookie <a href="https://www.shinylib.net/httpserver/authentication" target="_blank" rel="noopener noreferrer">authentication</a> and <a href="https://www.shinylib.net/httpserver/host-filtering" target="_blank" rel="noopener noreferrer">host filtering</a> against DNS rebinding.
+- **<a href="https://www.shinylib.net/httpserver/nuget" target="_blank" rel="noopener noreferrer">Shiny.Net.HttpServer.NuGet</a>** and **<a href="https://www.shinylib.net/httpserver/npm" target="_blank" rel="noopener noreferrer">.Npm</a>** host the package feeds at `/nuget` and `/npm`.
+- **<a href="https://www.shinylib.net/appdevicebridge/" target="_blank" rel="noopener noreferrer">Shiny.AppDeviceBridge</a>** serves the Blazor WebAssembly portal straight out of an embedded zip, with <a href="https://www.shinylib.net/appdevicebridge/updates" target="_blank" rel="noopener noreferrer">signed over-the-air frontend updates</a> so the portal can change without an app release. `Shiny.AppDeviceBridge.Tunnel` opens the public address.
+- **<a href="https://www.shinylib.net/documentdb/sqlite" target="_blank" rel="noopener noreferrer">Shiny.DocumentDb</a>** keeps everything in one SQLite file, with source-generated JSON and no reflection fallback, so the trimmed release build is safe. <a href="https://www.shinylib.net/documentdb/backup" target="_blank" rel="noopener noreferrer">Backups</a> are taken live while the server is serving.
+- **<a href="https://www.shinylib.net/controls/" target="_blank" rel="noopener noreferrer">Shiny.Blazor.Controls</a>** draws the portal: <a href="https://www.shinylib.net/controls/datagrid/" target="_blank" rel="noopener noreferrer">DataGrid</a> with server-side sort and paging for activity, people and links, <a href="https://www.shinylib.net/controls/passwordstrength/" target="_blank" rel="noopener noreferrer">PasswordStrength</a> loaded with the server's own rules, <a href="https://www.shinylib.net/controls/treeview/" target="_blank" rel="noopener noreferrer">TreeView</a> for picking folders, plus dialogs and toasts.
+- **<a href="https://www.shinylib.net/controls/trayicon/" target="_blank" rel="noopener noreferrer">Tray icon</a>** from `Shiny.Maui.Controls.Desktop` on all three desktops, turning green while someone is connected.
+- **<a href="https://www.shinylib.net/client/notifications/" target="_blank" rel="noopener noreferrer">Shiny.Notifications</a>** (with `Shiny.Notifications.Linux`) sends a desktop notification for the events you choose.
+- **<a href="https://www.shinylib.net/client/core/app-startup-installer" target="_blank" rel="noopener noreferrer">Shiny.Core</a>**'s `IAppStartupInstaller` handles start at login: a `Run` registry value on Windows, an `SMAppService` login item on macOS, an XDG autostart entry on Linux. One API, no per-head code.
+
+## What building these taught the libraries
+
+Shipping real apps is the best bug report there is. A few things that came out of these three:
+
+- **Desktop controls.** The <a href="https://www.shinylib.net/controls/ribbon/" target="_blank" rel="noopener noreferrer">Ribbon</a>, desktop <a href="https://www.shinylib.net/controls/keyboard-shortcuts/" target="_blank" rel="noopener noreferrer">keyboard shortcuts</a>, <a href="https://www.shinylib.net/controls/notch/" target="_blank" rel="noopener noreferrer">NotchView</a>, the <a href="https://www.shinylib.net/controls/trayicon/" target="_blank" rel="noopener noreferrer">tray icon</a>, <a href="https://www.shinylib.net/controls/quick-entry/" target="_blank" rel="noopener noreferrer">Quick Entry</a> and <a href="https://www.shinylib.net/controls/file-drop/" target="_blank" rel="noopener noreferrer">file drop</a> all exist because one of these apps needed them.
+- **`IAppStartupInstaller`.** Notcho and FileServe both needed open at login on three operating systems, and both needed to tell the user *why* it didn't take. That became <a href="https://www.shinylib.net/client/core/app-startup-installer" target="_blank" rel="noopener noreferrer">one API in Shiny.Core</a> with an honest state enum instead of a boolean.
+- **An embedded HTTP server that's actually complete.** Commander's folder sharing and FileServe's whole product run on <a href="https://www.shinylib.net/httpserver/" target="_blank" rel="noopener noreferrer">Shiny.Net.HttpServer</a>, which is why it grew WebDAV, tus, tunnels, NuGet and npm feeds, and host filtering.
+- **AppKit and GTK4 quirks.** The maui-labs backends are previews, and these apps found their edges: trigger setters that don't restore, children added to an on-screen layout that never get native views, status items that only appear if created before the first window. Each README documents the workarounds, and the fixes go back upstream.
+
+## Try them
+
+- **Shiny Commander:** <a href="https://shinysoftware.github.io/Commander/" target="_blank" rel="noopener noreferrer">Website</a> · <a href="https://github.com/ShinySoftware/Commander" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/ShinySoftware/Commander/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>
+- **Notcho:** <a href="https://shinysoftware.github.io/Notcho/" target="_blank" rel="noopener noreferrer">Website (live demo)</a> · <a href="https://github.com/ShinySoftware/Notcho" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/ShinySoftware/Notcho/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>
+- **FileServe:** <a href="https://shinysoftware.github.io/ShinyFileServe/" target="_blank" rel="noopener noreferrer">Website</a> · <a href="https://github.com/ShinySoftware/ShinyFileServe" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/ShinySoftware/ShinyFileServe/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>
+- **.NET MAUI Labs:** <a href="https://github.com/dotnet/maui-labs" target="_blank" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/dotnet/maui-labs#macos-appkit-backend" target="_blank" rel="noopener noreferrer">AppKit backend</a> · <a href="https://github.com/dotnet/maui-labs/tree/main/platforms/Linux.Gtk4" target="_blank" rel="noopener noreferrer">GTK4 backend</a> · <a href="https://github.com/dotnet/maui-labs#devflow" target="_blank" rel="noopener noreferrer">DevFlow</a>
+- **Shiny:** <a href="https://www.shinylib.net/foundation/apps/" target="_blank" rel="noopener noreferrer">All the apps built with Shiny</a> · <a href="https://www.shinylib.net/controls/" target="_blank" rel="noopener noreferrer">Controls</a> · <a href="https://github.com/shinyorg" target="_blank" rel="noopener noreferrer">GitHub</a>
+
+All three were built by my company, <a href="https://shinysoft.biz" target="_blank" rel="noopener noreferrer">ShinySoft Technologies</a>. If you want something like them for your own product, <a href="https://shinysoft.biz" target="_blank" rel="noopener noreferrer">get in touch</a>. And if you build something with Shiny, tell me about it. I'd love to <a href="https://www.shinylib.net/foundation/apps/" target="_blank" rel="noopener noreferrer">list it</a>.

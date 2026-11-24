@@ -20,6 +20,8 @@ export interface Project {
 	tags: string[];
 	/** Documentation site, when one exists. Verified links only. */
 	docs?: string;
+	/** More places to go: a product website, a live playground. Verified links only. */
+	links?: { label: string; url: string }[];
 	/**
 	 * Hero artwork filename in `src/assets`. Cards with art get the large
 	 * media treatment; cards without get the compact treatment.
@@ -115,6 +117,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'Shiny Controls',
 				repo: 'shinyorg/controls',
 				docs: 'https://shinylib.net/controls/',
+				links: [{ label: 'Blazor playground', url: 'https://shinyorg.github.io/controls/' }],
 				hero: 'projects/shiny-controls-hero.svg',
 				tagline:
 					'A native, MVVM-friendly control library for Blazor and every .NET MAUI platform — iOS, Android, macOS, Windows and Linux — the screens every app needs, without building them twice.',
@@ -480,6 +483,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'MAUI Platforms',
 				repo: 'shinyorg/mauiplatforms',
 				hero: 'projects/mauiplatforms-hero.svg',
+				links: [{ label: 'MAUI web playground', url: 'https://shinyorg.github.io/mauiplatforms/' }],
 				tagline:
 					'Community .NET MAUI backends for the platforms MAUI does not officially cover — MAUI for the Web is here, alongside Apple TV. Our macOS backend is now official in dotnet/maui-labs.',
 				highlights: [
@@ -555,18 +559,21 @@ export const GROUPS: ProjectGroup[] = [
 	},
 	{
 		id: 'samples',
-		title: 'Sample apps',
+		title: "Public Apps I've Built",
 		blurb:
 			'Real apps, built in the open, that show the libraries doing actual work — usually because I wanted the app myself.',
 		layout: 'compact',
 		projects: [
 			{
-				name: 'Shiny Notch',
-				repo: 'ShinySoftware/ShinyNotch',
-				hero: 'projects/shinynotch-hero.svg',
+				name: 'Notcho',
+				repo: 'ShinySoftware/Notcho',
+				hero: 'projects/notcho-hero.svg',
+				links: [{ label: 'Website', url: 'https://shinysoftware.github.io/Notcho/' }],
 				tagline:
-					'A macOS app that turns the MacBook camera notch into a live panel — now playing, weather, calendar, a file tray, a camera mirror and more, built on .NET MAUI for AppKit.',
+					'Notcho Notcho Man! Turns the MacBook camera notch into a live panel — now playing, weather, calendar, a file tray, a camera mirror and more, built on .NET MAUI for AppKit, with Windows and Linux builds too.',
 				highlights: [
+					'Try the notch live on its website',
+					'Colours, gradients & frosted glass',
 					'Shiny Controls NotchView & notch window',
 					'Calendar & meeting peek via Shiny.Calendar',
 					'Camera mirror on CameraView',
@@ -581,6 +588,7 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'FileServe',
 				repo: 'ShinySoftware/ShinyFileServe',
 				hero: 'projects/shinyfileserve-hero.svg',
+				links: [{ label: 'Website', url: 'https://shinysoftware.github.io/ShinyFileServe/' }],
 				tagline:
 					'A self-hosted file server for a team that lives in the tray on macOS, Windows and Linux and serves a Blazor portal — shares, quotas, audit log, plus a private NuGet feed and npm registry.',
 				highlights: [
@@ -596,7 +604,7 @@ export const GROUPS: ProjectGroup[] = [
 			{
 				name: 'ShinyCommander',
 				repo: 'ShinySoftware/Commander',
-				docs: 'https://shinysoftware.github.io/Commander/',
+				links: [{ label: 'Website', url: 'https://shinysoftware.github.io/Commander/' }],
 				hero: 'projects/shinycommander-hero.svg',
 				tagline:
 					'A keyboard-first, dual-pane file manager in the spirit of Total Commander — one .NET MAUI UI on native WinUI, AppKit and GTK4, dressed in Shiny Controls.',
@@ -657,17 +665,18 @@ export const GROUPS: ProjectGroup[] = [
 				name: 'KML Recorder',
 				repo: 'shinyorg/kmlrecorder',
 				hero: 'maui-carplay-hero.svg',
+				links: [{ label: 'Website', url: 'https://shinyorg.github.io/kmlrecorder/' }],
 				tagline:
-					'Record GPS tracks and export them as KML or GeoJSON, with CarPlay and Android Auto dashboards.',
+					'Record GPS tracks and OBD-II engine data, and export them as KML, GeoJSON or CSV — with the engine readings pinned to the track — plus CarPlay and Android Auto dashboards.',
+				highlights: [
+					'GPS tracks to KML & GeoJSON',
+					'OBD-II recording via Shiny.Obd',
+					'BLE, classic Bluetooth & WiFi adapters',
+					'37 PIDs: speed, RPM, odometer & more',
+					'Engine data as CSV or KML on the track',
+					'CarPlay & Android Auto dashboards',
+				],
 				tags: ['MAUI', 'Hardware'],
-			},
-			{
-				name: 'Plex Suggest',
-				repo: 'aritchie/plexsuggest',
-				hero: 'projects/plexsuggest-hero.svg',
-				tagline:
-					'A recommendation engine for Plex libraries that scores unwatched content against your history. MAUI app and CLI.',
-				tags: ['MAUI', 'Data'],
 			},
 			{
 				name: 'Beat The Bank',

@@ -6,7 +6,7 @@ import { GROUPS, TAGS, TOTAL_PROJECTS, githubUrl } from '../data/projects';
 
 const title = 'Projects';
 const description =
-	'Open source .NET frameworks, libraries, developer tooling and sample apps by Allan Ritchie.';
+	'Open source .NET frameworks, libraries, developer tooling and public apps by Allan Ritchie.';
 
 // Resolve hero artwork to URLs rather than importing the SVGs as components -
 // several of them share element ids (`bg`, `grid`, `glow`), which would collide
@@ -30,7 +30,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				<p class="eyebrow">Open source</p>
 				<h1>Projects</h1>
 				<p class="lede">
-					Frameworks, libraries, developer tooling and sample apps — built in the open, maintained
+					Frameworks, libraries, developer tooling and public apps — built in the open, maintained
 					in public, and shipped to production by teams I'll never meet.
 				</p>
 				<dl class="stats">
@@ -156,8 +156,29 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 														<span class="sr-only">for {project.name}</span>
 													</a>
 												)}
+												{project.links?.map((link, n) => (
+													<a
+														class:list={['btn', !project.docs && n === 0 ? 'btn--primary' : 'btn--secondary']}
+														href={link.url}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														<span>{link.label}</span>
+														<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+															<path
+																d="M7 17 17 7M9 7h8v8"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="2"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+															/>
+														</svg>
+														<span class="sr-only">for {project.name}</span>
+													</a>
+												))}
 												<a
-													class:list={['btn', project.docs ? 'btn--secondary' : 'btn--primary']}
+													class:list={['btn', project.docs || project.links?.length ? 'btn--secondary' : 'btn--primary']}
 													href={githubUrl(project.repo)}
 													target="_blank"
 													rel="noopener noreferrer"

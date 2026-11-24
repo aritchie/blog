@@ -406,12 +406,11 @@ const projects = [
 	{ slug: 'whereareyou', title: 'Where Are You', kicker: 'Background GPS into .NET Orleans', repo: 'GoneDotNet/whereareyou', accent: '#34d399', motif: 'pins' },
 	{ slug: 'githubmon', title: 'GitHub Mon', kicker: 'Desktop dashboard for your repos', repo: 'aritchie/githubmon', accent: '#60a5fa', motif: 'terminal' },
 	{ slug: 'digitalscoreboard', title: 'Digital Scoreboard', kicker: 'Bluetooth LE client and peripheral', repo: 'aritchie/digitalscoreboard', accent: '#22d3ee', motif: 'signal' },
-	{ slug: 'plexsuggest', title: 'Plex Suggest', kicker: 'Scored picks from your watch history', repo: 'aritchie/plexsuggest', accent: '#fbbf24', motif: 'layers' },
 	{ slug: 'beatthebank', title: 'Beat The Bank', kicker: 'Voice-powered trivia', repo: 'aritchie/beatthebank', accent: '#f87171', motif: 'bubbles' },
 	{ slug: 'tunegames', title: 'TUNE Games', kicker: 'Name that tune, from your own library', repo: 'aritchie/tunegames', accent: '#c084fc', motif: 'music' },
 	{ slug: 'headsup', title: 'Heads Up Clone', kicker: 'Accelerometer party game', repo: 'gonedotnet/headsup', accent: '#fb923c', motif: 'cards' },
 	{ slug: 'mediatorsample', title: 'Mediator Sample', kicker: 'Handlers, events, middleware', repo: 'shinyorg/mediatorsample', accent: '#a3e635', motif: 'pipeline' },
-	{ slug: 'shinynotch', title: 'Shiny Notch', kicker: 'The MacBook notch, turned into a live panel', repo: 'ShinySoftware/ShinyNotch', accent: '#a78bfa', motif: 'notch' },
+	// Notcho's hero (notcho-hero.svg) is drawn by hand around the app's logo, so it isn't generated here.
 	{ slug: 'shinyfileserve', title: 'FileServe', kicker: 'A self-hosted file server for a team', repo: 'ShinySoftware/ShinyFileServe', accent: '#2dd4bf', motif: 'server' },
 ];
 
