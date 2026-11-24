@@ -10,50 +10,45 @@ import shinysoftLogo from '../assets/shinysoft-logo.png';
 ---
 
 <header data-site-header>
-	<nav>
+	<nav class="bar">
 		<a class="brand" href="/">
-			<Image src={logo} alt="" width={64} height={64} loading="eager" />
+			<span class="brand-mark">
+				<Image src={logo} alt="" width={64} height={64} loading="eager" />
+			</span>
 			<span class="site-title">{SITE_TITLE}</span>
 		</a>
 
-		<div class="nav-end">
-			<div class="nav-menu" id="nav-menu">
-				<div class="internal-links">
-					<HeaderLink href="/">Blog</HeaderLink>
-					<HeaderLink href="/projects">Projects</HeaderLink>
-					<HeaderLink href="/speaking">Speaking</HeaderLink>
-					<HeaderLink href="/about">About</HeaderLink>
-					<HeaderLink
-						href="https://shinysoft.biz"
-						target="_blank"
-						rel="noopener"
-						class="shinysoft-link"
-					>
-						<Image
-							src={shinysoftLogo}
-							alt="ShinySoft Technologies"
-							width={320}
-							height={109}
-							loading="eager"
-						/>
-					</HeaderLink>
-				</div>
-				<div class="nav-social">
-					<SocialLinks />
-				</div>
+		<div class="nav-menu" id="nav-menu">
+			<div class="internal-links" data-nav-links>
+				<span class="nav-indicator" data-nav-indicator aria-hidden="true"></span>
+				<HeaderLink href="/">Blog</HeaderLink>
+				<HeaderLink href="/projects">Projects</HeaderLink>
+				<HeaderLink href="/speaking">Speaking</HeaderLink>
+				<HeaderLink href="/about">About</HeaderLink>
 			</div>
+			<a class="shinysoft-link" href="https://shinysoft.biz" target="_blank" rel="noopener">
+				<Image
+					src={shinysoftLogo}
+					alt="ShinySoft Technologies"
+					width={320}
+					height={109}
+					loading="eager"
+				/>
+			</a>
+			<div class="nav-social">
+				<SocialLinks />
+			</div>
+		</div>
 
+		<div class="nav-end">
 			<Search />
-
 			<ThemeToggle />
-
 			<button
 				class="mobile-menu-toggle"
 				aria-label="Toggle menu"
 				aria-expanded="false"
 				aria-controls="nav-menu"
 			>
-				<span></span>
 				<span></span>
 				<span></span>
 			</button>
@@ -66,36 +61,70 @@ import shinysoftLogo from '../assets/shinysoft-logo.png';
 	const toggle = document.querySelector<HTMLButtonElement>('.mobile-menu-toggle');
 	const menu = document.querySelector<HTMLElement>('#nav-menu');
 
-	toggle?.addEventListener('click', () => {
-		const open = menu?.classList.toggle('active') ?? false;
-		toggle.classList.toggle('active', open);
-		toggle.setAttribute('aria-expanded', String(open));
-	});
+	const setOpen = (open: boolean) => {
+		menu?.classList.toggle('active', open);
+		toggle?.classList.toggle('active', open);
+		toggle?.setAttribute('aria-expanded', String(open));
+	};
+
+	toggle?.addEventListener('click', () => setOpen(!menu?.classList.contains('active')));
 
 	// close the menu on navigation or Escape
 	menu?.addEventListener('click', (event) => {
-		if (!(event.target as HTMLElement).closest('a')) return;
-		menu.classList.remove('active');
-		toggle?.classList.remove('active');
-		toggle?.setAttribute('aria-expanded', 'false');
+		if ((event.target as HTMLElement).closest('a')) setOpen(false);
 	});
 	document.addEventListener('keydown', (event) => {
 		if (event.key !== 'Escape' || !menu?.classList.contains('active')) return;
-		menu.classList.remove('active');
-		toggle?.classList.remove('active');
-		toggle?.setAttribute('aria-expanded', 'false');
+		setOpen(false);
 		toggle?.focus();
 	});
 
 	// the glass only earns its shadow once there's content behind it
 	const sentinel = document.createElement('div');
 	sentinel.setAttribute('aria-hidden', 'true');
-	sentinel.style.cssText = 'position:absolute;top:0;height:1px;width:1px;';
+	sentinel.style.cssText = 'position:absolute;top:0;height:8px;width:1px;';
 	document.body.prepend(sentinel);
-	new IntersectionObserver(
-		([entry]) => header?.classList.toggle('is-scrolled', !entry.isIntersecting),
-		{ threshold: 0 },
-	).observe(sentinel);
+	const scrollObserver = new IntersectionObserver(([entry]) =>
+		header?.classList.toggle('is-scrolled', !entry.isIntersecting),
+	);
+	scrollObserver.observe(sentinel);
+
+	/*
+	  The pill behind the nav links slides to whichever link is hovered or
+	  focused, and settles back on the current section when the pointer leaves.
+	*/
+	const links = document.querySelector<HTMLElement>('[data-nav-links]');
+	const indicator = document.querySelector<HTMLElement>('[data-nav-indicator]');
+	if (links && indicator) {
+		const anchors = Array.from(links.querySelectorAll<HTMLAnchorElement>('a'));
+		const current = anchors.find((a) => a.classList.contains('active'));
+
+		const moveTo = (target: HTMLElement | undefined, instant = false) => {
+			if (!target) {
+				indicator.style.opacity = '0';
+				return;
+			}
+			if (instant) indicator.style.transition = 'none';
+			indicator.style.opacity = '1';
+			indicator.style.width = `${target.offsetWidth}px`;
+			indicator.style.transform = `translateX(${target.offsetLeft}px)`;
+			if (instant) {
+				// flush, then restore the transition for subsequent moves
+				void indicator.offsetWidth;
+				indicator.style.transition = '';
+			}
+		};
+
+		moveTo(current, true);
+		for (const a of anchors) {
+			a.addEventListener('pointerenter', () => moveTo(a));
+			a.addEventListener('focus', () => moveTo(a));
+		}
+		links.addEventListener('pointerleave', () => moveTo(current));
+		links.addEventListener('focusout', () => moveTo(current));
+		window.addEventListener('resize', () => moveTo(current, true));
+		document.fonts?.ready.then(() => moveTo(current, true));
+	}
 </script>
 
 <style>
@@ -103,268 +132,327 @@ import shinysoftLogo from '../assets/shinysoft-logo.png';
 		position: sticky;
 		top: 0;
 		z-index: 1000;
-		margin: 0;
-		padding: 0 1.25em;
-		background: var(--glass);
-		backdrop-filter: blur(18px) saturate(180%);
-		-webkit-backdrop-filter: blur(18px) saturate(180%);
-		border-bottom: 1px solid transparent;
-		transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-		/* stays put while the page beneath it transitions */
-		view-transition-name: site-header;
-	}
-	/* a hairline of light along the top edge is what sells the glass */
-	header::before {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto;
-		height: 1px;
-		background: var(--glass-edge);
+		padding: 14px clamp(0.75rem, 2vw, 1.25rem) 0;
 		pointer-events: none;
 	}
-	header.is-scrolled {
-		border-bottom-color: rgb(var(--gray-light));
-		box-shadow: 0 2px 16px rgba(var(--shadow), 10%);
-	}
 
-	nav {
+	.bar {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
-		min-height: 62px;
+		width: min(1200px, 100%);
+		min-height: 58px;
+		margin: 0 auto;
+		padding: 0 0.6rem 0 0.75rem;
+		background: var(--glass);
+		-webkit-backdrop-filter: blur(20px) saturate(180%);
+		backdrop-filter: blur(20px) saturate(180%);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		box-shadow:
+			inset 0 1px 0 var(--glass-edge),
+			0 4px 24px -12px rgba(var(--shadow), 20%);
+		pointer-events: auto;
+		/* stays put while the page beneath it transitions. Named here rather
+		   than on <header>: a named element is a backdrop root, which would
+		   leave the glass nothing to blur. */
+		view-transition-name: site-header;
+		transition:
+			box-shadow 0.4s ease,
+			border-color 0.4s ease,
+			min-height 0.4s var(--ease-out);
+		animation: bar-drop 0.9s var(--ease-out) both;
+	}
+	@keyframes bar-drop {
+		from {
+			opacity: 0;
+			transform: translateY(-14px) scale(0.98);
+		}
+	}
+	:global(.vt-nav) .bar {
+		animation: none;
+	}
+	header.is-scrolled .bar {
+		min-height: 52px;
+		border-color: var(--border-strong);
+		box-shadow:
+			inset 0 1px 0 var(--glass-edge),
+			0 12px 40px -14px rgba(var(--shadow), 35%);
 	}
 
 	.brand {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.55em;
+		gap: 0.6rem;
+		flex: 0 0 auto;
+		color: rgb(var(--black));
 		text-decoration: none;
-		font-weight: 700;
+	}
+	.brand-mark {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 34px;
+		height: 34px;
+		border-radius: 50%;
+		padding: 2px;
+		background: var(--grad);
+		transition: transform 0.6s var(--ease-spring);
+	}
+	.brand:hover .brand-mark {
+		transform: rotate(-12deg) scale(1.08);
 	}
 	.brand :global(img) {
-		width: 30px;
-		height: 30px;
-		border-radius: 8px;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		border-radius: 50%;
+		background: var(--surface);
 	}
 	.site-title {
+		font-size: 1rem;
+		font-weight: 650;
+		letter-spacing: -0.02em;
+		white-space: nowrap;
+	}
+
+	.nav-menu {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.internal-links {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 0.1rem;
+		padding: 4px;
+		border-radius: 999px;
+	}
+	.nav-indicator {
+		position: absolute;
+		top: 4px;
+		bottom: 4px;
+		left: 0;
+		width: 0;
+		border-radius: 999px;
+		background: rgba(var(--gray-light), 85%);
+		box-shadow: inset 0 0 0 1px var(--border);
+		opacity: 0;
+		transition:
+			transform 0.45s var(--ease-out),
+			width 0.45s var(--ease-out),
+			opacity 0.3s ease;
+	}
+	.internal-links :global(a) {
+		position: relative;
+		z-index: 1;
+		padding: 0.5rem 0.95rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: rgb(var(--gray));
+		text-decoration: none;
+		border-radius: 999px;
+		transition: color 0.25s ease;
+	}
+	.internal-links :global(a:hover),
+	.internal-links :global(a.active) {
 		color: rgb(var(--black));
-		font-size: 1.02rem;
-		letter-spacing: -0.01em;
+	}
+	/* a little gradient dot marks the current section */
+	.internal-links :global(a.active)::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: 3px;
+		width: 4px;
+		height: 4px;
+		margin-left: -2px;
+		border-radius: 50%;
+		background: var(--accent);
+	}
+
+	.shinysoft-link {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.3rem 0.55rem;
+		border-radius: 999px;
+		transition:
+			background-color 0.2s ease,
+			transform 0.3s var(--ease-spring);
+	}
+	.shinysoft-link:hover {
+		background: rgba(var(--gray-light), 70%);
+		transform: translateY(-1px);
+	}
+	.shinysoft-link :global(img) {
+		display: block;
+		width: auto;
+		height: 26px;
+		margin: 0;
+		border-radius: 0;
+	}
+	/* the wordmark's "TECHNOLOGIES" line is near-black - give it a plate on dark */
+	:global(:root[data-theme='dark']) .shinysoft-link {
+		background: rgba(255, 255, 255, 0.9);
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .shinysoft-link {
+			background: rgba(255, 255, 255, 0.9);
+		}
+	}
+
+	/* The icons read as one cluster, not eight separate nav items */
+	.nav-social {
+		--social-icon-size: 16px;
+		--social-gap: 0;
+		--social-margin-top: 0;
+		display: flex;
+		align-items: center;
+		padding-left: 0.75rem;
+		border-left: 1px solid var(--border);
+	}
+	.nav-social :global(a) {
+		padding: 0.4rem;
+		border-radius: 999px;
+	}
+	.nav-social :global(a:hover) {
+		background: rgba(var(--gray-light), 80%);
 	}
 
 	.nav-end {
 		display: flex;
 		align-items: center;
-		gap: 0.6rem;
-	}
-	.nav-menu {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-	.internal-links {
-		display: flex;
-		align-items: center;
-		gap: 0.15rem;
-	}
-
-	/* Nav links: a pill on hover, a short accent bar under the current section */
-	.nav-menu :global(a) {
-		position: relative;
-		padding: 0.45em 0.7em;
-		color: rgb(var(--gray-dark));
-		font-size: 0.95rem;
-		text-decoration: none;
-		border-radius: 8px;
-		transition: color 0.2s ease, background-color 0.2s ease;
-	}
-	.nav-menu :global(a:hover) {
-		color: rgb(var(--black));
-		background: rgba(var(--gray-light), 55%);
-	}
-	.nav-menu :global(a.active) {
-		color: var(--accent);
-		font-weight: 700;
-		text-decoration: none;
-	}
-	.nav-menu :global(a.active)::after {
-		content: '';
-		position: absolute;
-		left: 0.7em;
-		right: 0.7em;
-		bottom: 0.1em;
-		height: 2px;
-		border-radius: 2px;
-		background: var(--accent);
-	}
-
-	.nav-menu :global(a.shinysoft-link) {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.4em 0.5em;
-	}
-	.nav-menu :global(a.shinysoft-link img) {
-		width: auto;
-		height: 30px;
-	}
-	.nav-menu :global(a.shinysoft-link)::after {
-		display: none;
-	}
-	/* the wordmark's "TECHNOLOGIES" line is near-black - give it a plate on dark */
-	:global(:root[data-theme='dark']) .nav-menu :global(a.shinysoft-link) {
-		background: rgba(255, 255, 255, 0.92);
-	}
-	@media (prefers-color-scheme: dark) {
-		:global(:root:not([data-theme='light'])) .nav-menu :global(a.shinysoft-link) {
-			background: rgba(255, 255, 255, 0.92);
-		}
-	}
-
-	/* The icons read as one cluster, not eight separate nav items, so they
-	   opt out of the nav link padding and sit tight inside a shared plate. */
-	.nav-social {
-		--social-icon-size: 17px;
-		--social-gap: 0.1rem;
-		--social-margin-top: 0;
-		display: flex;
-		align-items: center;
-		margin-left: 0.35rem;
-		padding: 0.2rem 0.3rem;
-		border-radius: 999px;
-		background: rgba(var(--gray-light), 45%);
-	}
-	.nav-social :global(a) {
-		padding: 0.3rem;
-		border-radius: 8px;
-		font-size: 0;
-	}
-	.nav-social :global(a:hover) {
-		background: rgba(var(--gray-light), 90%);
+		gap: 0.35rem;
+		flex: 0 0 auto;
 	}
 
 	.mobile-menu-toggle {
 		display: none;
 		flex-direction: column;
-		justify-content: space-around;
-		width: 34px;
-		height: 34px;
-		padding: 7px 5px;
+		justify-content: center;
+		gap: 5px;
+		width: 38px;
+		height: 38px;
+		padding: 0 10px;
 		background: transparent;
 		border: 1px solid transparent;
 		border-radius: 999px;
 		cursor: pointer;
+		transition:
+			background-color 0.2s ease,
+			border-color 0.2s ease;
 	}
 	.mobile-menu-toggle:hover {
-		border-color: rgb(var(--gray-light));
+		background: rgba(var(--gray-light), 70%);
 	}
 	.mobile-menu-toggle span {
 		width: 100%;
-		height: 2px;
+		height: 1.75px;
 		border-radius: 2px;
 		background-color: rgb(var(--black));
-		transition: transform 0.25s ease, opacity 0.2s ease;
+		transition: transform 0.4s var(--ease-spring);
 		transform-origin: center;
 	}
 	.mobile-menu-toggle.active span:nth-child(1) {
-		transform: translateY(6px) rotate(45deg);
+		transform: translateY(3.4px) rotate(45deg);
 	}
 	.mobile-menu-toggle.active span:nth-child(2) {
-		opacity: 0;
-	}
-	.mobile-menu-toggle.active span:nth-child(3) {
-		transform: translateY(-6px) rotate(-45deg);
+		transform: translateY(-3.4px) rotate(-45deg);
 	}
 
-	/* Collapse before the links + icons run out of room */
-	@media (max-width: 1080px) {
-		header {
-			padding: 0 0.85em;
+	/* The social cluster is the first thing to go when room runs short */
+	@media (max-width: 1240px) {
+		.nav-social {
+			display: none;
 		}
-		nav {
-			position: relative;
-			min-height: 56px;
-		}
+	}
+
+	/* Then the links fold into a dropdown panel */
+	@media (max-width: 920px) {
 		.mobile-menu-toggle {
 			display: flex;
 		}
 		.nav-menu {
 			position: absolute;
-			top: calc(100% + 0.85em);
+			top: calc(100% + 10px);
 			left: 0;
 			right: 0;
 			flex-direction: column;
 			align-items: stretch;
 			gap: 0.5rem;
-			padding: 0.75em;
-			/* nested backdrop-filters don't blur, so the panel is opaque */
-			background: var(--surface);
-			border: 1px solid rgb(var(--gray-light));
-			border-radius: 14px;
-			box-shadow: 0 12px 30px rgba(var(--shadow), 18%);
-			transform: translateY(-8px);
+			padding: 0.6rem;
+			/* nested backdrop-filters don't blur, so the panel is near-opaque */
+			background: color-mix(in srgb, var(--surface) 96%, transparent);
+			border: 1px solid var(--border-strong);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--box-shadow);
+			transform: translateY(-10px) scale(0.98);
+			transform-origin: top center;
 			opacity: 0;
 			visibility: hidden;
-			transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s ease;
-			z-index: 999;
+			transition:
+				transform 0.4s var(--ease-out),
+				opacity 0.25s ease,
+				visibility 0.25s ease;
 		}
 		.nav-menu.active {
-			transform: translateY(0);
+			transform: none;
 			opacity: 1;
 			visibility: visible;
 		}
 		.internal-links {
 			flex-direction: column;
 			align-items: stretch;
-			gap: 0.1rem;
-			width: 100%;
+			padding: 0;
 		}
-		.nav-menu :global(a) {
-			padding: 0.7em 0.75em;
-			border-radius: 10px;
-		}
-		.nav-menu :global(a.active) {
-			background: var(--accent-soft);
-		}
-		.nav-menu :global(a.active)::after {
+		.nav-indicator {
 			display: none;
 		}
+		.internal-links :global(a) {
+			padding: 0.85rem 1rem;
+			font-size: 1rem;
+			border-radius: var(--radius-sm);
+		}
+		.internal-links :global(a:hover) {
+			background: rgba(var(--gray-light), 60%);
+		}
+		.internal-links :global(a.active) {
+			background: var(--accent-soft);
+			color: var(--accent);
+		}
+		.internal-links :global(a.active)::after {
+			display: none;
+		}
+		.shinysoft-link {
+			align-self: flex-start;
+			margin-left: 0.5rem;
+		}
 		.nav-social {
+			display: flex;
 			--social-icon-size: 20px;
-			--social-gap: 0.15rem;
-			align-self: center;
 			justify-content: center;
 			flex-wrap: wrap;
-			width: fit-content;
-			max-width: 100%;
-			margin: 0.35em 0 0.15em;
-			padding: 0.25rem 0.4rem;
+			padding: 0.6rem 0 0.2rem;
+			border-left: 0;
+			border-top: 1px solid var(--border);
+		}
+		.nav-social :global(.social-links) {
+			flex-wrap: wrap;
 		}
 		.nav-social :global(a) {
-			padding: 0.4rem;
-			border-radius: 10px;
+			padding: 0.55rem;
 		}
 	}
 
 	@media (max-width: 480px) {
 		header {
-			padding: 0 0.6em;
-		}
-		.brand :global(img) {
-			width: 26px;
-			height: 26px;
+			padding-top: 10px;
 		}
 		.site-title {
 			font-size: 0.92rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		header,
-		.nav-menu,
-		.nav-menu :global(a),
-		.mobile-menu-toggle span {
-			transition: none;
 		}
 	}
 </style>

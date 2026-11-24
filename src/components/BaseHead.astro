@@ -1,6 +1,10 @@
 ---
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseHead /> component.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
 import MotionBackground from './MotionBackground.astro';
@@ -21,7 +25,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="theme-color" content="#ffffff" />
+<meta name="theme-color" content="#f8f7f4" />
 
 <!--
   Applies the saved theme before first paint so a dark-mode reader never gets a
@@ -30,6 +34,16 @@ const { title, description, image = FallbackImage } = Astro.props;
 -->
 <script is:inline>
 	(() => {
+		// Lets CSS hide scroll-reveal content only when something will reveal it
+		document.documentElement.classList.add('js');
+		// Arriving through a page transition: the header should hold still, not drop in again
+		window.addEventListener('pagereveal', (event) => {
+			if (event.viewTransition) document.documentElement.classList.add('vt-nav');
+		});
+		// ...and if the reveal script never runs, show everything anyway
+		setTimeout(() => {
+			if (!window.__reveal) document.documentElement.classList.add('reveal-all');
+		}, 2500);
 		try {
 			const saved = localStorage.getItem('theme');
 			if (saved === 'light' || saved === 'dark') {
@@ -41,7 +55,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 			(!document.documentElement.dataset.theme &&
 				window.matchMedia('(prefers-color-scheme: dark)').matches);
 		if (dark) {
-			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0d1117');
+			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0a0910');
 		}
 	})();
 </script>
@@ -61,9 +75,48 @@ const { title, description, image = FallbackImage } = Astro.props;
 
 <MotionBackground />
 
-<!-- Font preloads -->
-<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
-<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
+<script>
+	/*
+	  Scroll reveal: anything with `data-reveal` gets `.is-revealed` the first
+	  time it enters the viewport (styles in global.css). Siblings inside a
+	  `data-reveal-group` are staggered automatically.
+	*/
+	(window as Window & { __reveal?: boolean }).__reveal = true;
+
+	for (const group of document.querySelectorAll<HTMLElement>('[data-reveal-group]')) {
+		const items = group.querySelectorAll<HTMLElement>(':scope > [data-reveal], :scope > * > [data-reveal]');
+		items.forEach((el, i) => el.style.setProperty('--reveal-i', String(i % 6)));
+	}
+
+	const revealer = new IntersectionObserver(
+		(entries) => {
+			for (const entry of entries.filter((e) => e.isIntersecting)) {
+				entry.target.classList.add('is-revealed');
+				revealer.unobserve(entry.target);
+			}
+		},
+		{ rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+	);
+	for (const el of document.querySelectorAll('[data-reveal]')) revealer.observe(el);
+
+	/*
+	  Spotlight: cards marked `.spotlight` get --mx / --my set to the pointer
+	  position so a soft light can follow it. One delegated listener for the page.
+	*/
+	const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+	document.addEventListener(
+		'pointermove',
+		(event) => {
+			if (!finePointer.matches) return;
+			const card = (event.target as Element | null)?.closest<HTMLElement>('.spotlight');
+			if (!card) return;
+			const rect = card.getBoundingClientRect();
+			card.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+			card.style.setProperty('--my', `${event.clientY - rect.top}px`);
+		},
+		{ passive: true },
+	);
+</script>
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />

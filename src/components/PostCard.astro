@@ -20,8 +20,16 @@ const href = `/blog/${post.id}/`;
 const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 ---
 
-<article class:list={['card', `card--${variant}`]}>
+<article class:list={['card', `card--${variant}`, 'surface-card', 'spotlight']} data-reveal>
 	<a class="card-media" href={href} tabindex="-1" aria-hidden="true">
+		{
+			!heroImage && (
+				<span class="card-art">
+					<span class="card-art-tag">{tags?.[0] ?? 'Notes'}</span>
+					<span class="card-art-title">{title}</span>
+				</span>
+			)
+		}
 		{
 			heroImage && (
 				<Image
@@ -35,25 +43,39 @@ const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 				/>
 			)
 		}
+		{variant === 'featured' && <span class="badge">Latest post</span>}
 	</a>
 	<div class="card-body">
 		<p class="card-meta">
 			<FormattedDate date={pubDate} />
-			{minutes && <><span aria-hidden="true">·</span><span>{minutes} min read</span></>}
+			{minutes && <><span class="dot" aria-hidden="true"></span><span>{minutes} min read</span></>}
 		</p>
 		<h3><a href={href}>{title}</a></h3>
 		<p class="card-desc">{description}</p>
-		{
-			tags && tags.length > 0 && (
-				<ul class="card-tags" role="list">
-					{tags.slice(0, 3).map((tag) => (
-						<li>
-							<a href={`/tags/${encodeURIComponent(tag)}/`}>{tag}</a>
-						</li>
-					))}
-				</ul>
-			)
-		}
+		<div class="card-foot">
+			{
+				tags && tags.length > 0 && (
+					<ul class="card-tags" role="list">
+						{tags.slice(0, 3).map((tag) => (
+							<li>
+								<a href={`/tags/${encodeURIComponent(tag)}/`}>{tag}</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
+			<span class="card-arrow" aria-hidden="true">
+				<svg viewBox="0 0 24 24" focusable="false">
+					<path
+						d="M5 12h14M13 6l6 6-6 6"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"></path>
+				</svg>
+			</span>
+		</div>
 	</div>
 </article>
 
@@ -62,50 +84,18 @@ const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		overflow: hidden;
-		background: var(--surface);
-		border: 1px solid rgb(var(--gray-light));
-		border-radius: 14px;
-		box-shadow: 0 1px 2px rgba(var(--shadow), 12%);
-		transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-	}
-	@media (hover: hover) and (pointer: fine) {
-		.card:hover {
-			transform: translateY(-3px);
-			border-color: var(--accent);
-			box-shadow: 0 10px 30px rgba(var(--shadow), 22%);
-		}
-		.card:hover .card-media :global(img) {
-			transform: scale(1.05);
-		}
-	}
-
-	/* Cards drift up into place as they scroll into view. Scroll-driven, so no
-	   script and nothing is ever hidden where it isn't supported. */
-	@supports (animation-timeline: view()) {
-		@media (prefers-reduced-motion: no-preference) {
-			.card {
-				animation: card-reveal linear both;
-				animation-timeline: view();
-				animation-range: entry 0% entry 55%;
-			}
-		}
-	}
-	/* translate/scale rather than transform, so the hover lift still applies */
-	@keyframes card-reveal {
-		from {
-			opacity: 0;
-			translate: 0 40px;
-			scale: 0.97;
-		}
+		padding: 8px;
 	}
 
 	.card-media {
+		position: relative;
 		display: block;
 		aspect-ratio: 1200 / 630;
 		overflow: hidden;
-		background: #0f172a;
-		border-bottom: 1px solid rgb(var(--gray-light));
+		background: #0f0d1c;
+		border-radius: calc(var(--radius-lg) - 8px);
+		/* keeps the rounded clip crisp while the image scales */
+		isolation: isolate;
 	}
 	.card-media :global(img) {
 		display: block;
@@ -115,54 +105,197 @@ const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 		margin: 0;
 		border-radius: 0;
 		view-transition-class: post-hero;
-		transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+		transition:
+			transform 0.9s var(--ease-out),
+			filter 0.9s var(--ease-out);
+	}
+	/* a sheen sweeps across the art on hover */
+	.card-media::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			115deg,
+			transparent 35%,
+			rgba(255, 255, 255, 0.18) 50%,
+			transparent 65%
+		);
+		translate: -110% 0;
+		pointer-events: none;
+	}
+	@media (hover: hover) and (pointer: fine) {
+		.card:hover .card-media :global(img) {
+			transform: scale(1.06);
+			filter: saturate(1.15);
+		}
+		.card:hover .card-media::after {
+			translate: 110% 0;
+			transition: translate 1s var(--ease-out);
+		}
+	}
+
+	/* Posts without hero art get a generated cover in the brand gradient */
+	.card-art {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding: clamp(1.25rem, 3vw, 2.25rem);
+		color: #fff;
+		background:
+			radial-gradient(70% 90% at 15% 10%, rgba(124, 92, 255, 0.85), transparent 60%),
+			radial-gradient(60% 80% at 90% 30%, rgba(224, 69, 155, 0.7), transparent 60%),
+			radial-gradient(70% 70% at 70% 110%, rgba(240, 138, 36, 0.75), transparent 60%),
+			#120f24;
+		background-size: 140% 140%;
+		animation: art-drift 14s ease-in-out infinite alternate;
+	}
+	.card-art::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image:
+			linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+		background-size: 32px 32px;
+		mask-image: linear-gradient(180deg, #000, transparent 85%);
+		-webkit-mask-image: linear-gradient(180deg, #000, transparent 85%);
+	}
+	@keyframes art-drift {
+		to {
+			background-position: 100% 100%;
+		}
+	}
+	.card-art-tag {
+		position: relative;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		opacity: 0.8;
+	}
+	.card-art-title {
+		position: relative;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		font-family: var(--font-display);
+		font-size: clamp(1.6rem, 1rem + 1.8vw, 2.6rem);
+		font-style: italic;
+		line-height: 1.02;
+		text-wrap: balance;
+	}
+	/* the featured card already shows the title beside it - lead with the topic */
+	.card--featured .card-art-title {
+		display: none;
+	}
+	.card--featured .card-art-tag {
+		font-family: var(--font-display);
+		font-size: clamp(3rem, 1.5rem + 5vw, 6rem);
+		font-style: italic;
+		letter-spacing: -0.02em;
+		line-height: 0.9;
+		text-transform: none;
+		opacity: 1;
+	}
+
+	.badge {
+		position: absolute;
+		top: 0.85rem;
+		left: 0.85rem;
+		z-index: 1;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.35rem 0.7rem;
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: #fff;
+		background: rgba(12, 10, 24, 0.55);
+		-webkit-backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+	}
+	.badge::before {
+		content: '';
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #6ee7b7;
+		box-shadow: 0 0 0 0 rgba(110, 231, 183, 0.7);
+		animation: pulse 2s ease-out infinite;
+	}
+	@keyframes pulse {
+		to {
+			box-shadow: 0 0 0 8px rgba(110, 231, 183, 0);
+		}
 	}
 
 	.card-body {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
-		gap: 0.5rem;
-		padding: 1.1rem 1.2rem 1.2rem;
+		gap: 0.55rem;
+		padding: 1.1rem 0.9rem 0.8rem;
 	}
 	.card-meta {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.4rem;
+		gap: 0.5rem;
 		margin: 0;
-		font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-		font-size: 0.72rem;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.02em;
 		color: rgb(var(--gray));
+	}
+	.dot {
+		width: 3px;
+		height: 3px;
+		border-radius: 50%;
+		background: currentColor;
+		opacity: 0.6;
 	}
 	.card h3 {
 		margin: 0;
-		font-size: 1.25rem;
+		font-size: 1.22rem;
+		font-weight: 620;
 		line-height: 1.25;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.025em;
 		text-wrap: pretty;
 	}
 	.card h3 a {
 		color: rgb(var(--black));
 		text-decoration: none;
+		background-image: linear-gradient(currentColor, currentColor);
+		background-size: 0% 1.5px;
+		background-position: 0 100%;
+		background-repeat: no-repeat;
+		transition: background-size 0.5s var(--ease-out);
+	}
+	.card:hover h3 a {
+		background-size: 100% 1.5px;
 	}
 	/* the whole card is clickable, but only the title is in the tab order */
 	.card h3 a::after {
 		content: '';
 		position: absolute;
 		inset: 0;
-	}
-	.card {
-		position: relative;
-	}
-	.card h3 a:hover {
-		color: var(--accent);
+		border-radius: inherit;
 	}
 	.card-desc {
 		margin: 0;
-		font-size: 0.88rem;
-		line-height: 1.55;
-		color: rgb(var(--gray-dark));
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: rgb(var(--gray));
 		text-wrap: pretty;
 		display: -webkit-box;
 		-webkit-line-clamp: 3;
@@ -170,11 +303,19 @@ const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
+	.card-foot {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-top: auto;
+		padding-top: 0.6rem;
+	}
 	.card-tags {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.35rem;
-		margin: 0.35rem 0 0;
+		margin: 0;
 		padding: 0;
 	}
 	.card-tags li {
@@ -185,18 +326,49 @@ const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 		position: relative;
 		z-index: 1;
 		display: inline-block;
-		padding: 0.2rem 0.55rem;
+		padding: 0.25rem 0.6rem;
 		font-size: 0.7rem;
-		font-weight: 700;
+		font-weight: 520;
 		line-height: 1.3;
 		text-decoration: none;
-		color: var(--accent-dark);
-		background: color-mix(in srgb, var(--accent) 10%, transparent);
+		color: rgb(var(--gray-dark));
+		background: rgba(var(--gray-light), 60%);
+		border: 1px solid var(--border);
 		border-radius: 999px;
+		transition:
+			background-color 0.2s ease,
+			color 0.2s ease,
+			border-color 0.2s ease;
 	}
 	.card-tags a:hover {
-		background: var(--accent);
-		color: var(--on-accent);
+		background: var(--accent-soft);
+		border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+		color: var(--accent);
+	}
+	.card-arrow {
+		display: grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 34px;
+		height: 34px;
+		color: rgb(var(--black));
+		border: 1px solid var(--border-strong);
+		border-radius: 50%;
+		transition:
+			background-color 0.3s ease,
+			color 0.3s ease,
+			border-color 0.3s ease,
+			transform 0.5s var(--ease-spring);
+	}
+	.card-arrow svg {
+		width: 15px;
+		height: 15px;
+	}
+	.card:hover .card-arrow {
+		color: var(--on-ink-btn);
+		background: var(--ink-btn);
+		border-color: var(--ink-btn);
+		transform: rotate(-45deg);
 	}
 
 	/* ---------- featured ---------- */
@@ -204,39 +376,33 @@ const heroTransition = `post-${post.id.replace(/[^\w-]/g, '-')}`;
 	@media (min-width: 900px) {
 		.card--featured {
 			display: grid;
-			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+			gap: 0.5rem;
 		}
 		.card--featured .card-media {
 			height: 100%;
 			aspect-ratio: auto;
-			border-right: 1px solid rgb(var(--gray-light));
-			border-bottom: 0;
+			min-height: 360px;
 		}
 		.card--featured .card-body {
-			gap: 0.65rem;
-			padding: 1.9rem;
+			justify-content: center;
+			gap: 0.9rem;
+			padding: 2rem 2rem 1.5rem;
 		}
 		.card--featured h3 {
-			font-size: 1.9rem;
+			font-family: var(--font-display);
+			font-size: clamp(2.2rem, 1.4rem + 1.6vw, 3rem);
+			font-weight: 400;
+			line-height: 1.02;
+			letter-spacing: -0.015em;
 		}
 		.card--featured .card-desc {
-			font-size: 0.98rem;
-			-webkit-line-clamp: 5;
-			line-clamp: 5;
+			font-size: 1rem;
+			-webkit-line-clamp: 4;
+			line-clamp: 4;
 		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.card {
-			transition: none;
-		}
-		.card:hover {
-			transform: none;
-		}
-		.card-media :global(img),
-		.card:hover .card-media :global(img) {
-			transition: none;
-			transform: none;
+		.card--featured .card-foot {
+			margin-top: 0.75rem;
 		}
 	}
 </style>

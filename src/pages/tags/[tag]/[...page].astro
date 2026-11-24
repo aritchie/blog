@@ -53,7 +53,7 @@ const title = page.currentPage === 1 ? tag : `${tag} — page ${page.currentPage
 	<body>
 		<Header />
 		<main>
-			<header class="tag-head">
+			<header class="page-head enter">
 				<a class="back" href="/">
 					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 						<path
@@ -67,14 +67,14 @@ const title = page.currentPage === 1 ? tag : `${tag} — page ${page.currentPage
 					<span>All posts</span>
 				</a>
 				<p class="eyebrow">Tagged</p>
-				<h1>{tag}</h1>
+				<h1 class="display"><span class="hash" aria-hidden="true">#</span><em>{tag}</em></h1>
 				<p class="lede">
 					{total} post{total === 1 ? '' : 's'}
 					{page.lastPage > 1 && <> · page {page.currentPage} of {page.lastPage}</>}
 				</p>
 			</header>
 
-			<ul class="grid" role="list">
+			<ul class="grid" role="list" data-reveal-group>
 				{
 					page.data.map((post, i) => (
 						<li>
@@ -90,56 +90,55 @@ const title = page.currentPage === 1 ? tag : `${tag} — page ${page.currentPage
 
 		<style>
 			main {
-				width: min(1160px, calc(100% - 2.5rem));
+				width: min(1200px, calc(100% - 2.5rem));
 				max-width: none;
 				margin: 0 auto;
-				padding: 0 0 5rem;
+				padding: 0;
 			}
 
-			.tag-head {
-				padding: 2.5rem 0 2rem;
-			}
 			.back {
 				display: inline-flex;
 				align-items: center;
 				gap: 0.3rem;
-				margin-bottom: 1.25rem;
+				margin-bottom: 2rem;
+				padding: 0.45rem 0.85rem 0.45rem 0.6rem;
 				font-size: 0.82rem;
-				font-weight: 700;
+				font-weight: 520;
 				text-decoration: none;
-				color: rgb(var(--gray));
+				color: rgb(var(--gray-dark));
+				background: var(--glass);
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				transition:
+					color 0.2s ease,
+					border-color 0.2s ease;
 			}
 			.back:hover {
 				color: var(--accent);
+				border-color: var(--accent);
 			}
 			.back svg {
 				width: 1rem;
 				height: 1rem;
+				transition: transform 0.35s var(--ease-spring);
 			}
-			.eyebrow {
-				margin: 0 0 0.4rem;
-				font-size: 0.8rem;
-				font-weight: 700;
-				letter-spacing: 0.14em;
-				text-transform: uppercase;
-				color: var(--accent);
+			.back:hover svg {
+				transform: translateX(-3px);
 			}
-			.tag-head h1 {
-				margin: 0 0 0.4rem;
-				font-size: clamp(2.2rem, 1.7rem + 2.4vw, 3.4rem);
-				letter-spacing: -0.03em;
-				text-wrap: balance;
+			.hash {
+				margin-right: 0.08em;
+				color: rgb(var(--gray-light));
+				font-style: normal;
 			}
 			.lede {
-				margin: 0;
-				font-size: 0.95rem;
-				color: rgb(var(--gray));
+				font-family: var(--font-mono);
+				font-size: 0.85rem;
 			}
 
 			.grid {
 				display: grid;
 				grid-template-columns: minmax(0, 1fr);
-				gap: 1.25rem;
+				gap: 1.5rem;
 				margin: 0;
 				padding: 0;
 			}

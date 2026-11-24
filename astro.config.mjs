@@ -7,6 +7,14 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'https://allanritchie.com',
 	integrations: [mdx(), sitemap()],
+	markdown: {
+		// Both palettes are emitted as CSS variables; global.css picks one per theme
+		shikiConfig: {
+			themes: { light: 'github-light', dark: 'github-dark-dimmed' },
+			defaultColor: false,
+			wrap: false,
+		},
+	},
 	vite: {
 		plugins: [
 			{

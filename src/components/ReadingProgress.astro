@@ -44,100 +44,97 @@ const { minutes, dock = 'top', target = 'article' } = Astro.props;
 </div>
 
 <style>
+	/* A hairline of brand gradient along the viewport edge, plus a floating chip
+	   that counts down the minutes once reading begins. */
 	.reading-progress {
 		position: fixed;
 		left: 0;
 		right: 0;
 		z-index: 1001;
-		display: flex;
-		flex-direction: column;
-		background: var(--glass);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		font-size: 0.7rem;
+		height: 0;
+		font-size: 0.72rem;
 		line-height: 1;
-		color: rgb(var(--gray));
+		color: rgb(var(--gray-dark));
 		pointer-events: none;
 	}
-
 	.reading-progress[data-dock='top'] {
-		top: var(--reading-progress-offset, 0px);
-		border-bottom: 1px solid rgba(var(--gray-light), 90%);
-		box-shadow: 0 2px 10px rgba(var(--shadow), 8%);
+		top: 0;
 	}
-
-	/* bottom dock reads better with the bar on the outer edge */
 	.reading-progress[data-dock='bottom'] {
 		bottom: 0;
-		flex-direction: column-reverse;
-		border-top: 1px solid rgba(var(--gray-light), 90%);
-		box-shadow: 0 -2px 10px rgba(var(--shadow), 8%);
 	}
 
 	.rp-track {
+		position: absolute;
+		left: 0;
+		right: 0;
 		height: 3px;
-		width: 100%;
-		background: rgba(var(--gray-light), 70%);
 	}
-
+	.reading-progress[data-dock='bottom'] .rp-track {
+		bottom: 0;
+	}
 	.rp-fill {
 		height: 100%;
 		width: 0;
-		background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-		transform-origin: left center;
-		transition: width 0.1s linear;
+		background: var(--grad);
+		border-radius: 0 3px 3px 0;
+		box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+		transition: width 0.12s linear;
 	}
 
 	.rp-meta {
+		position: fixed;
+		right: clamp(0.75rem, 2vw, 1.5rem);
+		bottom: clamp(0.75rem, 2vw, 1.5rem);
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 1em;
-		width: 720px;
-		max-width: calc(100% - 2em);
-		margin: 0 auto;
-		padding: 0.45em 0;
+		gap: 0.75em;
+		padding: 0.6em 0.95em;
+		font-family: var(--font-mono);
+		background: var(--glass);
+		-webkit-backdrop-filter: blur(16px) saturate(160%);
+		backdrop-filter: blur(16px) saturate(160%);
+		border: 1px solid var(--border-strong);
+		border-radius: 999px;
+		box-shadow: var(--card-shadow-hover);
+		opacity: 0;
+		transform: translateY(12px) scale(0.96);
+		transition:
+			opacity 0.4s ease,
+			transform 0.5s var(--ease-spring);
+	}
+	.reading-progress[data-dock='bottom'] .rp-meta {
+		bottom: calc(clamp(0.75rem, 2vw, 1.5rem) + 6px);
+	}
+	.reading-progress.is-reading .rp-meta {
+		opacity: 1;
+		transform: none;
 	}
 
 	.rp-read {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.4em;
-		font-weight: 600;
+		gap: 0.45em;
 	}
-
 	.rp-icon {
 		width: 0.95rem;
 		height: 0.95rem;
 		flex: none;
 		color: var(--accent);
 	}
-
 	.rp-left {
-		opacity: 0;
-		transition: opacity 0.2s ease;
+		padding-left: 0.75em;
+		border-left: 1px solid var(--border-strong);
+		color: rgb(var(--black));
 	}
-
-	.rp-left:not(:empty) {
-		opacity: 0.85;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.rp-fill,
-		.rp-left {
-			transition: none;
-		}
+	.rp-left:empty {
+		display: none;
 	}
 
 	@media print {
 		.reading-progress {
 			display: none;
 		}
-	}
-
-	/* keep the footer clear of a bottom-docked bar */
-	:global(body.has-bottom-reading-progress) {
-		padding-bottom: 3.5rem;
 	}
 </style>
 
@@ -160,9 +157,8 @@ const { minutes, dock = 'top', target = 'article' } = Astro.props;
 		const updateOffset = () => {
 			if (el.dataset.dock !== 'top') return;
 			const offset = header ? header.getBoundingClientRect().height : 0;
-			el.style.setProperty('--reading-progress-offset', `${offset}px`);
 			// keep anchor targets from landing behind the header + bar
-			document.documentElement.style.scrollPaddingTop = `${offset + el.offsetHeight}px`;
+			document.documentElement.style.scrollPaddingTop = `${offset + 16}px`;
 		};
 
 		let ticking = false;
@@ -177,6 +173,7 @@ const { minutes, dock = 'top', target = 'article' } = Astro.props;
 			const percent = Math.round(progress * 100);
 
 			if (fill) fill.style.width = `${percent}%`;
+			el.classList.toggle('is-reading', percent >= 2);
 			el.setAttribute('aria-valuenow', String(percent));
 
 			if (left) {

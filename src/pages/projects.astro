@@ -26,9 +26,9 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 	<body>
 		<Header />
 		<main>
-			<header class="page-head">
+			<header class="page-head enter">
 				<p class="eyebrow">Open source</p>
-				<h1>Projects</h1>
+				<h1 class="display">Things I <em>build</em></h1>
 				<p class="lede">
 					Frameworks, libraries, developer tooling and public apps — built in the open, maintained
 					in public, and shipped to production by teams I'll never meet.
@@ -41,6 +41,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			</header>
 
 			<div class="toolbar" data-toolbar>
+				<div class="toolbar-inner">
 				<div class="search">
 					<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 						<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
@@ -58,18 +59,19 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				<div class="tag-filters" role="group" aria-label="Filter by technology">
 					{
 						TAGS.map((tag) => (
-							<button type="button" class="tag-filter" data-tag={tag} aria-pressed="false">
+							<button type="button" class="chip" data-tag={tag} aria-pressed="false">
 								{tag}
 							</button>
 						))
 					}
-					<button type="button" class="tag-filter tag-clear" data-clear data-clear-toggle hidden>
+					<button type="button" class="chip chip--clear" data-clear data-clear-toggle hidden>
 						Clear
 					</button>
 				</div>
 				<p class="result-count" data-count aria-live="polite">
 					Showing all {TOTAL_PROJECTS} projects
 				</p>
+				</div>
 			</div>
 
 			<span class="results-top" data-results-top aria-hidden="true"></span>
@@ -82,7 +84,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			{
 				GROUPS.map((group) => (
 					<section class="group" id={group.id} data-group aria-labelledby={`${group.id}-title`}>
-						<header class="group-head">
+						<header class="group-head" data-reveal>
 							<div class="group-heading">
 								<h2 id={`${group.id}-title`}>{group.title}</h2>
 								<span class="group-count" data-group-count>
@@ -92,7 +94,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 							<p>{group.blurb}</p>
 						</header>
 
-						<ul class:list={['grid', `grid--${group.layout}`]} role="list">
+						<ul class:list={['grid', `grid--${group.layout}`]} role="list" data-reveal-group>
 							{group.projects.map((project, i) => (
 								<li
 									class:list={['cell', group.layout === 'media' && i === 0 && 'cell--lead']}
@@ -102,7 +104,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 										project.highlights ?? []
 									).join(' ')} ${project.tags.join(' ')}`.toLowerCase()}
 								>
-									<article class:list={['card', `card--${group.layout}`]}>
+									<article class:list={['card', `card--${group.layout}`, 'surface-card', 'spotlight']} data-reveal>
 										{project.hero && (
 											<div class="card-media">
 												<img
@@ -202,9 +204,9 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				))
 			}
 
-			<section class="coda" aria-labelledby="coda-title">
+			<section class="coda" aria-labelledby="coda-title" data-reveal>
 				<div class="coda-copy">
-					<h2 id="coda-title">Support my work</h2>
+					<h2 id="coda-title">Support my <em>work</em></h2>
 					<p>
 						All of this is free, and all of it is maintained on evenings and weekends. If it saves
 						your team time, there are a few ways to give some back — help write documentation and
@@ -324,75 +326,34 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 
 		<style>
 			main {
-				width: min(1180px, calc(100% - 2.5rem));
+				width: min(1200px, calc(100% - 2.5rem));
 				max-width: none;
 				margin: 0 auto;
-				padding: 0 0 5rem;
-			}
-
-			/* ---------- page head ---------- */
-
-			.page-head {
-				padding: 3.5rem 0 2.5rem;
-				border-bottom: 1px solid rgb(var(--gray-light));
-			}
-			.eyebrow {
-				margin: 0 0 0.5rem;
-				font-size: 0.8rem;
-				font-weight: 700;
-				letter-spacing: 0.14em;
-				text-transform: uppercase;
-				color: var(--accent);
-			}
-			.page-head h1 {
-				margin: 0 0 0.5rem;
-				font-size: clamp(2.6rem, 1.9rem + 3vw, 4.2rem);
-				letter-spacing: -0.03em;
-			}
-			.lede {
-				max-width: 62ch;
-				margin: 0;
-				font-size: 1.05rem;
-				color: rgb(var(--gray));
-				text-wrap: pretty;
-			}
-			.stats {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2.5rem;
-				margin: 2rem 0 0;
-			}
-			.stats dt {
-				font-size: 0.72rem;
-				font-weight: 700;
-				letter-spacing: 0.12em;
-				text-transform: uppercase;
-				color: rgb(var(--gray));
-			}
-			.stats dd {
-				margin: 0.15rem 0 0;
-				font-size: 1.7rem;
-				font-weight: 700;
-				line-height: 1;
-				color: rgb(var(--black));
+				padding: 0;
 			}
 
 			/* ---------- toolbar ---------- */
 
 			.toolbar {
 				position: sticky;
-				top: 60px;
+				top: 84px;
 				z-index: 20;
+				margin: 0.5rem 0 0;
+			}
+			.toolbar-inner {
 				display: flex;
 				flex-wrap: wrap;
 				align-items: center;
 				gap: 0.75rem 1rem;
-				margin: 0 -0.75rem;
-				padding: 0.9rem 0.75rem;
+				padding: 0.6rem;
 				background: var(--glass);
-				backdrop-filter: blur(16px) saturate(180%);
-				-webkit-backdrop-filter: blur(16px) saturate(180%);
-				border-bottom: 1px solid rgb(var(--gray-light));
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				backdrop-filter: blur(20px) saturate(180%);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-lg);
+				box-shadow:
+					inset 0 1px 0 var(--glass-edge),
+					0 12px 36px -18px rgba(var(--shadow), 30%);
 			}
 			.search {
 				position: relative;
@@ -402,7 +363,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			}
 			.search svg {
 				position: absolute;
-				left: 0.7rem;
+				left: 0.85rem;
 				width: 1rem;
 				height: 1rem;
 				color: rgb(var(--gray));
@@ -410,55 +371,31 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			}
 			.search input {
 				width: 100%;
-				padding: 0.5rem 0.7rem 0.5rem 2.2rem;
+				padding: 0.6rem 0.9rem 0.6rem 2.4rem;
 				font-family: inherit;
 				font-size: 0.9rem;
-				color: rgb(var(--gray-dark));
+				color: rgb(var(--black));
 				background: var(--surface);
-				border: 1px solid rgb(var(--gray-light));
+				border: 1px solid var(--border-strong);
 				border-radius: 999px;
-				transition: border-color 0.15s ease, box-shadow 0.15s ease;
+				transition:
+					border-color 0.2s ease,
+					box-shadow 0.2s ease;
 			}
 			.search input:focus {
 				outline: none;
 				border-color: var(--accent);
-				box-shadow: 0 0 0 3px var(--accent-soft);
+				box-shadow: 0 0 0 4px var(--accent-soft);
 			}
 			.tag-filters {
 				display: flex;
 				flex-wrap: wrap;
-				gap: 0.4rem;
-			}
-			.tag-filter {
-				padding: 0.35rem 0.7rem;
-				font-family: inherit;
-				font-size: 0.78rem;
-				font-weight: 700;
-				line-height: 1;
-				color: rgb(var(--gray-dark));
-				background: var(--surface);
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 999px;
-				cursor: pointer;
-				transition: all 0.15s ease;
-			}
-			.tag-filter:hover {
-				border-color: var(--accent);
-				color: var(--accent);
-			}
-			.tag-filter[aria-pressed='true'] {
-				background: var(--accent);
-				border-color: var(--accent);
-				color: var(--on-accent);
-			}
-			.tag-clear {
-				color: rgb(var(--gray));
-				border-style: dashed;
+				gap: 0.35rem;
 			}
 			.result-count {
-				margin: 0 0 0 auto;
-				font-size: 0.8rem;
-				font-weight: 700;
+				margin: 0 0.5rem 0 auto;
+				font-family: var(--font-mono);
+				font-size: 0.72rem;
 				color: rgb(var(--gray));
 				white-space: nowrap;
 			}
@@ -487,37 +424,39 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			/* ---------- groups ---------- */
 
 			.group {
-				margin-top: clamp(3.5rem, 6vw, 5.5rem);
+				margin-top: clamp(3.5rem, 7vw, 6rem);
 			}
 			.group-head {
 				display: grid;
 				gap: 0.6rem;
-				padding-bottom: 1rem;
-				border-bottom: 1px solid rgb(var(--gray-light));
+				margin-bottom: 1.75rem;
 			}
 			.group-heading {
 				display: flex;
 				align-items: baseline;
-				justify-content: space-between;
 				gap: 1rem;
 			}
 			.group-heading h2 {
 				margin: 0;
-				font-size: clamp(1.9rem, 1.5rem + 1.4vw, 2.8rem);
-				letter-spacing: -0.03em;
+				font-family: var(--font-display);
+				font-weight: 400;
+				font-size: clamp(2.2rem, 1.6rem + 2.2vw, 3.4rem);
+				line-height: 1;
+				letter-spacing: -0.015em;
 			}
 			.group-count {
 				flex: 0 0 auto;
-				font-size: 0.75rem;
-				font-weight: 700;
-				letter-spacing: 0.1em;
-				text-transform: uppercase;
-				color: var(--accent);
+				padding: 0.3rem 0.65rem;
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				color: rgb(var(--gray));
+				border: 1px solid var(--border);
+				border-radius: 999px;
 			}
 			.group-head p {
-				max-width: 60ch;
+				max-width: 62ch;
 				margin: 0;
-				font-size: 0.95rem;
+				font-size: 1rem;
 				color: rgb(var(--gray));
 				text-wrap: pretty;
 			}
@@ -526,8 +465,8 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 
 			.grid {
 				display: grid;
-				gap: 1.25rem;
-				margin: 1.5rem 0 0;
+				gap: 1.5rem;
+				margin: 0;
 				padding: 0;
 				grid-template-columns: minmax(0, 1fr);
 			}
@@ -536,9 +475,7 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				list-style: none;
 			}
 			@media (min-width: 640px) {
-				.grid--media {
-					grid-template-columns: repeat(2, minmax(0, 1fr));
-				}
+				.grid--media,
 				.grid--compact {
 					grid-template-columns: repeat(2, minmax(0, 1fr));
 				}
@@ -555,30 +492,18 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			/* ---------- cards ---------- */
 
 			.card {
-				position: relative;
 				display: flex;
 				flex-direction: column;
 				height: 100%;
-				overflow: hidden;
-				background: var(--surface);
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 14px;
-				box-shadow: 0 1px 2px rgba(var(--shadow), 12%);
-				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-			}
-			@media (hover: hover) and (pointer: fine) {
-				.card:hover {
-					transform: translateY(-3px);
-					border-color: var(--accent);
-					box-shadow: 0 10px 30px rgba(var(--shadow), 22%);
-				}
+				padding: 8px;
 			}
 			.card-media {
 				position: relative;
 				aspect-ratio: 1200 / 630;
 				overflow: hidden;
-				background: #0f172a;
-				border-bottom: 1px solid rgb(var(--gray-light));
+				background: #0f0d1c;
+				border-radius: calc(var(--radius-lg) - 8px);
+				isolation: isolate;
 			}
 			.card-media img {
 				display: block;
@@ -586,20 +511,29 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				height: 100%;
 				object-fit: cover;
 				border-radius: 0;
+				transition: transform 0.9s var(--ease-out);
+			}
+			@media (hover: hover) and (pointer: fine) {
+				.card:hover .card-media img {
+					transform: scale(1.05);
+				}
 			}
 			.card-body {
 				display: flex;
 				flex: 1;
 				flex-direction: column;
 				gap: 0.6rem;
-				padding: 1.15rem 1.25rem 1.25rem;
+				padding: 1.1rem 0.9rem 0.8rem;
+			}
+			.card--compact .card-body {
+				padding: 1rem 0.9rem 0.8rem;
 			}
 			.repo {
 				display: inline-flex;
 				align-items: center;
-				gap: 0.35rem;
-				font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-				font-size: 0.72rem;
+				gap: 0.4rem;
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
 				color: rgb(var(--gray));
 				overflow-wrap: anywhere;
 			}
@@ -611,18 +545,18 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			.card-body h3 {
 				margin: 0;
 				font-size: 1.4rem;
-				letter-spacing: -0.02em;
+				font-weight: 620;
+				letter-spacing: -0.025em;
 				line-height: 1.15;
-				text-wrap: balance;
 			}
 			.card--compact .card-body h3 {
-				font-size: 1.2rem;
+				font-size: 1.18rem;
 			}
 			.tagline {
 				margin: 0;
-				font-size: 0.9rem;
-				line-height: 1.5;
-				color: rgb(var(--gray-dark));
+				font-size: 0.92rem;
+				line-height: 1.55;
+				color: rgb(var(--gray));
 				text-wrap: pretty;
 			}
 			.highlights {
@@ -634,97 +568,99 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 			}
 			.highlights li {
 				list-style: none;
-				padding: 0.25rem 0.55rem;
+				padding: 0.25rem 0.6rem;
 				font-size: 0.72rem;
 				line-height: 1.3;
 				color: rgb(var(--gray-dark));
 				background: rgba(var(--gray-light), 55%);
-				border-radius: 6px;
+				border: 1px solid var(--border);
+				border-radius: 999px;
 			}
 			.card--compact .highlights li {
 				font-size: 0.68rem;
 			}
 			.actions {
+				position: relative;
+				z-index: 1;
 				display: flex;
 				flex-wrap: wrap;
-				gap: 0.5rem;
+				gap: 0.45rem;
 				margin-top: auto;
-				padding-top: 0.85rem;
+				padding-top: 0.9rem;
 			}
-
-			.btn {
-				display: inline-flex;
-				align-items: center;
-				gap: 0.4rem;
-				padding: 0.5rem 0.85rem;
-				font-size: 0.82rem;
-				font-weight: 700;
-				line-height: 1;
-				text-decoration: none;
-				border: 1px solid transparent;
-				border-radius: 8px;
-				transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-			}
-			.btn svg {
-				flex: 0 0 auto;
-				width: 0.95rem;
-				height: 0.95rem;
-			}
-			.btn--primary {
-				background: var(--accent);
-				border-color: var(--accent);
-				color: var(--on-accent);
-			}
-			.btn--primary:hover {
-				background: var(--accent-dark);
-				border-color: var(--accent-dark);
-				color: var(--on-accent);
-			}
-			.btn--secondary {
-				background: var(--surface);
-				border-color: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-			}
-			.btn--secondary:hover {
-				border-color: var(--accent);
-				color: var(--accent);
+			.actions .btn {
+				--btn-pad-y: 0.55rem;
+				--btn-pad-x: 0.9rem;
+				font-size: 0.8rem;
 			}
 
 			/* lead card: art beside the copy once there's room for both */
 			@media (min-width: 980px) {
 				.cell--lead .card {
 					display: grid;
-					grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+					grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+					gap: 0.5rem;
 				}
 				.cell--lead .card-media {
 					height: 100%;
 					aspect-ratio: auto;
-					border-right: 1px solid rgb(var(--gray-light));
-					border-bottom: 0;
 				}
 				.cell--lead .card-body {
-					padding: 1.75rem;
-					gap: 0.7rem;
+					justify-content: center;
+					padding: 2rem;
+					gap: 0.8rem;
 				}
 				.cell--lead .card-body h3 {
-					font-size: 2rem;
+					font-family: var(--font-display);
+					font-weight: 400;
+					font-size: 3rem;
+					line-height: 1;
+					letter-spacing: -0.015em;
 				}
 				.cell--lead .tagline {
-					font-size: 1rem;
+					font-size: 1.02rem;
 				}
 			}
 
 			/* ---------- coda ---------- */
 
 			.coda {
-				margin-top: clamp(4rem, 7vw, 6rem);
-				padding-top: clamp(2rem, 4vw, 3rem);
-				border-top: 1px solid rgb(var(--gray-light));
+				position: relative;
+				margin-top: clamp(4rem, 8vw, 7rem);
+				padding: clamp(2rem, 5vw, 3.5rem);
+				overflow: hidden;
+				background: color-mix(in srgb, var(--surface) 80%, transparent);
+				-webkit-backdrop-filter: blur(14px);
+				backdrop-filter: blur(14px);
+				border: 1px solid var(--border);
+				border-radius: calc(var(--radius-lg) + 8px);
+			}
+			.coda::before {
+				content: '';
+				position: absolute;
+				top: -40%;
+				right: -10%;
+				width: 50%;
+				aspect-ratio: 1;
+				border-radius: 50%;
+				background: var(--grad);
+				filter: blur(90px);
+				opacity: 0.3;
+				pointer-events: none;
 			}
 			.coda h2 {
-				margin: 0 0 0.6rem;
-				font-size: clamp(1.9rem, 1.5rem + 1.4vw, 2.8rem);
-				letter-spacing: -0.03em;
+				margin: 0 0 0.75rem;
+				font-family: var(--font-display);
+				font-weight: 400;
+				font-size: clamp(2.2rem, 1.6rem + 2.2vw, 3.4rem);
+				line-height: 1;
+			}
+			.coda h2 em {
+				font-style: italic;
+				color: var(--accent);
+			}
+			.coda-copy {
+				position: relative;
 			}
 			.coda-copy p {
 				max-width: 64ch;
@@ -735,12 +671,14 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.6rem;
-				margin-top: 1.5rem;
+				margin-top: 1.75rem;
 			}
 
 			@media (max-width: 720px) {
 				.toolbar {
-					top: 56px;
+					top: 74px;
+				}
+				.toolbar-inner {
 					gap: 0.6rem;
 				}
 				.search {
@@ -758,25 +696,11 @@ const heroUrl = (file?: string) => (file ? heroUrls[`../assets/${file}`] : undef
 				.tag-filters::-webkit-scrollbar {
 					display: none;
 				}
-				.tag-filter {
+				.chip {
 					flex: 0 0 auto;
 				}
 				.result-count {
-					margin-left: 0;
-				}
-				.stats {
-					gap: 1.5rem;
-				}
-			}
-
-			@media (prefers-reduced-motion: reduce) {
-				.card,
-				.btn,
-				.tag-filter {
-					transition: none;
-				}
-				.card:hover {
-					transform: none;
+					margin-left: 0.25rem;
 				}
 			}
 		</style>

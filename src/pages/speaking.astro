@@ -37,9 +37,9 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 	<body>
 		<Header />
 		<main>
-			<header class="page-head">
+			<header class="page-head enter">
 				<p class="eyebrow">Speaking</p>
-				<h1>Talks &amp; appearances</h1>
+				<h1 class="display">Talks &amp; <em>appearances</em></h1>
 				<p class="lede">
 					I've been talking about .NET, mobile and open source since {FIRST_YEAR} — on conference
 					stages, community standups, user groups and a lot of live streams. If your event needs a
@@ -52,9 +52,9 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 				</dl>
 			</header>
 
-			<section class="invite" aria-labelledby="invite-title">
-				<div class="invite-copy">
-					<h2 id="invite-title">Have me speak at your event</h2>
+			<section class="invite" aria-labelledby="invite-title" data-reveal-group>
+				<div class="invite-copy" data-reveal>
+					<h2 id="invite-title">Have me speak at <em>your</em> event</h2>
 					<p>
 						User group, conference, podcast or company lunch-and-learn — I'm happy to travel or dial
 						in. I talk about my open source work, .NET in general, and 25 years of shipping software
@@ -101,7 +101,7 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 					</div>
 				</div>
 
-				<aside class="show" aria-labelledby="show-title">
+				<aside class="show surface-card spotlight" aria-labelledby="show-title" data-reveal>
 					<a class="show-media" href="https://www.youtube.com/@GoneDotNet" target="_blank" rel="noopener noreferrer">
 						<Image src={gonedotnet} alt="Gone .NET" width={640} densities={[1, 2]} />
 					</a>
@@ -141,9 +141,9 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 			</section>
 
 			<section class="archive" aria-labelledby="archive-title">
-				<header class="archive-head">
+				<header class="archive-head" data-reveal>
 					<div class="archive-heading">
-						<h2 id="archive-title">Past talks</h2>
+						<h2 id="archive-title">Past <em>talks</em></h2>
 						<span class="archive-count" data-count aria-live="polite">{TOTAL_TALKS} talks</span>
 					</div>
 					<div class="filters" role="group" aria-label="Filter by format">
@@ -163,10 +163,11 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 				{
 					years.map(({ year, items }) => (
 						<section class="year" data-year aria-label={`Talks from ${year}`}>
-							<h3 class="year-marker">{year}</h3>
+							<h3 class="year-marker" data-reveal>{year}</h3>
 							<ol class="timeline" role="list">
 								{items.map((talk) => (
 									<li
+										data-reveal
 										class="entry"
 										data-talk
 										data-format={talk.format}
@@ -268,113 +269,94 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 
 		<style>
 			main {
-				width: min(1080px, calc(100% - 2.5rem));
+				width: min(1120px, calc(100% - 2.5rem));
 				max-width: none;
 				margin: 0 auto;
-				padding: 0 0 5rem;
-			}
-
-			/* ---------- page head ---------- */
-
-			.page-head {
-				padding: 3.5rem 0 2.5rem;
-			}
-			.eyebrow {
-				margin: 0 0 0.5rem;
-				font-size: 0.8rem;
-				font-weight: 700;
-				letter-spacing: 0.14em;
-				text-transform: uppercase;
-				color: var(--accent);
-			}
-			.page-head h1 {
-				margin: 0 0 0.5rem;
-				font-size: clamp(2.4rem, 1.8rem + 2.8vw, 4rem);
-				letter-spacing: -0.03em;
-				text-wrap: balance;
-			}
-			.lede {
-				max-width: 62ch;
-				margin: 0;
-				font-size: 1.05rem;
-				color: rgb(var(--gray));
-				text-wrap: pretty;
-			}
-			.stats {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2.5rem;
-				margin: 2rem 0 0;
-			}
-			.stats dt {
-				font-size: 0.72rem;
-				font-weight: 700;
-				letter-spacing: 0.12em;
-				text-transform: uppercase;
-				color: rgb(var(--gray));
-			}
-			.stats dd {
-				margin: 0.15rem 0 0;
-				font-size: 1.7rem;
-				font-weight: 700;
-				line-height: 1;
-				color: rgb(var(--black));
+				padding: 0;
 			}
 
 			/* ---------- invite + show ---------- */
 
 			.invite {
 				display: grid;
-				gap: 1.25rem;
-				margin-top: 1rem;
+				gap: 1.5rem;
 			}
 			@media (min-width: 900px) {
 				.invite {
-					grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+					grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
 					align-items: stretch;
 				}
 			}
 
 			.invite-copy {
+				position: relative;
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
-				padding: clamp(1.4rem, 3vw, 2.1rem);
-				color: #f8fafc;
-				background:
-					radial-gradient(120% 120% at 0% 0%, rgba(99, 102, 241, 0.55), transparent 60%),
-					linear-gradient(135deg, #0b1020, #161c3d 55%, #0b1020);
-				border-radius: 16px;
+				padding: clamp(1.75rem, 4vw, 2.75rem);
+				overflow: hidden;
+				isolation: isolate;
+				color: #f4f2fc;
+				background: #0e0c1a;
+				border-radius: calc(var(--radius-lg) + 8px);
+				box-shadow: var(--box-shadow);
+			}
+			.invite-copy::before {
+				content: '';
+				position: absolute;
+				inset: -50%;
+				z-index: -1;
+				background: conic-gradient(from 0deg, #5b3df5, #b23fd6, #f0613b, #f08a24, #5b3df5);
+				filter: blur(90px);
+				opacity: 0.45;
+				animation: spin 20s linear infinite;
+			}
+			.invite-copy::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				z-index: -1;
+				background: radial-gradient(90% 90% at 100% 100%, rgba(14, 12, 26, 0.1), rgba(14, 12, 26, 0.8));
+			}
+			@keyframes spin {
+				to {
+					rotate: 360deg;
+				}
 			}
 			.invite-copy h2 {
-				margin: 0 0 0.6rem;
-				font-size: clamp(1.7rem, 1.4rem + 1.2vw, 2.4rem);
-				letter-spacing: -0.03em;
+				margin: 0 0 0.8rem;
+				font-family: var(--font-display);
+				font-weight: 400;
+				font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
+				line-height: 1;
 				color: #fff;
-				text-wrap: balance;
+			}
+			.invite-copy h2 em {
+				font-style: italic;
+				color: #ffb074;
 			}
 			.invite-copy p {
 				max-width: 46ch;
 				margin: 0;
-				font-size: 0.95rem;
-				line-height: 1.55;
-				color: rgba(248, 250, 252, 0.82);
+				font-size: 0.98rem;
+				line-height: 1.6;
+				color: rgba(244, 242, 252, 0.8);
 				text-wrap: pretty;
 			}
 			.topics {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.4rem;
-				margin: 1.2rem 0 0;
+				margin: 1.4rem 0 0;
 				padding: 0;
 			}
 			.topics li {
 				list-style: none;
-				padding: 0.3rem 0.6rem;
-				font-size: 0.75rem;
+				padding: 0.32rem 0.7rem;
+				font-size: 0.76rem;
 				line-height: 1.3;
-				color: rgba(248, 250, 252, 0.92);
-				background: rgba(255, 255, 255, 0.1);
+				color: rgba(244, 242, 252, 0.92);
+				background: rgba(255, 255, 255, 0.08);
 				border: 1px solid rgba(255, 255, 255, 0.16);
 				border-radius: 999px;
 			}
@@ -382,43 +364,38 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.6rem;
-				margin-top: 1.6rem;
+				margin-top: 1.8rem;
 			}
 			.invite-copy .btn--primary {
 				background: #fff;
 				border-color: #fff;
-				color: #0b1020;
+				color: #0e0c1a;
 			}
 			.invite-copy .btn--primary:hover {
-				background: rgba(255, 255, 255, 0.86);
-				border-color: rgba(255, 255, 255, 0.86);
-				color: #0b1020;
+				color: #0e0c1a;
 			}
 			.invite-copy .btn--secondary {
-				background: transparent;
-				border-color: rgba(255, 255, 255, 0.34);
-				color: #f8fafc;
+				background: rgba(255, 255, 255, 0.06);
+				border-color: rgba(255, 255, 255, 0.28);
+				color: #fff;
 			}
 			.invite-copy .btn--secondary:hover {
+				background: rgba(255, 255, 255, 0.14);
 				border-color: #fff;
-				background: rgba(255, 255, 255, 0.08);
 				color: #fff;
 			}
 
 			.show {
 				display: flex;
 				flex-direction: column;
-				overflow: hidden;
-				background: var(--surface);
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 16px;
+				padding: 8px;
 			}
 			.show-media {
 				display: block;
 				aspect-ratio: 16 / 9;
 				overflow: hidden;
 				background: rgba(var(--gray-light), 50%);
-				border-bottom: 1px solid rgb(var(--gray-light));
+				border-radius: calc(var(--radius-lg) - 8px);
 			}
 			.show-media :global(img) {
 				display: block;
@@ -427,11 +404,11 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 				object-fit: cover;
 				border-radius: 0;
 				margin: 0;
-				transition: transform 0.3s ease;
+				transition: transform 0.9s var(--ease-out);
 			}
 			@media (hover: hover) and (pointer: fine) {
-				.show-media:hover :global(img) {
-					transform: scale(1.03);
+				.show:hover .show-media :global(img) {
+					transform: scale(1.05);
 				}
 			}
 			.show-copy {
@@ -439,137 +416,99 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 				flex: 1;
 				flex-direction: column;
 				gap: 0.55rem;
-				padding: clamp(1.1rem, 2vw, 1.5rem);
+				padding: 1.25rem 1rem 1rem;
 			}
 			.show-flag {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.45rem;
 				margin: 0;
-				font-size: 0.7rem;
-				font-weight: 700;
+				font-family: var(--font-mono);
+				font-size: 0.68rem;
 				letter-spacing: 0.14em;
 				text-transform: uppercase;
-				color: var(--accent);
+				color: rgb(var(--gray));
+			}
+			/* a live dot */
+			.show-flag::before {
+				content: '';
+				width: 7px;
+				height: 7px;
+				border-radius: 50%;
+				background: #ef4444;
+				box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+				animation: live 1.8s ease-out infinite;
+			}
+			@keyframes live {
+				to {
+					box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+				}
 			}
 			.show-copy h2 {
 				margin: 0;
-				font-size: 1.6rem;
-				letter-spacing: -0.02em;
+				font-family: var(--font-display);
+				font-weight: 400;
+				font-size: 2.2rem;
+				line-height: 1;
 			}
 			.show-copy p {
 				margin: 0;
-				font-size: 0.9rem;
-				line-height: 1.5;
-				color: rgb(var(--gray-dark));
+				font-size: 0.93rem;
+				line-height: 1.6;
+				color: rgb(var(--gray));
 				text-wrap: pretty;
 			}
 			.show-links {
+				position: relative;
+				z-index: 1;
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.5rem;
 				margin-top: auto;
-				padding-top: 0.85rem;
-			}
-
-			/* ---------- shared buttons ---------- */
-
-			.btn {
-				display: inline-flex;
-				align-items: center;
-				gap: 0.4rem;
-				padding: 0.55rem 0.9rem;
-				font-size: 0.85rem;
-				font-weight: 700;
-				line-height: 1;
-				text-decoration: none;
-				border: 1px solid transparent;
-				border-radius: 8px;
-				transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-			}
-			.btn svg {
-				flex: 0 0 auto;
-				width: 1rem;
-				height: 1rem;
-			}
-			.btn--primary {
-				background: var(--accent);
-				border-color: var(--accent);
-				color: var(--on-accent);
-			}
-			.btn--primary:hover {
-				background: var(--accent-dark);
-				border-color: var(--accent-dark);
-				color: var(--on-accent);
-			}
-			.btn--secondary {
-				background: var(--surface);
-				border-color: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-			}
-			.btn--secondary:hover {
-				border-color: var(--accent);
-				color: var(--accent);
+				padding-top: 1rem;
 			}
 
 			/* ---------- archive ---------- */
 
 			.archive {
-				margin-top: clamp(3.5rem, 6vw, 5rem);
+				margin-top: clamp(4rem, 8vw, 6.5rem);
 			}
 			.archive-head {
 				display: grid;
-				gap: 1rem;
-				padding-bottom: 1rem;
-				border-bottom: 1px solid rgb(var(--gray-light));
+				gap: 1.25rem;
+				padding-bottom: 1.25rem;
+				border-bottom: 1px solid var(--border);
 			}
 			.archive-heading {
 				display: flex;
 				align-items: baseline;
-				justify-content: space-between;
 				gap: 1rem;
 			}
 			.archive-heading h2 {
 				margin: 0;
-				font-size: clamp(1.9rem, 1.5rem + 1.4vw, 2.6rem);
-				letter-spacing: -0.03em;
+				font-family: var(--font-display);
+				font-weight: 400;
+				font-size: clamp(2.2rem, 1.6rem + 2.2vw, 3.4rem);
+				line-height: 1;
+			}
+			.archive-heading h2 em {
+				font-style: italic;
+				color: var(--accent);
 			}
 			.archive-count {
 				flex: 0 0 auto;
-				font-size: 0.75rem;
-				font-weight: 700;
-				letter-spacing: 0.1em;
-				text-transform: uppercase;
-				color: var(--accent);
+				padding: 0.3rem 0.65rem;
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				color: rgb(var(--gray));
 				white-space: nowrap;
+				border: 1px solid var(--border);
+				border-radius: 999px;
 			}
 			.filters {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.4rem;
-			}
-			.chip {
-				padding: 0.35rem 0.7rem;
-				font-family: inherit;
-				font-size: 0.78rem;
-				font-weight: 700;
-				line-height: 1;
-				color: rgb(var(--gray-dark));
-				background: var(--surface);
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 999px;
-				cursor: pointer;
-				transition: all 0.15s ease;
-			}
-			.chip:hover {
-				border-color: var(--accent);
-				color: var(--accent);
-			}
-			.chip[aria-pressed='true'] {
-				background: var(--accent);
-				border-color: var(--accent);
-				color: var(--on-accent);
-			}
-			.chip--clear {
-				color: rgb(var(--gray));
-				border-style: dashed;
 			}
 
 			.empty-state {
@@ -582,8 +521,8 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 
 			.year {
 				display: grid;
-				gap: 0.5rem 2rem;
-				padding-top: 2.25rem;
+				gap: 0.75rem 2.5rem;
+				padding-top: 2.75rem;
 			}
 			/* `display: grid` outranks the UA's [hidden] rule, so say it explicitly */
 			.year[hidden] {
@@ -591,33 +530,46 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 			}
 			@media (min-width: 820px) {
 				.year {
-					grid-template-columns: 6rem minmax(0, 1fr);
+					grid-template-columns: 8rem minmax(0, 1fr);
 				}
 				.year-marker {
 					position: sticky;
-					top: 90px;
+					top: 110px;
 					align-self: start;
 					text-align: right;
 				}
 			}
 			.year-marker {
 				margin: 0;
-				font-size: 1.5rem;
-				font-weight: 700;
-				line-height: 1;
-				color: rgb(var(--gray));
-				letter-spacing: -0.02em;
+				font-family: var(--font-display);
+				font-size: 3rem;
+				font-weight: 400;
+				line-height: 0.9;
+				color: transparent;
+				background: linear-gradient(180deg, rgb(var(--black)), rgba(var(--black), 0.25));
+				-webkit-background-clip: text;
+				background-clip: text;
 			}
 
 			.timeline {
+				position: relative;
 				margin: 0;
-				padding: 0 0 0 1.6rem;
+				padding: 0 0 0 1.75rem;
 				list-style: none;
-				border-left: 2px solid rgb(var(--gray-light));
+			}
+			/* the rail fades in and out at its ends */
+			.timeline::before {
+				content: '';
+				position: absolute;
+				top: 0.4rem;
+				bottom: 0;
+				left: 0;
+				width: 1px;
+				background: linear-gradient(180deg, var(--accent), rgb(var(--gray-light)) 30%, rgb(var(--gray-light)) 85%, transparent);
 			}
 			.entry {
 				position: relative;
-				padding: 0 0 1.6rem;
+				padding: 0 0 1.75rem;
 			}
 			.entry:last-child {
 				padding-bottom: 0;
@@ -626,113 +578,133 @@ const formatDate = (iso: string, monthOnly?: boolean) =>
 			.entry::before {
 				content: '';
 				position: absolute;
-				top: 0.55rem;
-				left: calc(-1.6rem - 6px);
-				width: 10px;
-				height: 10px;
-				background: var(--surface);
+				top: 0.5rem;
+				left: calc(-1.75rem - 5px);
+				width: 11px;
+				height: 11px;
+				background: var(--page-bg);
 				border: 2px solid rgb(var(--gray-light));
 				border-radius: 50%;
-				transition: border-color 0.2s ease, background-color 0.2s ease;
+				transition:
+					border-color 0.3s ease,
+					background-color 0.3s ease,
+					transform 0.4s var(--ease-spring),
+					box-shadow 0.3s ease;
 			}
 			@media (hover: hover) and (pointer: fine) {
 				.entry:hover::before {
 					border-color: var(--accent);
 					background: var(--accent);
+					transform: scale(1.3);
+					box-shadow: 0 0 0 5px var(--accent-soft);
 				}
+			}
+			.entry article {
+				padding: 0.1rem 0;
+				transition: transform 0.4s var(--ease-out);
+			}
+			.entry:hover article {
+				transform: translateX(4px);
 			}
 			.entry-meta {
 				display: flex;
 				flex-wrap: wrap;
 				align-items: center;
 				gap: 0.5rem;
-				margin-bottom: 0.25rem;
+				margin-bottom: 0.3rem;
 			}
 			.entry-meta time {
-				font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-				font-size: 0.74rem;
+				font-family: var(--font-mono);
+				font-size: 0.72rem;
 				color: rgb(var(--gray));
 			}
 			.format {
-				padding: 0.15rem 0.45rem;
+				--tone: var(--accent);
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35rem;
+				padding: 0.18rem 0.55rem;
 				font-size: 0.66rem;
-				font-weight: 700;
-				letter-spacing: 0.06em;
+				font-weight: 560;
+				letter-spacing: 0.04em;
 				text-transform: uppercase;
-				color: rgb(var(--gray-dark));
-				background: rgba(var(--gray-light), 60%);
-				border-radius: 4px;
+				color: color-mix(in srgb, var(--tone) 80%, rgb(var(--black)));
+				background: color-mix(in srgb, var(--tone) 12%, transparent);
+				border: 1px solid color-mix(in srgb, var(--tone) 25%, transparent);
+				border-radius: 999px;
+			}
+			.format::before {
+				content: '';
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: var(--tone);
 			}
 			.format[data-format-badge='Conference'] {
-				color: #1e40af;
-				background: #dbeafe;
+				--tone: #5b6cf5;
 			}
 			.format[data-format-badge='Community standup'] {
-				color: #5b21b6;
-				background: #ede9fe;
+				--tone: #9b51e0;
 			}
 			.format[data-format-badge='Live stream'] {
-				color: #9f1239;
-				background: #ffe4e6;
+				--tone: #e0457b;
 			}
 			.format[data-format-badge='User group'] {
-				color: #065f46;
-				background: #d1fae5;
+				--tone: #10a37f;
 			}
 			.format[data-format-badge='Podcast'] {
-				color: #92400e;
-				background: #fef3c7;
+				--tone: #e08a1e;
 			}
 			.format[data-format-badge='Workshop'] {
-				color: #155e75;
-				background: #cffafe;
+				--tone: #0ea5b7;
 			}
 			.entry h4 {
 				margin: 0;
 				font-size: 1.12rem;
-				font-weight: 700;
-				line-height: 1.3;
+				font-weight: 600;
+				line-height: 1.35;
 				color: rgb(var(--black));
-				letter-spacing: -0.01em;
+				letter-spacing: -0.015em;
 				text-wrap: pretty;
 			}
 			.entry-event {
-				margin: 0.15rem 0 0;
-				font-size: 0.88rem;
+				margin: 0.2rem 0 0;
+				font-size: 0.9rem;
 				color: rgb(var(--gray));
 			}
 			.entry-links {
 				display: flex;
 				flex-wrap: wrap;
-				gap: 0.9rem;
-				margin-top: 0.45rem;
+				gap: 0.4rem;
+				margin-top: 0.6rem;
 			}
 			.entry-links a {
 				display: inline-flex;
 				align-items: center;
 				gap: 0.25rem;
-				font-size: 0.82rem;
-				font-weight: 700;
+				padding: 0.28rem 0.65rem;
+				font-size: 0.78rem;
+				font-weight: 520;
 				text-decoration: none;
+				color: rgb(var(--black));
+				background: var(--glass);
+				border: 1px solid var(--border-strong);
+				border-radius: 999px;
+				transition:
+					border-color 0.2s ease,
+					color 0.2s ease;
 			}
 			.entry-links a:hover {
-				text-decoration: underline;
+				border-color: var(--accent);
+				color: var(--accent);
 			}
 			.entry-links svg {
-				width: 0.85rem;
-				height: 0.85rem;
+				width: 0.8rem;
+				height: 0.8rem;
+				transition: transform 0.3s var(--ease-spring);
 			}
-
-			@media (prefers-reduced-motion: reduce) {
-				.btn,
-				.chip,
-				.entry::before,
-				.show-media :global(img) {
-					transition: none;
-				}
-				.show-media:hover :global(img) {
-					transform: none;
-				}
+			.entry-links a:hover svg {
+				transform: translate(2px, -2px);
 			}
 		</style>
 	</body>

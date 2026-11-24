@@ -83,15 +83,20 @@ import shinyicon from '../assets/shinyicon.png';
 		display: flex;
 		text-decoration: none;
 		color: rgb(var(--gray));
-		transition: color 0.2s ease, opacity 0.2s ease;
+		transition:
+			color 0.2s ease,
+			background-color 0.2s ease,
+			transform 0.35s var(--ease-spring);
 	}
 	.social-links a:hover {
-		color: rgb(var(--gray-dark));
-		opacity: 0.85;
+		color: rgb(var(--black));
+		transform: translateY(-2px);
 	}
 	.social-links :is(svg, img) {
 		display: block;
 		width: var(--social-icon-size, 32px);
 		height: var(--social-icon-size, 32px);
+		margin: 0;
+		border-radius: 0;
 	}
 </style>
